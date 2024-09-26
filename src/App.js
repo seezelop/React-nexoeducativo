@@ -4,7 +4,6 @@ import './App.css';
 class App extends Component {
   constructor(props) {
     super(props);
-    // Definir el estado inicial
     this.state = {
       nombre: '',
       apellido: '',
@@ -14,7 +13,6 @@ class App extends Component {
     };
   }
 
-  // Manejar los cambios en los campos del formulario
   manejarCambio = (event) => {
     const { name, value, type, checked } = event.target;
     this.setState({
@@ -22,17 +20,35 @@ class App extends Component {
     });
   };
 
-  // Manejar el envío del formulario
-  manejarEnvio = (event) => {
+  // Modificar el método manejarEnvio para enviar los datos al backend
+  manejarEnvio = async (event) => {
     event.preventDefault();
-    console.log('Formulario enviado:', this.state);
-    // Aquí podrías enviar los datos a un backend o procesarlos
+
+    // Aquí debes enviar los datos al backend
+    try {
+      const respuesta = await fetch('http://localhost:8080/api/guardarUsuario', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(this.state),
+      });
+
+      if (respuesta.ok) {
+        const datos = await respuesta.json();
+        console.log('Datos guardados:', datos);
+      } else {
+        console.error('Error al guardar los datos');
+      }
+    } catch (error) {
+      console.error('Error en la conexión con el backend:', error);
+    }
   };
 
   render() {
     return (
       <div className="App">
-        <h1>Formulario de Registro de usuarios</h1>
+        <h1>Formulario de Registro</h1>
         <form onSubmit={this.manejarEnvio}>
           <div>
             <label>Nombre:</label>
