@@ -8,7 +8,7 @@ class App extends Component {
       nombre: '',
       apellido: '',
       dni: '',
-      email: '',
+      eMail: '',
       activo: false,
     };
   }
@@ -22,26 +22,35 @@ class App extends Component {
 
   // Modificar el método manejarEnvio para enviar los datos al backend
   manejarEnvio = async (event) => {
-    event.preventDefault();
-
-    // Aquí debes enviar los datos al backend
+    event.preventDefault(); // Evita la recarga de la página
+  
     try {
-      const respuesta = await fetch('http://localhost:8080/api/guardarUsuario', {
-        method: 'POST',
+      // Convertir el DNI a número
+      const formData = {
+        ...this.state,
+        dni: parseInt(this.state.dni, 10),
+      };
+  
+      // Hacer la petición fetch al backend en el endpoint "/usuario"
+      const respuesta = await fetch('http://localhost:8080/usuario', {
+        method: 'POST', // Tipo de petición: POST
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json', // Indicar que se envía JSON
         },
-        body: JSON.stringify(this.state),
+        body: JSON.stringify(formData), // Enviar los datos del formulario
       });
-
-      if (respuesta.ok) {
-        const datos = await respuesta.json();
+  
+      if (respuesta.ok) { // Si la respuesta es exitosa
+        const datos = await respuesta.json(); // Obtener los datos de la respuesta
         console.log('Datos guardados:', datos);
+        alert('Usuario creado exitosamente');
       } else {
         console.error('Error al guardar los datos');
+        alert('Error al crear el usuario');
       }
     } catch (error) {
       console.error('Error en la conexión con el backend:', error);
+      alert('Error en la conexión con el servidor');
     }
   };
 
@@ -73,7 +82,7 @@ class App extends Component {
           <div>
             <label>DNI:</label>
             <input
-              type="text"
+              type="number" // Cambiamos a tipo "number" para que sea más intuitivo
               name="dni"
               value={this.state.dni}
               onChange={this.manejarCambio}
@@ -84,8 +93,8 @@ class App extends Component {
             <label>Email:</label>
             <input
               type="email"
-              name="email"
-              value={this.state.email}
+              name="eMail" 
+              value={this.state.eMail}
               onChange={this.manejarCambio}
               required
             />
