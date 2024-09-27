@@ -39,10 +39,9 @@ class App extends Component {
         },
         body: JSON.stringify(formData), // Enviar los datos del formulario
       });
-  
+
       if (respuesta.ok) { // Si la respuesta es exitosa
-        const datos = await respuesta.json(); // Obtener los datos de la respuesta
-        console.log('Datos guardados:', datos);
+        console.log('Datos guardados:');
         alert('Usuario creado exitosamente');
       } else {
         console.error('Error al guardar los datos');
