@@ -54,16 +54,15 @@ class Header extends Component {
                 </div>
               </li>
             </ul>
-            <form className="d-flex">
-              <input
-                className="form-control me-sm-2"
-                type="search"
-                placeholder="Search"
-              />
-              <button className="btn btn-secondary my-2 my-sm-0" type="submit">
-                Search
-              </button>
-            </form>
+
+             {/* Ícono de inicio de sesión al final del navbar */}
+            <ul className="navbar-nav ms-auto"> {/* Alinea el ícono a la derecha */}
+              <li className="nav-item">
+                <a className="nav-link" href="#">
+                  <i className="fa-regular fa-circle-user"></i> {/* Icono de usuario */}
+                </a>
+              </li>
+            </ul>
           </div>
         </div>
       </nav>
