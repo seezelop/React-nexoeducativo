@@ -7,13 +7,27 @@ function App() {
   return (
     <div className="App">
       <Header />
-      <div className="container my-4">
-      <Carousel />
-      <Footer />
-      </div>
       
+       {/* Sección principal con título y descripción */}
+       <section className="container my-4">
+        <h1 className="text-center">Bienvenido a Nexo Educativo</h1> 
+        <p className="text-center">
+          Aca va a ir nuestra descripción
+        </p> 
+      </section>
+      
+      {/* Sección del carrusel */}
+      <section className="container my-4">
+        <Carousel />
+      </section>
+      
+      {/* Sección del footer */}
+      <section className="container my-4">
+        <Footer />
+      </section>
     </div>
   );
 }
 
 export default App;
+
