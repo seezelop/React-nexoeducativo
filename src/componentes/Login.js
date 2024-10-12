@@ -18,7 +18,7 @@ function Login() {
       const userDoc = await getDoc(doc(db, "usuarios", user.uid));
       if (userDoc.exists()) {
         const userData = userDoc.data();
-        if (userData.role === "admin") {
+        if (userData.rol === "admin") {
           console.log("El usuario es administrador");
           // Redirigir a la página de admin
         } else {
