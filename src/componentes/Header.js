@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { Link } from 'react-router-dom'; // Importamos Link
 
 class Header extends Component {
   render() {
@@ -56,11 +57,12 @@ class Header extends Component {
             </ul>
 
              {/* Ícono de inicio de sesión al final del navbar */}
-            <ul className="navbar-nav ms-auto"> {/* Alinea el ícono a la derecha */}
+            <ul className="navbar-nav ms-auto">
               <li className="nav-item">
-                <a className="nav-link" href="#">
+                {/* Cambiamos <a> por Link para navegar sin recargar la página */}
+                <Link className="nav-link" to="/login">
                   <i className="fa-regular fa-circle-user"></i> {/* Icono de usuario */}
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
