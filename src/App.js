@@ -1,11 +1,11 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'; // Importa los componentes de react-router-dom
-import Header from './componentes/Header';
-import Carousel from './componentes/Carousel';
-import Footer from './componentes/Footer';
-import Login from './componentes/Login';
-import Admin from './componentes/Admin'; // Importa el componente Admin
-import User from './componentes/User';   // Importa el componente User
+import Header from './componentes/templates/Header';
+import Carousel from './componentes/templates/Carousel';
+import Footer from './componentes/templates/Footer';
+import Login from './componentes/pages/Login';
+import Admin from './componentes/pages/Admin'; // Importa el componente Admin
+import User from './componentes/pages/User';   // Importa el componente User
 
 function App() {
   return (
