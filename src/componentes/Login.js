@@ -9,29 +9,32 @@ function Login() {
   const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
+  e.preventDefault();
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
 
-      // Verificamos si es administrador o usuario común
-      const userDoc = await getDoc(doc(db, "usuarios", user.uid));
-      if (userDoc.exists()) {
-        const userData = userDoc.data();
-        if (userData.rol === "admin") {
-          console.log("El usuario es administrador");
-          // Redirigir a la página de admin
-        } else {
-          console.log("El usuario es común");
-          // Redirigir a la página de usuario común
-        }
+    console.log("UID del usuario autenticado:", user.uid); // Agrega esta línea
+
+    // Verificamos si es administrador o usuario común
+    const userDoc = await getDoc(doc(db, "usuarios", user.uid));
+    if (userDoc.exists()) {
+      const userData = userDoc.data();
+      if (userData.rol === "admin") {
+        console.log("El usuario es administrador");
+        // Redirigir a la página de admin
       } else {
-        console.log("No se encontró información del usuario");
+        console.log("El usuario es común");
+        // Redirigir a la página de usuario común
       }
-    } catch (error) {
-      setError("Error al iniciar sesión: " + error.message);
+    } else {
+      console.log("No se encontró información del usuario");
     }
-  };
+  } catch (error) {
+    setError("Error al iniciar sesión: " + error.message);
+  }
+};
+
 
   return (
     <div className="container d-flex justify-content-center align-items-center vh-100">
