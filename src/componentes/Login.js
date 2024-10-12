@@ -2,39 +2,35 @@ import React, { useState } from 'react';
 import { auth, db } from '../firebase';
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
+import { useNavigate } from 'react-router-dom'; // Importa useNavigate
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const navigate = useNavigate(); // Inicializa el hook useNavigate
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  try {
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
+    e.preventDefault();
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
 
-    console.log("UID del usuario autenticado:", user.uid); // Agrega esta línea
-
-    // Verificamos si es administrador o usuario común
-    const userDoc = await getDoc(doc(db, "usuarios", user.uid));
-    if (userDoc.exists()) {
-      const userData = userDoc.data();
-      if (userData.rol === "admin") {
-        console.log("El usuario es administrador");
-        // Redirigir a la página de admin
+      const userDoc = await getDoc(doc(db, "usuarios", user.uid));
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        if (userData.rol === "admin") {
+          navigate('/admin'); // Redirige a la página del admin
+        } else {
+          navigate('/user');  // Redirige a la página de usuario común
+        }
       } else {
-        console.log("El usuario es común");
-        // Redirigir a la página de usuario común
+        setError("No se encontró información del usuario");
       }
-    } else {
-      console.log("No se encontró información del usuario");
+    } catch (error) {
+      setError("Error al iniciar sesión: " + error.message);
     }
-  } catch (error) {
-    setError("Error al iniciar sesión: " + error.message);
-  }
-};
-
+  };
 
   return (
     <div className="container d-flex justify-content-center align-items-center vh-100">
@@ -50,7 +46,7 @@ function Login() {
               placeholder="Ingrese su correo"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              style={{ padding: '10px', width: '100%' }} // Ajustar tamaño
+              style={{ padding: '10px', width: '100%' }}
             />
           </div>
           <div className="mb-3">
@@ -62,7 +58,7 @@ function Login() {
               placeholder="Ingrese su contraseña"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              style={{ padding: '10px', width: '100%' }} // Ajustar tamaño
+              style={{ padding: '10px', width: '100%' }}
             />
           </div>
           {error && <p className="text-danger">{error}</p>}

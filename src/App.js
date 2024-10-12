@@ -4,6 +4,8 @@ import Header from './componentes/Header';
 import Carousel from './componentes/Carousel';
 import Footer from './componentes/Footer';
 import Login from './componentes/Login';
+import Admin from './componentes/Admin'; // Importa el componente Admin
+import User from './componentes/User';   // Importa el componente User
 
 function App() {
   return (
@@ -13,6 +15,7 @@ function App() {
         
         {/* Configuramos las rutas */}
         <Routes>
+          {/* Ruta principal */}
           <Route path="/" element={ 
             <>
               {/* Sección principal con título y descripción */}
@@ -37,6 +40,10 @@ function App() {
 
           {/* Ruta para la página de login */}
           <Route path="/login" element={<Login />} /> {/* Aquí renderiza el componente Login */}
+
+          {/* Rutas para admin y user */}
+          <Route path="/admin" element={<Admin />} /> {/* Renderiza el componente Admin */}
+          <Route path="/user" element={<User />} />   {/* Renderiza el componente User */}
         </Routes>
       </div>
     </Router>
