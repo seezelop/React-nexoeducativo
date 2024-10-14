@@ -6,7 +6,7 @@ class Header extends Component {
     return (
       <nav className="navbar navbar-expand-lg bg-dark" data-bs-theme="dark">
         <div className="container-fluid">
-          <a className="navbar-brand" href="#">Navbar</a>
+          <Link className="nav-link active" to="/App">Navbar</Link>
           <button
             className="navbar-toggler"
             type="button"
@@ -21,39 +21,18 @@ class Header extends Component {
           <div className="collapse navbar-collapse" id="navbarColor02">
             <ul className="navbar-nav me-auto">
               <li className="nav-item">
-                <a className="nav-link active" href="#">
-                  Home
-                  <span className="visually-hidden">(current)</span>
-                </a>
+                <a className="nav-link active" href="">Que ofrecemos?</a>
               </li>
               <li className="nav-item">
-                <a className="nav-link" href="#">Features</a>
+                <a className="nav-link active" href="#">Preguntas Frecuentes</a>
               </li>
               <li className="nav-item">
-                <a className="nav-link" href="#">Pricing</a>
+                <Link className="nav-link active" to="/SobreNosotros">Sobre nosotros</Link>
               </li>
               <li className="nav-item">
-                <a className="nav-link" href="#">About</a>
+                <Link className="nav-link active" to="/Contacto" >Contacto</Link>
               </li>
-              <li className="nav-item dropdown">
-                <a
-                  className="nav-link dropdown-toggle"
-                  data-bs-toggle="dropdown"
-                  href="#"
-                  role="button"
-                  aria-haspopup="true"
-                  aria-expanded="false"
-                >
-                  Dropdown
-                </a>
-                <div className="dropdown-menu">
-                  <a className="dropdown-item" href="#">Action</a>
-                  <a className="dropdown-item" href="#">Another action</a>
-                  <a className="dropdown-item" href="#">Something else here</a>
-                  <div className="dropdown-divider"></div>
-                  <a className="dropdown-item" href="#">Separated link</a>
-                </div>
-              </li>
+              
             </ul>
 
              {/* Ícono de inicio de sesión al final del navbar */}

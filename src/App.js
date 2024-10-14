@@ -6,6 +6,8 @@ import Footer from './componentes/templates/Footer';
 import Login from './componentes/pages/Login';
 import Admin from './componentes/pages/Admin'; // Importa el componente Admin
 import User from './componentes/pages/User';   // Importa el componente User
+import SobreNosotros from './componentes/pages/SobreNosotros';
+import Contacto from './componentes/pages/Contacto';
 
 function App() {
   return (
@@ -40,6 +42,10 @@ function App() {
 
           {/* Ruta para la página de login */}
           <Route path="/login" element={<Login />} /> {/* Aquí renderiza el componente Login */}
+
+          <Route path="/sobrenosotros" element={<SobreNosotros />} /> {/* Aquí renderiza el componente SobreNostros */}
+
+          <Route path="/contacto" element={<Contacto />} /> {/* Aquí renderiza el componente Contacto */}
 
           {/* Rutas para admin y user */}
           <Route path="/admin" element={<Admin />} /> {/* Renderiza el componente Admin */}
