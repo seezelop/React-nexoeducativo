@@ -6,12 +6,15 @@ import Footer from './componentes/templates/Footer';
 import Login from './componentes/pages/Login';
 import Admin from './componentes/pages/Admin'; // Importa el componente Admin
 import User from './componentes/pages/User';   // Importa el componente User
+import SobreNosotros from './componentes/pages/SobreNosotros'; // Asegúrate de que esta ruta sea correcta
+
 
 function App() {
   return (
     <Router> {/* Envolvemos todo dentro de Router */}
       <div className="App">
         <Header />
+        <SobreNosotros />
         
         {/* Configuramos las rutas */}
         <Routes>

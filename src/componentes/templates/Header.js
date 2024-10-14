@@ -6,7 +6,7 @@ class Header extends Component {
     return (
       <nav className="navbar navbar-expand-lg bg-dark" data-bs-theme="dark">
         <div className="container-fluid">
-          <a className="navbar-brand" href="#">Navbar</a>
+          <Link className="nav-link active" to="/App">Navbar</Link>
           <button
             className="navbar-toggler"
             type="button"
@@ -21,13 +21,13 @@ class Header extends Component {
           <div className="collapse navbar-collapse" id="navbarColor02">
             <ul className="navbar-nav me-auto">
               <li className="nav-item">
-                <a className="nav-link active" href="#">Que ofrecemos?</a>
+                <a className="nav-link active" href="">Que ofrecemos?</a>
               </li>
               <li className="nav-item">
                 <a className="nav-link active" href="#">Preguntas Frecuentes</a>
               </li>
               <li className="nav-item">
-                <a className="nav-link active" href="#">Sobre nosotros</a>
+                <Link className="nav-link active" to="/SobreNosotros">Sobre nosotros</Link>
               </li>
               <li className="nav-item">
                 <a className="nav-link active" href="#">Contacto</a>
