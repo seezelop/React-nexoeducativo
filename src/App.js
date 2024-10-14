@@ -8,6 +8,8 @@ import Admin from './componentes/pages/Admin';
 import User from './componentes/pages/User';   
 import SobreNosotros from './componentes/pages/SobreNosotros';
 import Contacto from './componentes/pages/Contacto';
+import PreguntasFrecuentes from './componentes/pages/PreguntasFrecuentes';
+import QueOfrecemos from './componentes/pages/QueOfrecemos';
 
 function App() {
   return (
@@ -46,6 +48,9 @@ function App() {
           <Route path="/sobrenosotros" element={<SobreNosotros />} />
 
           <Route path="/contacto" element={<Contacto />} />
+
+          <Route path="/QueOfrecemos" element={<QueOfrecemos />} /> {/* Ruta para QueOfrecemos */}
+        <Route path="/PreguntasFrecuentes" element={<PreguntasFrecuentes />} /> {/* Ruta para Preguntas Frecuentes */}
 
           {/* Rutas para admin y user */}
           <Route path="/admin" element={<Admin />} /> {/* Renderiza el componente Admin */}
