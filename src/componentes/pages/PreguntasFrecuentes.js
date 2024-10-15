@@ -23,7 +23,7 @@ function PreguntasFrecuentes() {
               <strong>¿Pregunta 3?</strong>
               <p>Respuesta a la pregunta 3.</p>
             </li>
-            {/* Agrega más preguntas según sea necesario */}
+            
           </ul>
         </section>
       </section>
