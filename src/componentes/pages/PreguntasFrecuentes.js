@@ -1,5 +1,5 @@
 import React from 'react';
-import Footer from '../templates/Footer';
+
 
 function PreguntasFrecuentes() {
   return (
@@ -27,9 +27,6 @@ function PreguntasFrecuentes() {
           </ul>
         </section>
       </section>
-
-      {/* Footer colocado al final */}
-      <Footer />
     </section>
   );
 }

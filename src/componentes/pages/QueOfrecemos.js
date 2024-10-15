@@ -1,5 +1,4 @@
 import React from 'react';
-import Footer from '../templates/Footer';
 
 function QueOfrecemos() {
   return (
@@ -19,9 +18,6 @@ function QueOfrecemos() {
           </ul>
         </section>
       </section>
-
-      {/* Footer colocado al final */}
-      <Footer />
     </section>
   );
 }

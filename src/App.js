@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'; // Importa los componentes de react-router-dom
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'; 
 import Header from './componentes/templates/Header';
 import Carousel from './componentes/templates/Carousel';
 import Footer from './componentes/templates/Footer';
@@ -13,7 +13,7 @@ import QueOfrecemos from './componentes/pages/QueOfrecemos';
 
 function App() {
   return (
-    <Router> {/* Envolvemos todo dentro de Router */}
+    <Router> 
       <div className="App">
         <Header />
         
@@ -34,28 +34,22 @@ function App() {
               <section className="container my-4">
                 <Carousel />
               </section>
-
-              {/* Sección del footer */}
-              <section className="container my-4">
-                <Footer />
-              </section>
             </>
           } />
 
           {/* Ruta para la página de login */}
           <Route path="/login" element={<Login />} /> 
-
           <Route path="/sobrenosotros" element={<SobreNosotros />} />
-
           <Route path="/contacto" element={<Contacto />} />
-
-          <Route path="/QueOfrecemos" element={<QueOfrecemos />} /> {/* Ruta para QueOfrecemos */}
-        <Route path="/PreguntasFrecuentes" element={<PreguntasFrecuentes />} /> {/* Ruta para Preguntas Frecuentes */}
+          <Route path="/QueOfrecemos" element={<QueOfrecemos />} />
+          <Route path="/PreguntasFrecuentes" element={<PreguntasFrecuentes />} />
 
           {/* Rutas para admin y user */}
-          <Route path="/admin" element={<Admin />} /> {/* Renderiza el componente Admin */}
-          <Route path="/user" element={<User />} />   {/* Renderiza el componente User */}
+          <Route path="/admin" element={<Admin />} /> 
+          <Route path="/user" element={<User />} />   
         </Routes>
+
+        <Footer />
       </div>
     </Router>
   );

@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import Footer from '../templates/Footer';
 
 class Contacto extends Component {
     render() {
@@ -31,9 +30,6 @@ class Contacto extends Component {
                         </form>
                     </section>
                 </section>
-
-                {/* Footer colocado al final */}
-                <Footer />
             </section>
         );
     }
