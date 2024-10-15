@@ -5,28 +5,73 @@ class Contacto extends Component {
         return (
             <section className="d-flex flex-column min-vh-100"> {/* Contenedor principal usando section */}
                 <section className="container d-flex justify-content-center align-items-center flex-grow-1">
-                    <section className="col-md-6">
-                        <h2 className="text-center mb-4">Contacto</h2>
+                    <section className="col-md-8"> {/* Ajustamos a 8 columnas para mejor visibilidad */}
+                        <h2 className="text-center mb-4">Dejanos tu consulta</h2>
                         <form>
-                            <section className="mb-3">
-                                <label htmlFor="exampleFormControlInput1" className="form-label">Email:</label>
+                            <div className="row">
+                                {/* Campo para el Nombre */}
+                                <div className="col-md-6 mb-3">
+                                    <label htmlFor="nombre" className="form-label">Nombre:</label>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        id="nombre"
+                                        placeholder="Ingresa tu nombre"
+                                        required
+                                    />
+                                </div>
+
+                                {/* Campo para el Apellido */}
+                                <div className="col-md-6 mb-3">
+                                    <label htmlFor="apellido" className="form-label">Apellido:</label>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        id="apellido"
+                                        placeholder="Ingresa tu apellido"
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Campo para el Email */}
+                            <div className="mb-3">
+                                <label htmlFor="email" className="form-label">Email:</label>
                                 <input
                                     type="email"
                                     className="form-control"
-                                    id="exampleFormControlInput1"
-                                    placeholder="Ingresa tu mail"
+                                    id="email"
+                                    placeholder="Ingresa tu email"
+                                    required
                                 />
-                            </section>
-                            <section className="mb-3">
-                                <label htmlFor="exampleFormControlTextarea1" className="form-label">Comentarios</label>
+                            </div>
+
+                            {/* Campo para la Institución */}
+                            <div className="mb-3">
+                                <label htmlFor="institucion" className="form-label">Institución:</label>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    id="institucion"
+                                    placeholder="Ingresa el nombre de tu institución"
+                                />
+                            </div>
+
+                            {/* Campo para Comentarios */}
+                            <div className="mb-3">
+                                <label htmlFor="comentarios" className="form-label">Comentarios:</label>
                                 <textarea
                                     className="form-control"
-                                    id="exampleFormControlTextarea1"
-                                    rows="3"
+                                    id="comentarios"
+                                    rows="5"
                                     placeholder="Escribe tus comentarios aquí..."
+                                    required
                                 ></textarea>
-                            </section>
-                            <button type="submit" className="btn btn-primary w-100 mb-3">Enviar</button> {/* Botón de enviar */}
+                            </div>
+                           
+                            <div className="d-grid gap-2 mb-4"> 
+                                <button type="submit" className="btn btn-primary btn-lg">Enviar</button>
+                            </div>
                         </form>
                     </section>
                 </section>

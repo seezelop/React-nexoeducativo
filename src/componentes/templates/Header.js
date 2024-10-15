@@ -6,7 +6,7 @@ class Header extends Component {
     return (
       <nav className="navbar navbar-expand-lg bg-dark" data-bs-theme="dark">
         <div className="container-fluid">
-          <Link className="nav-link active" to="/">Inicio</Link>
+          <Link className="nav-link active me-3" to="/">Inicio</Link> {/* Añadido me-3 para margen derecho */}
           <button
             className="navbar-toggler"
             type="button"
@@ -20,25 +20,23 @@ class Header extends Component {
           </button>
           <div className="collapse navbar-collapse" id="navbarColor02">
             <ul className="navbar-nav me-auto">
-              <li className="nav-item">
-              <Link className="nav-link active" to="/queofrecemos">¿Qué ofrecemos?</Link>
+              <li className="nav-item me-3"> {/* Margen derecho para el resto de los elementos */}
+                <Link className="nav-link active" to="/queofrecemos">¿Qué ofrecemos?</Link>
               </li>
-              <li className="nav-item">
-              <Link className="nav-link active" to="/preguntasfrecuentes">Preguntas Frecuentes</Link>
+              <li className="nav-item me-3">
+                <Link className="nav-link active" to="/preguntasfrecuentes">Preguntas Frecuentes</Link>
               </li>
-              <li className="nav-item">
+              <li className="nav-item me-3">
                 <Link className="nav-link active" to="/SobreNosotros">Sobre nosotros</Link>
               </li>
-              <li className="nav-item">
-                <Link className="nav-link active" to="/Contacto" >Contacto</Link>
+              <li className="nav-item me-3">
+                <Link className="nav-link active" to="/Contacto">Contacto</Link>
               </li>
-              
             </ul>
 
-             {/* Ícono de inicio de sesión al final del navbar */}
+            {/* Ícono de inicio de sesión al final del navbar */}
             <ul className="navbar-nav ms-auto">
               <li className="nav-item">
-                {/* Cambiamos <a> por Link para navegar sin recargar la página */}
                 <Link className="nav-link" to="/login">
                   <i className="fa-regular fa-circle-user"></i> {/* Icono de usuario */}
                 </Link>

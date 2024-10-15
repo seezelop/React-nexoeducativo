@@ -63,7 +63,7 @@ function Login() {
               />
             </section>
             {error && <p className="text-danger">{error}</p>}
-            <button type="submit" className="btn btn-primary w-100 mb-3">Iniciar sesión</button> {/* Margen abajo */}
+            <button type="submit" className="btn btn-primary w-100 mb-4">Iniciar sesión</button> {/* Margen abajo */}
           </form>
         </section>
       </section>
