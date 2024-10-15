@@ -3,7 +3,6 @@ import { auth, db } from '../../firebase';
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { useNavigate } from 'react-router-dom'; // Importa useNavigate
-import Footer from '../templates/Footer';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -69,8 +68,7 @@ function Login() {
         </section>
       </section>
 
-      {/* Footer colocado al final */}
-      <Footer />
+
     </section>
   );
 }
