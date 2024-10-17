@@ -12,14 +12,19 @@ import PreguntasFrecuentes from './componentes/pages/PreguntasFrecuentes';
 import QueOfrecemos from './componentes/pages/QueOfrecemos';
 
 function App() {
+
+  const urlHome=[{ name: '¿Qué ofrecemos?', path: '/queofrecemos' },
+    { name: 'Preguntas Frecuentes', path: '/preguntasfrecuentes' },
+    { name: 'Sobre Nosotros', path: '/sobrenosotros' },
+    { name: 'Contacto', path: '/contacto' }];
   return (
     <Router> 
       <div className="App">
-        <Header />
-        
+        <Header links={urlHome}  />
+
         {/* Configuramos las rutas */}
         <Routes>
-          {/* Ruta principal */}
+          {/* Ruta principal */} 
           <Route path="/" element={ 
             <>
               {/* Sección principal con título y descripción */}
@@ -39,16 +44,19 @@ function App() {
 
           {/* Ruta para la página de login */}
           <Route path="/login" element={<Login />} /> 
+
+          {/* Otras rutas */}
           <Route path="/sobrenosotros" element={<SobreNosotros />} />
           <Route path="/contacto" element={<Contacto />} />
-          <Route path="/QueOfrecemos" element={<QueOfrecemos />} />
-          <Route path="/PreguntasFrecuentes" element={<PreguntasFrecuentes />} />
+          <Route path="/queofrecemos" element={<QueOfrecemos />} />
+          <Route path="/preguntasfrecuentes" element={<PreguntasFrecuentes />} />
 
           {/* Rutas para admin y user */}
           <Route path="/admin" element={<Admin />} /> 
           <Route path="/user" element={<User />} />   
         </Routes>
 
+        {/* Aquí se renderiza el Footer en todas las páginas */}
         <Footer />
       </div>
     </Router>

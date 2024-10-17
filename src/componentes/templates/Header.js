@@ -1,52 +1,42 @@
-import React, { Component } from "react";
+import React from "react";
 import { Link } from 'react-router-dom'; // Importamos Link
 
-class Header extends Component {
-  render() {
-    return (
-      <nav className="navbar navbar-expand-lg bg-dark" data-bs-theme="dark">
-        <div className="container-fluid">
-          <Link className="nav-link active me-3" to="/">Inicio</Link> {/* Añadido me-3 para margen derecho */}
-          <button
-            className="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarColor02"
-            aria-controls="navbarColor02"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
-          >
-            <span className="navbar-toggler-icon"></span>
-          </button>
-          <div className="collapse navbar-collapse" id="navbarColor02">
-            <ul className="navbar-nav me-auto">
-              <li className="nav-item me-3"> {/* Margen derecho para el resto de los elementos */}
-                <Link className="nav-link active" to="/queofrecemos">¿Qué ofrecemos?</Link>
-              </li>
-              <li className="nav-item me-3">
-                <Link className="nav-link active" to="/preguntasfrecuentes">Preguntas Frecuentes</Link>
-              </li>
-              <li className="nav-item me-3">
-                <Link className="nav-link active" to="/SobreNosotros">Sobre nosotros</Link>
-              </li>
-              <li className="nav-item me-3">
-                <Link className="nav-link active" to="/Contacto">Contacto</Link>
-              </li>
-            </ul>
-
-            {/* Ícono de inicio de sesión al final del navbar */}
-            <ul className="navbar-nav ms-auto">
-              <li className="nav-item">
-                <Link className="nav-link" to="/login">
-                  <i className="fa-regular fa-circle-user"></i> {/* Icono de usuario */}
+function Header({ links=[] }) {
+  return (
+    <nav className="navbar navbar-expand-lg bg-dark" data-bs-theme="dark">
+      <div className="container-fluid">
+        <Link className="nav-link active me-3" to="/">Nexo Educativo</Link>
+        <button
+          className="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarColor02"
+          aria-controls="navbarColor02"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span className="navbar-toggler-icon"></span>
+        </button>
+        <div className="collapse navbar-collapse" id="navbarColor02">
+          <ul className="navbar-nav me-auto">
+            {links.map((link, index) => (
+              <li className="nav-item me-3" key={index}>
+                <Link className="nav-link active" to={link.path}>
+                  {link.name}
                 </Link>
               </li>
-            </ul>
-          </div>
+            ))}
+          </ul>
+          <ul className="navbar-nav ms-auto">
+            <li className="nav-item">
+              <Link className="nav-link" to="/login">
+                <i className="fa-regular fa-circle-user"></i>
+              </Link>
+            </li>
+          </ul>
         </div>
-      </nav>
-    );
-  }
+      </div>
+    </nav>
+  );
 }
-
 export default Header;

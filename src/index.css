@@ -11,3 +11,10 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.d-flex flex-column {
+  background: #000;
+  padding-top: 2rem;
+  /* padding-right: 2rem; */
+  border-radius: 5rem;
+}
