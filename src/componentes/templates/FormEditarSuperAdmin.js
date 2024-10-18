@@ -6,7 +6,7 @@ class FormEditarSuperAdmin extends Component {
         return (
             <section className="d-flex flex-column">
            
-         {/* Contenedor principal usando section */}
+         {/* Contenedor principal usando section */} 
                 <section className="container d-flex justify-content-center align-items-center flex-grow-1">
                     <section className="col-md-8"> {/* Ajustamos a 8 columnas para mejor visibilidad */}
                         {/*<h2 className="text-center mb-4">Dejanos tu consulta</h2>*/}

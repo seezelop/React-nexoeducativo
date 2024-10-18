@@ -12,15 +12,10 @@ import PreguntasFrecuentes from './componentes/pages/PreguntasFrecuentes';
 import QueOfrecemos from './componentes/pages/QueOfrecemos';
 
 function App() {
-
-  const urlHome=[{ name: '¿Qué ofrecemos?', path: '/queofrecemos' },
-    { name: 'Preguntas Frecuentes', path: '/preguntasfrecuentes' },
-    { name: 'Sobre Nosotros', path: '/sobrenosotros' },
-    { name: 'Contacto', path: '/contacto' }];
   return (
     <Router> 
       <div className="App">
-        <Header links={urlHome}  />
+      <Header />
 
         {/* Configuramos las rutas */}
         <Routes>
