@@ -2,51 +2,63 @@ import React from 'react';
 
 function QueOfrecemos() {
   return (
-    <section className="d-flex flex-column min-vh-100"> {/* Contenedor principal usando section */}
-      <section className="container d-flex justify-content-center flex-grow-1">
-        <section className="col-md-8">
-          <h2 className="text-center mb-4">¿Qué ofrecemos?</h2>
-          <div class="accordion" id="accordionExample">
-  <div className="accordion-item">
-    <h2 className="accordion-header">
-      <button className="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-        Accordion Item #1
-      </button>
-    </h2>
-    <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
-      <div className="accordion-body">
-        <strong>This is the first item's accordion body.</strong> It is shown by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
+    <section className="d-flex flex-column min-vh-100">
+  {/* Contenedor principal usando section */}
+  <section className="container flex-grow-1">
+    <section className="col-md-8 mx-auto">
+      <h2 className="text-center mb-4 pt-3">¿Qué ofrecemos?</h2>
+      {/* Renglón para las tarjetas */}
+      <div className="row">
+        <div className="col-md-4 mb-4">
+          <div className="card">
+            <div className="card-body">
+              <h5 className="card-title">Gestion academica</h5>
+              <p className="card-text">
+                Los alumnos van a poder acceder facilmente con un par de clicks a toda la informacion relacionada a sus estudios ya sea el acceso al material, las notas de sus evaluaciones, agenda de sus proximos eventos y un registro sobre la cantidad de inasistencias ademas de ver las novedades subidas por las distintas autoridades
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        <div className="col-md-4 mb-4">
+          <div className="card">
+            <div className="card-body">
+              <h5 className="card-title">Comunicacion clara</h5>
+              <p className="card-text">
+                Tanto padres como alumnos van a poder comunicarse con profesores, preceptores y personal administrativo de forma instantanea y sin interrupciones gracias a que nuestra plataforma tiene su propia mensajeria
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        <div className="col-md-4 mb-4">
+          <div className="card">
+            <div className="card-body">
+              <h5 className="card-title">Informacion accesible</h5>
+              <p className="card-text">
+              ¿Cansado de tener que acceder a varias plataformas segun la informacion que necesites? No te preocupes, nosotros ofrecemos una plataforma que unifica notificaciones, asistencias, evaluaciones, novedades y pagos en un solo lugar
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="col-md-4 mb-4">
+          <div className="card">
+            <div className="card-body">
+              <h5 className="card-title">Facil de gestionar</h5>
+              <p className="card-text">
+                Con los diferentes roles que tenemos en la plataforma, las autoridades pueden delegar facilmente funciones a los usuarios sin inconvenientes evitando que se acceda a informacion innecesaria y sensible
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Puedes agregar más tarjetas aquí */}
+        
       </div>
-    </div>
-  </div>
-  <div className="accordion-item">
-    <h2 className="accordion-header">
-      <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-        Accordion Item #2
-      </button>
-    </h2>
-    <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
-      <div class="accordion-body">
-        <strong>This is the second item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
-      </div>
-    </div>
-  </div>
-  <div class="accordion-item">
-    <h2 class="accordion-header">
-      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-        Accordion Item #3
-      </button>
-    </h2>
-    <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
-      <div class="accordion-body">
-        <strong>This is the third item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
-      </div>
-    </div>
-  </div>
-</div>
-        </section>
-      </section>
     </section>
+  </section>
+</section>
+
   );
 }
 
