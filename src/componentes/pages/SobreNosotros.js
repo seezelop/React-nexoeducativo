@@ -27,10 +27,6 @@ class SobreNosotros extends Component {
                     </div>
                 </div>
 
-                {/* Footer */}
-                <footer className="bg-dark text-white text-center py-4"> {/* Ejemplo de Footer */}
-                    <p>&copy; 2024 Nexo Educativo. Todos los derechos reservados.</p>
-                </footer>
             </>
         );
     }
