@@ -6,7 +6,7 @@ function PreguntasFrecuentes() {
     <section className="d-flex flex-column min-vh-100"> {/* Contenedor principal usando section */}
       <section className="container d-flex justify-content-center flex-grow-1">
         <section className="col-md-8">
-          <h2 className="text-center mb-4">Preguntas Frecuentes</h2>
+          <h2 className="text-center mb-4 pt-3">Preguntas Frecuentes</h2>
           <div className="accordion" id="accordionExample">
   <div className="accordion-item">
     <h2 className="accordion-header">
