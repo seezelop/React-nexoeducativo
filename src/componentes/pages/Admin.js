@@ -1,5 +1,4 @@
 import React from 'react';
-import Header from '../templates/Header';
 import FormEditarSuperAdmin from '../templates/FormEditarSuperAdmin';
 
 function Admin() {
