@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'; // Importamos Link
 import { UserContext } from '../../context/UserContext';  // Importa el contexto
 
 const Header = () => {
-  const { userRol } = useContext(UserContext); // Accede al rol del usuario desde el contexto
+  const { userRole } = useContext(UserContext); // Accede al rol del usuario desde el contexto
 
   return (
     <nav className="navbar navbar-expand-lg bg-dark" data-bs-theme="dark">
@@ -23,7 +23,7 @@ const Header = () => {
         <div className="collapse navbar-collapse" id="navbarColor02">
           <ul className="navbar-nav me-auto">
             {/* Opciones solo para usuarios admin */}
-            {userRol === 'admin' ? (
+            {userRole === 'admin' ? (
               <>
                 <li className="nav-item me-3">
                   <Link className="nav-link active" to="/admin/cursos">Cursos</Link>
