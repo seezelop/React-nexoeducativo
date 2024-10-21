@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { auth, db } from '../../firebase';
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
-import { useNavigate } from 'react-router-dom'; // Importa useNavigate
+import { useNavigate } from 'react-router-dom'; 
+import { UserContext } from '../../context/UserContext';  // Importa el contexto
 
 function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const navigate = useNavigate(); // Inicializa el hook useNavigate
+  const { setUserRole } = useContext(UserContext); // Accede a setUserRole desde el contexto
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,6 +21,7 @@ function Login() {
       const userDoc = await getDoc(doc(db, "usuarios", user.uid));
       if (userDoc.exists()) {
         const userData = userDoc.data();
+        setUserRole(userData.rol);  // Guarda el rol en el contexto
         if (userData.rol === "admin") {
           navigate('/admin'); // Redirige a la página del admin
         } else {
@@ -33,7 +36,7 @@ function Login() {
   };
 
   return (
-    <section className="d-flex flex-column min-vh-100"> {/* Contenedor principal usando section */}
+    <section className="d-flex flex-column min-vh-100">
       <section className="container d-flex justify-content-center align-items-center flex-grow-1">
         <section className="col-md-6">
           <h2 className="text-center mb-4">Iniciar sesión</h2>
@@ -47,7 +50,6 @@ function Login() {
                 placeholder="Ingrese su correo"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                style={{ padding: '10px', width: '100%' }}
               />
             </section>
             <section className="mb-3">
@@ -59,16 +61,13 @@ function Login() {
                 placeholder="Ingrese su contraseña"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                style={{ padding: '10px', width: '100%' }}
               />
             </section>
             {error && <p className="text-danger">{error}</p>}
-            <button type="submit" className="btn btn-primary w-100 mb-4">Iniciar sesión</button> {/* Margen abajo */}
+            <button type="submit" className="btn btn-primary w-100 mb-4">Iniciar sesión</button>
           </form>
         </section>
       </section>
-
-
     </section>
   );
 }
