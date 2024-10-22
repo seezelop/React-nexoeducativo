@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import Header from '../templates/Header';
-import AltaUsuario from '../templates/AltaUsuario';
-import BajaUsuario from '../templates/BajaUsuario';
+import AltaUsuario from './AltaUsuario';
+import BajaUsuario from './BajaUsuario';
+
 class InfoJefeColegio extends Component {
   render() {
     /*const links=[ 

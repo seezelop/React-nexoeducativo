@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 /*import 'index.css'  ARREGLAR ESTO*/
 import { Dropdown, DropdownButton } from 'react-bootstrap';
-import { Link } from 'react-router-dom'; // Importamos Link
 
 class BajaEscuela extends Component {
     render() {

@@ -1,6 +1,4 @@
 import React, { Component } from 'react';
-import Header from '../templates/Header';
-import BajaUsuario from '../templates/BajaUsuario';
 class AltaUsuario extends Component {
     render() {
         //valores por defecto

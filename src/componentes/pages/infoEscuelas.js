@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import Header from '../templates/Header';
-import AltaEscuela from '../templates/AltaEscuela';
-import BajaEscuela from '../templates/BajaEscuela';
+import AltaEscuela from './AltaEscuela';
+import BajaEscuela from './BajaEscuela';
+
 class InfoEscuelas extends Component {
   render() {
     /*const links=[ 

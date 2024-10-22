@@ -10,12 +10,12 @@ import SobreNosotros from './componentes/pages/SobreNosotros';
 import Contacto from './componentes/pages/Contacto';
 import PreguntasFrecuentes from './componentes/pages/PreguntasFrecuentes';
 import QueOfrecemos from './componentes/pages/QueOfrecemos';
-import InfoEscuelas from './componentes/pages/InfoEscuelas'; //
+import infoEscuelas from './componentes/pages/infoEscuelas';
 import { UserProvider } from './context/UserContext';  // Importa el UserProvider
-import AltaEscuela from './componentes/templates/AltaEscuela';
-import BajaEscuela from './componentes/templates/BajaEscuela'; 
-import AltaUsuario from './componentes/templates/AltaUsuario';
-import BajaUsuario from './componentes/templates/BajaUsuario';
+import AltaEscuela from './componentes/pages/AltaEscuela';
+import BajaEscuela from './componentes/pages/BajaEscuela'; 
+import AltaUsuario from './componentes/pages/AltaUsuario';
+import BajaUsuario from './componentes/pages/BajaUsuario';
 import InfoJefeColegio from './componentes/pages/InfoJefeColegio';
 
 
@@ -54,7 +54,7 @@ function App() {
             <Route path="/contacto" element={<Contacto />} />
             <Route path="/queofrecemos" element={<QueOfrecemos />} />
             <Route path="/preguntasfrecuentes" element={<PreguntasFrecuentes />} />
-            <Route path="/infoEscuelas" element={<InfoEscuelas />} />
+            <Route path="/infoEscuelas" element={<infoEscuelas />} />
             <Route path="/altaEscuela" element={<AltaEscuela />} />
             <Route path="/bajaEscuela" element={<BajaEscuela />} />
             <Route path="/altaUsuario" element={<AltaUsuario />} />
