@@ -10,7 +10,7 @@ import SobreNosotros from './componentes/pages/SobreNosotros';
 import Contacto from './componentes/pages/Contacto';
 import PreguntasFrecuentes from './componentes/pages/PreguntasFrecuentes';
 import QueOfrecemos from './componentes/pages/QueOfrecemos';
-import infoEscuelas from './componentes/pages/infoEscuelas';
+import InfoEscuelas from './componentes/pages/InfoEscuelas';
 import { UserProvider } from './context/UserContext';  // Importa el UserProvider
 import AltaEscuela from './componentes/pages/AltaEscuela';
 import BajaEscuela from './componentes/pages/BajaEscuela'; 
