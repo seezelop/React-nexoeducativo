@@ -53,7 +53,7 @@ class Contacto extends Component {
             <section className="d-flex flex-column min-vh-100"> {/* Contenedor principal usando section */}
                 <section className="container d-flex justify-content-center align-items-center flex-grow-1">
                     <section className="col-md-8"> {/* Ajustamos a 8 columnas para mejor visibilidad */}
-                        <h2 className="text-center mb-4">Déjanos tu consulta</h2>
+                        <h2 className="text-center mb-4 pt-4">Déjanos tu consulta</h2>
                         <div className="card mb-4"> {/* Tarjeta envolvente con margen inferior */}
                             <div className="card-body">
                                 <form onSubmit={this.handleShowModal}>
