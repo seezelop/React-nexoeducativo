@@ -14,6 +14,10 @@ import InfoEscuelas from './componentes/pages/InfoEscuelas'; //
 import { UserProvider } from './context/UserContext';  // Importa el UserProvider
 import AltaEscuela from './componentes/templates/AltaEscuela';
 import BajaEscuela from './componentes/templates/BajaEscuela'; 
+import AltaUsuario from './componentes/templates/AltaUsuario';
+import BajaUsuario from './componentes/templates/BajaUsuario';
+import InfoJefeColegio from './componentes/pages/InfoJefeColegio';
+
 
 function App() {
   return (
@@ -53,6 +57,9 @@ function App() {
             <Route path="/infoEscuelas" element={<InfoEscuelas />} />
             <Route path="/altaEscuela" element={<AltaEscuela />} />
             <Route path="/bajaEscuela" element={<BajaEscuela />} />
+            <Route path="/altaUsuario" element={<AltaUsuario />} />
+            <Route path="/bajaUsuario" element={<BajaUsuario />} />
+            <Route path="/infoJefeColegio" element={<InfoJefeColegio />} />
 
             {/* Rutas para admin y user */}
             <Route path="/admin" element={<Admin />} />
