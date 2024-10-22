@@ -60,7 +60,7 @@ const Header = () => {
           <ul className="navbar-nav ms-auto">
             <li className="nav-item">
               <Link className="nav-link" to="/login">
-                <i className="fa-regular fa-circle-user"></i> {/* Icono de usuario */}
+                <i className="fa-regular fa-circle-user fa-2x"></i> {/* Icono de usuario */}
               </Link>
             </li>
           </ul>
