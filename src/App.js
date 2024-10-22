@@ -10,7 +10,10 @@ import SobreNosotros from './componentes/pages/SobreNosotros';
 import Contacto from './componentes/pages/Contacto';
 import PreguntasFrecuentes from './componentes/pages/PreguntasFrecuentes';
 import QueOfrecemos from './componentes/pages/QueOfrecemos';
+import InfoEscuelas from './componentes/pages/InfoEscuelas'; //
 import { UserProvider } from './context/UserContext';  // Importa el UserProvider
+import AltaEscuela from './componentes/templates/AltaEscuela';
+import BajaEscuela from './componentes/templates/BajaEscuela'; 
 
 function App() {
   return (
@@ -47,6 +50,9 @@ function App() {
             <Route path="/contacto" element={<Contacto />} />
             <Route path="/queofrecemos" element={<QueOfrecemos />} />
             <Route path="/preguntasfrecuentes" element={<PreguntasFrecuentes />} />
+            <Route path="/infoEscuelas" element={<InfoEscuelas />} />
+            <Route path="/altaEscuela" element={<AltaEscuela />} />
+            <Route path="/bajaEscuela" element={<BajaEscuela />} />
 
             {/* Rutas para admin y user */}
             <Route path="/admin" element={<Admin />} />
