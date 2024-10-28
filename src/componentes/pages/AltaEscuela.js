@@ -8,10 +8,24 @@ class AltaEscuela extends Component {
         this.state = {
             nombre: '',
             direccion: '',
-            email: '',
+            activo: '',
             planSeleccionado: '',
             jefeColegioSeleccionado: '',
+            planes: [],
+            jefesColegio: []
         };
+    }
+
+    //esto es para rellenar los tipos de plan
+    componentDidMount() {
+        axios.get('http://localhost:8080/api/usuarios/getNombreRoles')
+            .then((response) => {
+                console.log(response);
+                this.setState({ planes: response.data})
+            })
+            .catch((error) => {
+                console.log(error)
+            })
     }
 
     // Manejar el cambio en los inputs
@@ -25,16 +39,16 @@ class AltaEscuela extends Component {
         this.setState({ [field]: value });
     };
 
-     // Enviar los datos al backend
-     handleSubmit = async (e) => {
+    // Enviar los datos al backend
+    handleSubmit = async (e) => {
         e.preventDefault();
-        const { nombre, direccion, email, planSeleccionado, jefeColegioSeleccionado } = this.state;
+        const { nombre, direccion, activo, planSeleccionado, jefeColegioSeleccionado } = this.state;
 
         try {
-            const response = await axios.post('http://localhost:8080/api/usuario/saveEscuela', {
+            const response = await axios.post('http://localhost:8080/usuario/saveEscuela', {
                 nombre,
                 direccion,
-                email,
+                activo,
                 plan: planSeleccionado,
                 jefeColegio: jefeColegioSeleccionado,
             });
@@ -48,7 +62,7 @@ class AltaEscuela extends Component {
         const {
             nombre = "Nombre:",
             direccion = "Dirección:",
-            email = "Email:",
+            activo = "¿El usuario esta activo en el sistema?",
             plan = "Tipo de plan:",
             jefeColegio = "Jefe colegio:",
             buttonText = "Confirmar"
@@ -59,7 +73,7 @@ class AltaEscuela extends Component {
                 {/* Contenedor principal usando section */}
                 <section className="container d-flex justify-content-center align-items-center flex-grow-1">
                     <section className="col-lg-12"> {/* Ajustamos a 12 columnas para mejor visibilidad */}
-                        <form>
+                        <form onSubmit={this.handleSubmit}>
                             <div className="row">
                                 {/* Campo para el Nombre */}
                                 <div className="mb-3">
@@ -69,12 +83,13 @@ class AltaEscuela extends Component {
                                         className="form-control"
                                         id="nombre"
                                         placeholder="Ingresa tu nombre"
+                                        value={this.state.nombre}
+                                        onChange={this.handleInputChange}
                                         required
                                     />
                                 </div>
                             </div>
-
-                            {/* Campo para la Dirección */}
+                            {/* Campo para la direccion */}
                             <div className="row">
                                 <div className="col mb-3">
                                     <label htmlFor="direccion" className="form-label">{direccion}</label>
@@ -83,30 +98,42 @@ class AltaEscuela extends Component {
                                         className="form-control"
                                         id="direccion"
                                         placeholder="Ingresa tu dirección"
+                                        value={this.state.direccion}
+                                        onChange={this.handleInputChange}
                                         required
                                     />
                                 </div>
                             </div>
 
-                            {/* Campo para el Email */}
-                            <div className="row">
-                                <div className="col-lg-12 mb-3">
-                                    <label htmlFor="email" className="form-label">{email}</label>
-                                    <input
-                                        type="email"
-                                        className="form-control"
-                                        id="email"
-                                        placeholder="Ingresa tu email"
-                                        required
-                                    />
-                                </div>
+
+                            {/* Campo para verificar si esta activo */}
+                            <label htmlFor="activo" className="form-label">{activo}</label>
+                            <div className="form-check">
+                                <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault" />
+                                <label className="form-check-label" for="flexCheckDefault">
+                                    Si
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" />
+                                <label class="form-check-label" for="flexCheckChecked">
+                                    No
+                                </label>
                             </div>
 
                             {/* Campo desplegable para los tipos de Plan */}
                             <div className="pt-2 pb-5">
                                 <label htmlFor="dropdown-basic-button" className="form-label">{plan}</label>
-                                <DropdownButton id="dropdown-basic-button" title="Seleccione un Plan" size="sm">
-                                    <Dropdown.Item href="#">Traer esta info desde la bbdd</Dropdown.Item>
+                                <DropdownButton
+                                    id="dropdown-plan"
+                                    title={this.state.planSeleccionado || "Seleccione un Plan"}
+                                    onSelect={(value) => this.handleDropdownChange('planSeleccionado', value)}
+                                >
+                                    {this.state.planes.map(plan => (
+                                        <Dropdown.Item key={plan.id} eventKey={plan.id}>
+                                            {plan.nombre}
+                                        </Dropdown.Item>
+                                    ))}
                                 </DropdownButton>
                             </div>
 
