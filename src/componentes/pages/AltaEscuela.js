@@ -1,7 +1,48 @@
-import React, { Component } from 'react';
+import React, { Component, useState } from 'react';
 import { DropdownButton, Dropdown } from 'react-bootstrap'; // Asegúrate de tener esto importado si lo usas
-
+import axios from 'axios';
 class AltaEscuela extends Component {
+    //se setean las propiedades que van a ser enviadas
+    constructor(props) {
+        super(props);
+        this.state = {
+            nombre: '',
+            direccion: '',
+            email: '',
+            planSeleccionado: '',
+            jefeColegioSeleccionado: '',
+        };
+    }
+
+    // Manejar el cambio en los inputs
+    handleInputChange = (e) => {
+        const { id, value } = e.target;
+        this.setState({ [id]: value });
+    };
+
+    // Manejar selección en Dropdown
+    handleDropdownChange = (field, value) => {
+        this.setState({ [field]: value });
+    };
+
+     // Enviar los datos al backend
+     handleSubmit = async (e) => {
+        e.preventDefault();
+        const { nombre, direccion, email, planSeleccionado, jefeColegioSeleccionado } = this.state;
+
+        try {
+            const response = await axios.post('http://localhost:8080/api/usuario/saveEscuela', {
+                nombre,
+                direccion,
+                email,
+                plan: planSeleccionado,
+                jefeColegio: jefeColegioSeleccionado,
+            });
+            console.log('Respuesta del servidor:', response.data);
+        } catch (error) {
+            console.error('Error al enviar el formulario:', error);
+        }
+    };
     render() {
         //valores por defecto
         const {
@@ -65,8 +106,7 @@ class AltaEscuela extends Component {
                             <div className="pt-2 pb-5">
                                 <label htmlFor="dropdown-basic-button" className="form-label">{plan}</label>
                                 <DropdownButton id="dropdown-basic-button" title="Seleccione un Plan" size="sm">
-                                    <Dropdown.Item href="#">Básico</Dropdown.Item>
-                                    <Dropdown.Item href="#">Premium</Dropdown.Item>
+                                    <Dropdown.Item href="#">Traer esta info desde la bbdd</Dropdown.Item>
                                 </DropdownButton>
                             </div>
 
