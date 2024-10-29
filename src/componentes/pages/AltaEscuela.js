@@ -38,7 +38,7 @@ class AltaEscuela extends Component {
     //esto es para rellenar que muestre los jefes colegios sin colegios asignados
     cargarJefeColegio = async () => {
         try {
-            const respuesta = await fetch(`http://localhost:8080/usuario/getJefeColegioSinEscuela`);
+            const respuesta = await fetch(`http://localhost:8080/api/usuario/getJefeColegioSinEscuela`);
 
             console.log(respuesta);
 
