@@ -18,142 +18,193 @@ class AltaEscuela extends Component {
 
     //esto es para rellenar los tipos de plan
     componentDidMount() {
-        axios.get('http://localhost:8080/api/usuarios/getNombreRoles')
+        axios.get('http://localhost:8080/usuario/getNombrePlanes')
             .then((response) => {
                 console.log(response);
-                this.setState({ planes: response.data})
+                // Mapear los datos a un formato de objeto con `idRol` y `nombre`
+                const planes = response.data.map((item) => {
+                    const [idRol, nombre] = item.split(',');
+                    return { idRol, nombre };
+                });
+                console.log("Planes procesados:", planes);
+
+                this.setState({ planes: response.data })
             })
             .catch((error) => {
                 console.log(error)
             })
     }
 
-    // Manejar el cambio en los inputs
-    handleInputChange = (e) => {
-        const { id, value } = e.target;
-        this.setState({ [id]: value });
-    };
-
-    // Manejar selección en Dropdown
-    handleDropdownChange = (field, value) => {
-        this.setState({ [field]: value });
-    };
-
-    // Enviar los datos al backend
-    handleSubmit = async (e) => {
-        e.preventDefault();
-        const { nombre, direccion, activo, planSeleccionado, jefeColegioSeleccionado } = this.state;
-
+    //esto es para rellenar que muestre los jefes colegios sin colegios asignados
+    cargarJefeColegio = async () => {
         try {
-            const response = await axios.post('http://localhost:8080/usuario/saveEscuela', {
-                nombre,
-                direccion,
-                activo,
-                plan: planSeleccionado,
-                jefeColegio: jefeColegioSeleccionado,
-            });
-            console.log('Respuesta del servidor:', response.data);
-        } catch (error) {
-            console.error('Error al enviar el formulario:', error);
-        }
-    };
-    render() {
-        //valores por defecto
-        const {
-            nombre = "Nombre:",
-            direccion = "Dirección:",
-            activo = "¿El usuario esta activo en el sistema?",
-            plan = "Tipo de plan:",
-            jefeColegio = "Jefe colegio:",
-            buttonText = "Confirmar"
-        } = this.props;
+            const respuesta = await fetch(`http://localhost:8080/usuario/getJefeColegioSinEscuela`);
 
-        return (
-            <section className="d-flex flex-column">
-                {/* Contenedor principal usando section */}
-                <section className="container d-flex justify-content-center align-items-center flex-grow-1">
-                    <section className="col-lg-12"> {/* Ajustamos a 12 columnas para mejor visibilidad */}
-                        <form onSubmit={this.handleSubmit}>
-                            <div className="row">
-                                {/* Campo para el Nombre */}
-                                <div className="mb-3">
-                                    <label htmlFor="nombre" className="form-label">{nombre}</label>
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        id="nombre"
-                                        placeholder="Ingresa tu nombre"
-                                        value={this.state.nombre}
-                                        onChange={this.handleInputChange}
-                                        required
-                                    />
-                                </div>
-                            </div>
-                            {/* Campo para la direccion */}
-                            <div className="row">
-                                <div className="col mb-3">
-                                    <label htmlFor="direccion" className="form-label">{direccion}</label>
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        id="direccion"
-                                        placeholder="Ingresa tu dirección"
-                                        value={this.state.direccion}
-                                        onChange={this.handleInputChange}
-                                        required
-                                    />
-                                </div>
-                            </div>
+            console.log(respuesta);
+
+            // Si la respuesta es correcta
+            if (respuesta.status === 200) {
+                const datos = await respuesta.json();
+                console.log("datitos:" + datos);
+
+                // Mapea los datos a los elementos del dropdown
+                const jefesColegio = datos.map(jefe => (
+                    <Dropdown.Item key={jefe.id_usuario} eventKey={jefe.id_usuario}>
+                        {jefe.nombre} {jefe.apellido}
+                    </Dropdown.Item>
+                ));
+
+                // Establece los items en el estado
+                this.setState({ jefesColegio });
 
 
-                            {/* Campo para verificar si esta activo */}
-                            <label htmlFor="activo" className="form-label">{activo}</label>
-                            <div className="form-check">
-                                <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault" />
-                                <label className="form-check-label" for="flexCheckDefault">
-                                    Si
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" />
-                                <label class="form-check-label" for="flexCheckChecked">
-                                    No
-                                </label>
-                            </div>
+            } else if (respuesta.status === 404) {
+                console.log('Todos los jefes colegios registrados tienen un colegio asignado');
+            } else {
+                console.log('Hubo un error y no sabemos que paso');
+            }
+    }catch(error) {
+        console.log(error);
+    }
+};
+componentDidMount() {
+    this.cargarJefeColegio();
+}
 
-                            {/* Campo desplegable para los tipos de Plan */}
-                            <div className="pt-2 pb-5">
-                                <label htmlFor="dropdown-basic-button" className="form-label">{plan}</label>
-                                <DropdownButton
-                                    id="dropdown-plan"
-                                    title={this.state.planSeleccionado || "Seleccione un Plan"}
-                                    onSelect={(value) => this.handleDropdownChange('planSeleccionado', value)}
-                                >
-                                    {this.state.planes.map(plan => (
-                                        <Dropdown.Item key={plan.id} eventKey={plan.id}>
-                                            {plan.nombre}
-                                        </Dropdown.Item>
-                                    ))}
-                                </DropdownButton>
-                            </div>
+// Manejar el cambio en los inputs
+handleInputChange = (e) => {
+    const { id, value } = e.target;
+    this.setState({ [id]: value });
+};
 
-                            {/* Campo desplegable para el jefe colegio */}
-                            <div className="pb-5">
-                                <label htmlFor="dropdown-basic-button" className="form-label">{jefeColegio}</label>
-                                <DropdownButton id="dropdown-basic-button" title="Seleccione un Jefe colegio" size="sm">
-                                    <Dropdown.Item href="#">Traer esta info desde la bbdd</Dropdown.Item>
-                                </DropdownButton>
-                            </div>
+// Manejar selección en Dropdown
+handleDropdownChange = (field, value) => {
+    this.setState({ [field]: value });
+};
 
-                            <div className="d-grid gap-2 mb-4">
-                                <button type="submit" className="btn btn-primary btn-lg">{buttonText}</button>
+// Enviar los datos al backend
+handleSubmit = async (e) => {
+    e.preventDefault();
+    const { nombre, direccion, activo, planSeleccionado, jefeColegioSeleccionado } = this.state;
+
+    try {
+        const response = await axios.post('http://localhost:8080/usuario/saveEscuela', {
+            nombre,
+            direccion,
+            activo,
+            plan: planSeleccionado,
+            jefeColegio: jefeColegioSeleccionado,
+        });
+        console.log('Respuesta del servidor:', response.data);
+    } catch (error) {
+        console.error('Error al enviar el formulario:', error);
+    }
+};
+render() {
+    //valores por defecto
+    const {
+        nombre = "Nombre:",
+        direccion = "Dirección:",
+        activo = "¿El usuario esta activo en el sistema?",
+        plan = "Tipo de plan:",
+        jefeColegio = "Jefe colegio:",
+        buttonText = "Confirmar"
+    } = this.props;
+
+    return (
+        <section className="d-flex flex-column">
+            {/* Contenedor principal usando section */}
+            <section className="container d-flex justify-content-center align-items-center flex-grow-1">
+                <section className="col-lg-12"> {/* Ajustamos a 12 columnas para mejor visibilidad */}
+                    <form onSubmit={this.handleSubmit}>
+                        <div className="row">
+                            {/* Campo para el Nombre */}
+                            <div className="mb-3">
+                                <label htmlFor="nombre" className="form-label">{nombre}</label>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    id="nombre"
+                                    placeholder="Ingresa tu nombre"
+                                    value={this.state.nombre}
+                                    onChange={this.handleInputChange}
+                                    required
+                                />
                             </div>
-                        </form>
-                    </section>
+                        </div>
+                        {/* Campo para la direccion */}
+                        <div className="row">
+                            <div className="col mb-3">
+                                <label htmlFor="direccion" className="form-label">{direccion}</label>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    id="direccion"
+                                    placeholder="Ingresa tu dirección"
+                                    value={this.state.direccion}
+                                    onChange={this.handleInputChange}
+                                    required
+                                />
+                            </div>
+                        </div>
+
+
+                        {/* Campo para verificar si esta activo */}
+                        <label htmlFor="activo" className="form-label">{activo}</label>
+                        <div className="form-check">
+                            <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault" />
+                            <label className="form-check-label" for="flexCheckDefault">
+                                Si
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" />
+                            <label class="form-check-label" for="flexCheckChecked">
+                                No
+                            </label>
+                        </div>
+
+                        {/* Campo desplegable para los tipos de Plan */}
+                        <div className="pt-2 pb-5">
+                            <label htmlFor="dropdown-basic-button" className="form-label">{plan}</label>
+                            <DropdownButton
+                                id="dropdown-plan"
+                                title={this.state.planSeleccionado || "Seleccione un Plan"}
+                                onSelect={(value) => this.handleDropdownChange('planSeleccionado', value)}
+                            >
+                                {this.state.planes.map(plan => (
+                                    <Dropdown.Item key={plan.idRol} eventKey={plan.idRol}>
+                                        {plan.nombre}
+                                    </Dropdown.Item>
+                                ))}
+                            </DropdownButton>
+
+                        </div>
+
+                        {/* Campo desplegable para el jefe colegio */}
+
+                        <div className="pb-5">
+                            <label htmlFor="dropdown-basic-button" className="form-label">{jefeColegio}</label>
+                            <DropdownButton
+                                id="dropdown-jefeC"
+                                title={this.state.jefeColegioSeleccionado || "Seleccione un Jefe Colegio"}
+                                onSelect={(value) => this.handleDropdownChange('jefeColegioSeleccionado', value)}
+                            >
+                                <Dropdown.Menu>
+                                    {this.state.jefesColegio} {/* Renderiza los items aquí */}
+                                </Dropdown.Menu>
+                            </DropdownButton>
+                        </div>
+
+                        <div className="d-grid gap-2 mb-4">
+                            <button type="submit" className="btn btn-primary btn-lg">{buttonText}</button>
+                        </div>
+                    </form>
                 </section>
             </section>
-        );
-    }
+        </section>
+    );
+}
 }
 
 // Valores por defecto para las props
