@@ -17,23 +17,40 @@ class AltaEscuela extends Component {
     }
 
     //esto es para rellenar los tipos de plan
-    componentDidMount() {
-        axios.get('http://localhost:8080/usuario/getNombrePlanes')
-            .then((response) => {
-                console.log(response);
-                // Mapear los datos a un formato de objeto con `idRol` y `nombre`
-                const planes = response.data.map((item) => {
-                    const [idRol, nombre] = item.split(',');
-                    return { idRol, nombre };
+    cargarPlanes = async () => {
+        try {
+            const respuesta = await fetch(`http://localhost:8080/api/usuario/getNombrePlanes`);
+            console.log(respuesta);
+    
+            if (respuesta.status === 200) {
+                const datos = await respuesta.json();
+                console.log("datos planes:", datos);
+    
+                // Procesa los datos para convertirlos en un formato de objeto
+                const planes = datos.map(item => {
+                    const [idPlan, descripcion] = item.split(','); // Divide el string por la coma
+                    return { idPlan, descripcion }; // Devuelve un objeto con las propiedades
                 });
-                console.log("Planes procesados:", planes);
-
-                this.setState({ planes: response.data })
-            })
-            .catch((error) => {
-                console.log(error)
-            })
-    }
+    
+                // Mapea los objetos a los elementos del dropdown
+                const dropdownItems = planes.map(plan => (
+                    <Dropdown.Item key={plan.idPlan} eventKey={plan.idPlan}>
+                        {plan.descripcion}
+                    </Dropdown.Item>
+                ));
+    
+                // Establece los items en el estado
+                this.setState({ planes: dropdownItems });
+    
+            } else if (respuesta.status === 404) {
+                console.log('no hay planes');
+            } else {
+                console.log('Hubo un error y no sabemos que pasó');
+            }
+        } catch (error) {
+            console.log(error);
+        }
+};
 
     //esto es para rellenar que muestre los jefes colegios sin colegios asignados
     cargarJefeColegio = async () => {
@@ -67,8 +84,10 @@ class AltaEscuela extends Component {
         console.log(error);
     }
 };
+//aca hago que se llame a los metodos en el dropdown
 componentDidMount() {
     this.cargarJefeColegio();
+    this.cargarPlanes();
 }
 
 // Manejar el cambio en los inputs
@@ -172,11 +191,9 @@ render() {
                                 title={this.state.planSeleccionado || "Seleccione un Plan"}
                                 onSelect={(value) => this.handleDropdownChange('planSeleccionado', value)}
                             >
-                                {this.state.planes.map(plan => (
-                                    <Dropdown.Item key={plan.idRol} eventKey={plan.idRol}>
-                                        {plan.nombre}
-                                    </Dropdown.Item>
-                                ))}
+                               <Dropdown.Menu>
+                                    {this.state.planes} {/* Renderiza los items aquí */}
+                                </Dropdown.Menu>
                             </DropdownButton>
 
                         </div>
