@@ -98,9 +98,10 @@ function Login() {
       });
 
       const userData = response.data;
-      setUserRole(userData.rol);  // Guarda el rol en el contexto
+      setUserRole(userData.rol);  // Guarda el rol en el contexto}
+      console.log("info del usuario"+userData.rol);
 
-      if (userData.rol === "super admin") {
+      if (userData === "super admin") {
         navigate('/admin'); // Redirige a la página del admin
       } else {
         navigate('/user');  // Redirige a la página de usuario común
