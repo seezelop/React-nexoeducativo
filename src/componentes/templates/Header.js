@@ -23,16 +23,10 @@ const Header = () => {
         <div className="collapse navbar-collapse" id="navbarColor02">
           <ul className="navbar-nav me-auto">
             {/* Opciones solo para usuarios admin */}
-            {userRole === 'admin' ? (
+            {userRole === 'super admin' ? (
               <>
                 <li className="nav-item me-3">
-                  <Link className="nav-link active" to="/admin/cursos">Cursos</Link>
-                </li>
-                <li className="nav-item me-3">
-                  <Link className="nav-link active" to="/admin/eventos">Eventos</Link>
-                </li>
-                <li className="nav-item me-3">
-                  <Link className="nav-link active" to="/admin/material">Material</Link>
+                  <Link className="nav-link active" to="/contacto">Contacto</Link>
                 </li>
                 <li className="nav-item me-3">
                   <Link className="nav-link active" to="/admin/chats">Chats</Link>
