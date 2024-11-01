@@ -8,9 +8,11 @@ class AltaEscuela extends Component {
         this.state = {
             nombre: '',
             direccion: '',
-            activo: '',
+            activo: 1,
             planSeleccionado: '',
+            idPlan: null,
             jefeColegioSeleccionado: '',
+            idJefe: null,
             planes: [],
             jefesColegio: []
         };
@@ -21,27 +23,28 @@ class AltaEscuela extends Component {
         try {
             const respuesta = await fetch(`http://localhost:8080/api/usuario/getNombrePlanes`);
             console.log(respuesta);
-    
+
             if (respuesta.status === 200) {
                 const datos = await respuesta.json();
                 console.log("datos planes:", datos);
-    
+
                 // Procesa los datos para convertirlos en un formato de objeto
                 const planes = datos.map(item => {
                     const [idPlan, descripcion] = item.split(','); // Divide el string por la coma
-                    return { idPlan, descripcion }; // Devuelve un objeto con las propiedades
+                    return { id: idPlan, nombre: descripcion }; // Devuelve un objeto con las propiedades
                 });
-    
+
                 // Mapea los objetos a los elementos del dropdown
-                const dropdownItems = planes.map(plan => (
+                /*const dropdownItems = planes.map(plan => (
                     <Dropdown.Item key={plan.idPlan} eventKey={plan.idPlan}>
                         {plan.descripcion}
                     </Dropdown.Item>
-                ));
-    
+                ));*/
+
                 // Establece los items en el estado
-                this.setState({ planes: dropdownItems });
-    
+                //this.setState({ planes: dropdownItems });
+                this.setState({ planes });
+
             } else if (respuesta.status === 404) {
                 console.log('no hay planes');
             } else {
@@ -50,7 +53,7 @@ class AltaEscuela extends Component {
         } catch (error) {
             console.log(error);
         }
-};
+    };
 
     //esto es para rellenar que muestre los jefes colegios sin colegios asignados
     cargarJefeColegio = async () => {
@@ -65,11 +68,13 @@ class AltaEscuela extends Component {
                 console.log("datitos:" + datos);
 
                 // Mapea los datos a los elementos del dropdown
-                const jefesColegio = datos.map(jefe => (
-                    <Dropdown.Item key={jefe.id_usuario} eventKey={jefe.id_usuario}>
-                        {jefe.nombre} {jefe.apellido}
-                    </Dropdown.Item>
-                ));
+                const jefesColegio = datos.map(jefe => ({
+                    /* <Dropdown.Item key={jefe.id_usuario} eventKey={jefe.id_usuario}>
+                         {jefe.nombre} {jefe.apellido}
+                     </Dropdown.Item>*/
+                    id: jefe.id_usuario,
+                    nombre: `${jefe.nombre} ${jefe.apellido}`
+                }));
 
                 // Establece los items en el estado
                 this.setState({ jefesColegio });
@@ -80,148 +85,196 @@ class AltaEscuela extends Component {
             } else {
                 console.log('Hubo un error y no sabemos que paso');
             }
-    }catch(error) {
-        console.log(error);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+    //aca hago que se llame a los metodos en el dropdown
+    componentDidMount() {
+        this.cargarJefeColegio();
+        this.cargarPlanes();
     }
-};
-//aca hago que se llame a los metodos en el dropdown
-componentDidMount() {
-    this.cargarJefeColegio();
-    this.cargarPlanes();
-}
 
-// Manejar el cambio en los inputs
-handleInputChange = (e) => {
-    const { id, value } = e.target;
-    this.setState({ [id]: value });
-};
+    // Manejar el cambio en los inputs
+    handleInputChange = (e) => {
+        const { id, value } = e.target;
+        this.setState({ [id]: value });
+    };
 
-// Manejar selección en Dropdown
-handleDropdownChange = (field, value) => {
-    this.setState({ [field]: value });
-};
+    // Manejar selección en Dropdown
+    handleDropdownChange = (field, value) => {
+        try {
+            const { id, nombre } = JSON.parse(value);
 
-// Enviar los datos al backend
-handleSubmit = async (e) => {
-    e.preventDefault();
-    const { nombre, direccion, activo, planSeleccionado, jefeColegioSeleccionado } = this.state;
+            if (field === 'planSeleccionado') {
+                this.setState({
+                    idPlan: id,
+                    planSeleccionado: nombre
+                });
+                console.log("id seleccionado plan: " + id)
+            } else if (field === 'jefeColegioSeleccionado') {
+                this.setState({
+                    idJefe: parseInt(id),
+                    jefeColegioSeleccionado: nombre
+                });
+                console.log("id seleccionado jefe colegio: " + id)
+            }
 
-    try {
-        const response = await axios.post('http://localhost:8080/usuario/saveEscuela', {
-            nombre,
-            direccion,
-            activo,
-            plan: planSeleccionado,
-            jefeColegio: jefeColegioSeleccionado,
-        });
-        console.log('Respuesta del servidor:', response.data);
-    } catch (error) {
-        console.error('Error al enviar el formulario:', error);
-    }
-};
-render() {
-    //valores por defecto
-    const {
-        nombre = "Nombre:",
-        direccion = "Dirección:",
-        activo = "¿El usuario esta activo en el sistema?",
-        plan = "Tipo de plan:",
-        jefeColegio = "Jefe colegio:",
-        buttonText = "Confirmar"
-    } = this.props;
+        } catch (error) {
+            console.error("Error al parsear el valor:", error);
+        }
+    };
+    // Enviar los datos al backend
+    handleSubmit = async (e) => {
+        e.preventDefault();
+        const activo = 1;
+        const { nombre, direccion, idPlan, idJefe } = this.state;
 
-    return (
-        <section className="d-flex flex-column">
-            {/* Contenedor principal usando section */}
-            <section className="container d-flex justify-content-center align-items-center flex-grow-1">
-                <section className="col-lg-12"> {/* Ajustamos a 12 columnas para mejor visibilidad */}
-                    <form onSubmit={this.handleSubmit}>
-                        <div className="row">
-                            {/* Campo para el Nombre */}
-                            <div className="mb-3">
-                                <label htmlFor="nombre" className="form-label">{nombre}</label>
-                                <input
-                                    type="text"
-                                    className="form-control"
-                                    id="nombre"
-                                    placeholder="Ingresa tu nombre"
-                                    value={this.state.nombre}
-                                    onChange={this.handleInputChange}
-                                    required
-                                />
+        //variables cuyos nombres son los del dto del back
+        const backDto={
+                nombre:nombre,
+                direccion:direccion,
+                activo:activo,
+                idPlan:idPlan,
+                jefeColegio: idJefe
+        };
+
+        console.log("datos a enviar:"+backDto.nombre)        
+        try {
+            const response = await fetch('http://localhost:8080/api/usuario/saveEscuela', {
+                method: 'POST', // Added method
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json' // Added headers
+                },
+                body:JSON.stringify({backDto})
+               
+            });
+            const data = await response.json();
+
+            if (response.ok) {
+                console.log('Respuesta del servidor:', data);
+                console.log('id del plan seleccionado a enviar:', idPlan)
+            } else {
+                // Handle error response
+                console.error('Error del servidor:', data);
+            }
+        } catch (error) {
+            console.error('Error al enviar el formulario:', error);
+        }
+    };
+    render() {
+        //valores por defecto
+        const {
+            nombre = "Nombre:",
+            direccion = "Dirección:",
+            plan = "Tipo de plan:",
+            jefeColegio = "Jefe colegio:",
+            buttonText = "Confirmar"
+        } = this.props;
+
+        return (
+            <section className="d-flex flex-column">
+                {/* Contenedor principal usando section */}
+                <section className="container d-flex justify-content-center align-items-center flex-grow-1">
+                    <section className="col-lg-12"> {/* Ajustamos a 12 columnas para mejor visibilidad */}
+                        <form onSubmit={this.handleSubmit}>
+                            <div className="row">
+                                {/* Campo para el Nombre */}
+                                <div className="mb-3">
+                                    <label htmlFor="nombre" className="form-label">{nombre}</label>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        id="nombre"
+                                        placeholder="Ingresa tu nombre"
+                                        value={this.state.nombre}
+                                        onChange={this.handleInputChange}
+                                        required
+                                    />
+                                </div>
                             </div>
-                        </div>
-                        {/* Campo para la direccion */}
-                        <div className="row">
-                            <div className="col mb-3">
-                                <label htmlFor="direccion" className="form-label">{direccion}</label>
-                                <input
-                                    type="text"
-                                    className="form-control"
-                                    id="direccion"
-                                    placeholder="Ingresa tu dirección"
-                                    value={this.state.direccion}
-                                    onChange={this.handleInputChange}
-                                    required
-                                />
+                            {/* Campo para la direccion */}
+                            <div className="row">
+                                <div className="col mb-3">
+                                    <label htmlFor="direccion" className="form-label">{direccion}</label>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        id="direccion"
+                                        placeholder="Ingresa tu dirección"
+                                        value={this.state.direccion}
+                                        onChange={this.handleInputChange}
+                                        required
+                                    />
+                                </div>
                             </div>
-                        </div>
 
 
-                        {/* Campo para verificar si esta activo */}
-                        <label htmlFor="activo" className="form-label">{activo}</label>
-                        <div className="form-check">
-                            <input className="form-check-input" type="checkbox" value="" id="flexCheckDefault" />
-                            <label className="form-check-label" for="flexCheckDefault">
-                                Si
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="" id="flexCheckChecked" />
-                            <label class="form-check-label" for="flexCheckChecked">
-                                No
-                            </label>
-                        </div>
+                            {/* Campo para verificar si esta activo */}
 
-                        {/* Campo desplegable para los tipos de Plan */}
-                        <div className="pt-2 pb-5">
-                            <label htmlFor="dropdown-basic-button" className="form-label">{plan}</label>
-                            <DropdownButton
-                                id="dropdown-plan"
-                                title={this.state.planSeleccionado || "Seleccione un Plan"}
-                                onSelect={(value) => this.handleDropdownChange('planSeleccionado', value)}
-                            >
-                               <Dropdown.Menu>
-                                    {this.state.planes} {/* Renderiza los items aquí */}
-                                </Dropdown.Menu>
-                            </DropdownButton>
 
-                        </div>
+                            {/* Campo desplegable para los tipos de Plan */}
+                            <div className="pt-2 pb-5">
+                                <label htmlFor="dropdown-basic-button" className="form-label">{plan}</label>
+                                <DropdownButton
+                                    id="dropdown-plan"
+                                    title={this.state.planSeleccionado || "Seleccione un Plan"}
+                                    onSelect={(value) => this.handleDropdownChange('planSeleccionado', value)}
+                                >
+                                    {/*<Dropdown.Menu>
+                                        {this.state.planes.map(plan => (
+                                            <Dropdown.Item
+                                                key={plan.id}
+                                                eventKey={JSON.stringify({ id: plan.idPlan, nombre: plan.descripcion })}
+                                            >
+                                                {plan.descripcion}
+                                            </Dropdown.Item>
+                                        ))}
+                                    </Dropdown.Menu>*/}
+                                    {this.state.planes.map(plan => (
+                                        <Dropdown.Item
+                                            key={plan.id}
+                                            eventKey={JSON.stringify({ id: plan.id, nombre: plan.nombre })}
+                                        >
+                                            {plan.nombre}
+                                        </Dropdown.Item>
+                                    ))}
+                                </DropdownButton>
 
-                        {/* Campo desplegable para el jefe colegio */}
+                            </div>
 
-                        <div className="pb-5">
-                            <label htmlFor="dropdown-basic-button" className="form-label">{jefeColegio}</label>
-                            <DropdownButton
-                                id="dropdown-jefeC"
-                                title={this.state.jefeColegioSeleccionado || "Seleccione un Jefe Colegio"}
-                                onSelect={(value) => this.handleDropdownChange('jefeColegioSeleccionado', value)}
-                            >
-                                <Dropdown.Menu>
-                                    {this.state.jefesColegio} {/* Renderiza los items aquí */}
-                                </Dropdown.Menu>
-                            </DropdownButton>
-                        </div>
+                            {/* Campo desplegable para el jefe colegio */}
 
-                        <div className="d-grid gap-2 mb-4">
-                            <button type="submit" className="btn btn-primary btn-lg">{buttonText}</button>
-                        </div>
-                    </form>
+                            <div className="pb-5">
+                                <label htmlFor="dropdown-basic-button" className="form-label">{jefeColegio}</label>
+                                <DropdownButton
+                                    id="dropdown-jefeC"
+                                    title={this.state.jefeColegioSeleccionado || "Seleccione un Jefe Colegio"}
+                                    onSelect={(value) => this.handleDropdownChange('jefeColegioSeleccionado', value)}
+                                >
+                                    <Dropdown.Menu>
+                                        {this.state.jefesColegio.map(jefe => (
+                                            <Dropdown.Item
+                                                key={jefe.id}
+                                                eventKey={JSON.stringify({ id: jefe.id, nombre: jefe.nombre })}
+                                            >
+                                                {jefe.nombre}
+                                            </Dropdown.Item>
+                                        ))}
+                                    </Dropdown.Menu>
+                                </DropdownButton>
+                            </div>
+
+                            <div className="d-grid gap-2 mb-4">
+                                <button type="submit" className="btn btn-primary btn-lg">{buttonText}</button>
+                            </div>
+                        </form>
+                    </section>
                 </section>
             </section>
-        </section>
-    );
-}
+        );
+    }
 }
 
 // Valores por defecto para las props
