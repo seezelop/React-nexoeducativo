@@ -29,21 +29,8 @@ class AltaEscuela extends Component {
                 console.log("datos planes:", datos);
 
                 // Procesa los datos para convertirlos en un formato de objeto
-                const planes = datos.map(item => {
-                    const [idPlan, descripcion] = item.split(','); // Divide el string por la coma
-                    return { id: idPlan, nombre: descripcion }; // Devuelve un objeto con las propiedades
-                });
-
-                // Mapea los objetos a los elementos del dropdown
-                /*const dropdownItems = planes.map(plan => (
-                    <Dropdown.Item key={plan.idPlan} eventKey={plan.idPlan}>
-                        {plan.descripcion}
-                    </Dropdown.Item>
-                ));*/
-
-                // Establece los items en el estado
-                //this.setState({ planes: dropdownItems });
-                this.setState({ planes });
+                
+                this.setState({  });
 
             } else if (respuesta.status === 404) {
                 console.log('no hay planes');
@@ -69,9 +56,6 @@ class AltaEscuela extends Component {
 
                 // Mapea los datos a los elementos del dropdown
                 const jefesColegio = datos.map(jefe => ({
-                    /* <Dropdown.Item key={jefe.id_usuario} eventKey={jefe.id_usuario}>
-                         {jefe.nombre} {jefe.apellido}
-                     </Dropdown.Item>*/
                     id: jefe.id_usuario,
                     nombre: `${jefe.nombre} ${jefe.apellido}`
                 }));
@@ -102,67 +86,9 @@ class AltaEscuela extends Component {
     };
 
     // Manejar selección en Dropdown
-    handleDropdownChange = (field, value) => {
-        try {
-            const { id, nombre } = JSON.parse(value);
-
-            if (field === 'planSeleccionado') {
-                this.setState({
-                    idPlan: id,
-                    planSeleccionado: nombre
-                });
-                console.log("id seleccionado plan: " + id)
-            } else if (field === 'jefeColegioSeleccionado') {
-                this.setState({
-                    idJefe: parseInt(id),
-                    jefeColegioSeleccionado: nombre
-                });
-                console.log("id seleccionado jefe colegio: " + id)
-            }
-
-        } catch (error) {
-            console.error("Error al parsear el valor:", error);
-        }
-    };
+    
     // Enviar los datos al backend
-    handleSubmit = async (e) => {
-        e.preventDefault();
-        const activo = 1;
-        const { nombre, direccion, idPlan, idJefe } = this.state;
-
-        //variables cuyos nombres son los del dto del back
-        const backDto={
-                nombre:nombre,
-                direccion:direccion,
-                activo:activo,
-                idPlan:idPlan,
-                jefeColegio: idJefe
-        };
-
-        console.log("datos a enviar:"+backDto.nombre)        
-        try {
-            const response = await fetch('http://localhost:8080/api/usuario/saveEscuela', {
-                method: 'POST', // Added method
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json' // Added headers
-                },
-                body:JSON.stringify({backDto})
-               
-            });
-            const data = await response.json();
-
-            if (response.ok) {
-                console.log('Respuesta del servidor:', data);
-                console.log('id del plan seleccionado a enviar:', idPlan)
-            } else {
-                // Handle error response
-                console.error('Error del servidor:', data);
-            }
-        } catch (error) {
-            console.error('Error al enviar el formulario:', error);
-        }
-    };
+   
     render() {
         //valores por defecto
         const {
