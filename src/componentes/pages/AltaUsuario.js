@@ -12,7 +12,7 @@ constructor(props) {
         clave:'',
         telefono:'',
         activo: 1,
-        rol:2,//por defecto, se da de alta un Alumno sino especificar como parametro
+        rol:2,//por defecto, se da de alta un jefe colegio sino especificar como parametro
         showModal:false
     };
 }
