@@ -21,7 +21,7 @@ class AltaEscuela extends Component {
     //esto es para rellenar los tipos de plan
     cargarPlanes = async () => {
         try {
-            const response = await axios.get('http://localhost:8080/usuario/getNombrePlanes');
+            const response = await axios.get('http://localhost:8080/api/usuario/getNombrePlanes');
             //pasar lista de string a objetos
             const planes = response.data.map(item => {
                 const [idPlan, descripcion] = item.split(','); // Divide la cadena en partes
@@ -38,7 +38,7 @@ class AltaEscuela extends Component {
     //esto es para rellenar que muestre los jefes colegios sin colegios asignados
     cargarJefeColegio = async () => {
         try {
-            const response = await axios.get('http://localhost:8080/usuario/getJefeColegioSinEscuela');
+            const response = await axios.get('http://localhost:8080/api/usuario/getJefeColegioSinEscuela');
             if (response.status === 200) {
                 const jefesColegio = response.data.map(jefe => ({
                     id_usuario: jefe.id_usuario,
@@ -88,7 +88,7 @@ class AltaEscuela extends Component {
        
         try {
             // Enviar los datos al backend
-            const response = await axios.post('http://localhost:8080/usuario/saveEscuela', {
+            const response = await axios.post('http://localhost:8080/api/usuario/saveEscuela', {
                 nombre,
                 direccion,
                 activo,

@@ -20,7 +20,7 @@ constructor(props) {
  handleSubmit = (e) => {
    // console.log("cuerpo:"+JSON.stringify(this.props))
     e.preventDefault();
-    fetch('http://localhost:8080/usuario/saveUsuario', {
+    fetch('http://localhost:8080/api/usuario/saveUsuario', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

@@ -92,9 +92,9 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:8080/auth/login', { // Conecta con la API
-        mail: mail, 
-        clave: clave,
+      const response = await axios.post('http://localhost:8080/login', { // Conecta con la API
+        username: mail, 
+        password: clave,
       });
 
       const userData = response.data;
