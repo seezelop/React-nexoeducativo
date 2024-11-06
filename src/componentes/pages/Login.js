@@ -14,7 +14,7 @@ function Login() {
   //metodo que obtien el rol del usuario logueado
   const rolUsuario = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/usuario/getEscuelas', {
+      const response = await axios.get('http://localhost:8080/api/usuario/getRolUsuarioLogueado', {
         withCredentials: true
       });
       
