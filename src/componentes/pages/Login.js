@@ -7,37 +7,59 @@ function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [escuelas, setEscuelas] = useState([]);
   const { setUserRole } = useContext(UserContext); // Accede a setUserRole desde el contexto
   const navigate = useNavigate();
 
+  //metodo que obtien el rol del usuario logueado
+  const rolUsuario = async () => {
+    try {
+      const response = await axios.get('http://localhost:8080/api/usuario/getEscuelas', {
+        withCredentials: true
+      });
+      
+      if (response.status === 200) {
+        const userRole = response.data.role; 
+        setUserRole(userRole);
+      } else {
+        console.log('No hay escuelas o rol no disponible');
+      }
+    } catch (error) {
+      console.error('Error al cargar las escuelas', error);
+      setError('Error al cargar las escuelas');
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try{
-    fetch("http://localhost:8080/login", {
-      method: "POST",
-      headers: {//seteo los headers que puse en el postman
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      body: new URLSearchParams({//métodos útiles
-        // para trabajar con los parámetros de búsqueda de 
-        //una URL
-        username: username,
-        password: password
-      }),
-      credentials: "include"
-    })
-    .then(response=>{
-      if(response.ok){
-        console.log("info"+response.status);
-      }else{
-        console.log("todo mal")
-      }
-    })
-  }catch(e){
-    console.log("error en la solicutud",e);
-  }
-    };
-  
+    try {
+      fetch("http://localhost:8080/login", {
+        method: "POST",
+        headers: {//seteo los headers que puse en el postman
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({//métodos útiles
+          // para trabajar con los parámetros de búsqueda de 
+          //una URL
+          username: username,
+          password: password
+        }),
+        credentials: "include"
+      })
+        .then(response => {
+          if (response.ok) {
+            rolUsuario();
+            navigate('/admin')
+            console.log('todo bien')
+          } else {
+            console.log("todo mal")
+          }
+        })
+    } catch (e) {
+      console.log("error en la solicutud", e);
+    }
+  };
+
 
 
   return (
