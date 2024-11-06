@@ -1,38 +1,43 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../../context/UserContext';  // Importa el contexto
-import axios from 'axios'; 
+import axios from 'axios';
 
 function Login() {
-  const [mail, setEmail] = useState('');
-  const [clave, setClave] = useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const { setUserRole } = useContext(UserContext); // Accede a setUserRole desde el contexto
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
-  try {
-    const response = await axios.post('http://localhost:8080/login', {
-      username: mail, 
-      password: clave,
-    }, { withCredentials: true }); // Permitir cookies en solicitudes CORS
-
-    const userData = response.data;
-    setUserRole(userData);
-    if (userData === "super admin") {
-      navigate('/admin');
-    } else {
-      navigate('/user');
-    }
-  } catch (error) {
-    if (error.response) {
-      setError("Error al iniciar sesión: " + error.response.data);
-    } else {
-      setError("Error al iniciar sesión: " + error.message); // Cambia aquí si solo dice "Network Error"
-    }
+    e.preventDefault();
+    try{
+    fetch("http://localhost:8080/login", {
+      method: "POST",
+      headers: {//seteo los headers que puse en el postman
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: new URLSearchParams({//métodos útiles
+        // para trabajar con los parámetros de búsqueda de 
+        //una URL
+        username: username,
+        password: password
+      }),
+      credentials: "include"
+    })
+    .then(response=>{
+      if(response.ok){
+        console.log("info"+response.status);
+      }else{
+        console.log("todo mal")
+      }
+    })
+  }catch(e){
+    console.log("error en la solicutud",e);
   }
-};
+    };
+  
 
 
   return (
@@ -48,8 +53,8 @@ function Login() {
                 className="form-control"
                 id="email"
                 placeholder="Ingrese su correo"
-                value={mail}
-                onChange={(e) => setEmail(e.target.value)}
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 required
               />
             </section>
@@ -60,8 +65,8 @@ function Login() {
                 className="form-control"
                 id="password"
                 placeholder="Ingrese su contraseña"
-                value={clave}
-                onChange={(e) => setClave(e.target.value)}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 required
               />
             </section>
