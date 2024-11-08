@@ -122,7 +122,7 @@ class BajaEscuela extends Component {
 
                             <div className="d-grid gap-2 mb-4">
                                 <Button
-                                    variant="danger"
+                                    //variant="danger"
                                     onClick={this.handleShowConfirmModal}
                                     className="d-flex align-items-center justify-content-center gap-2"
                                 >

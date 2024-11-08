@@ -1,8 +1,22 @@
 import React, { Component } from 'react';
 /*import 'index.css'  ARREGLAR ESTO*/
-import { Dropdown, DropdownButton } from 'react-bootstrap';
+import { Dropdown, DropdownButton, Button, Modal } from 'react-bootstrap';
 
 class BajaUsuario extends Component {
+    constructor(props) {
+        super(props);
+        this.state =
+        {
+            nombre: '',
+            apellido: '',
+            dni:'',
+            id_usuario: null,
+            usuarios: [],
+            showModal: false,
+            showConfirmModal: false,
+            usuarioSeleccionado: 'Seleccione un colegio'
+        };
+    }
     render() {
         return (
             <section className="d-flex flex-column">
@@ -21,7 +35,14 @@ class BajaUsuario extends Component {
 
 
                             <div className="d-grid gap-2 mb-4">
-                                    <i class="fa-solid fa-trash fa-3x"></i>{/* Icono de usuario */}
+                                <Button
+                                    //variant="danger"
+                                    onClick={this.handleShowConfirmModal}
+                                    className="d-flex align-items-center justify-content-center gap-2"
+                                >
+                                    <i className="fa-solid fa-trash"></i>
+                                    
+                                </Button>
                             </div>
                         </form>
                     </section>
