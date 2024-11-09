@@ -76,6 +76,11 @@ class BajaUsuario extends Component {
 
             // actualizar la lista sin incluir la escuela borrada
             await this.cargarUsuarios();
+            if(response.status===200) {
+                alert("Usuario eliminado exitosamente!")
+            }else{
+                alert("error al eliminar usuario")
+            }
 
         } catch (error) {
             console.error("Error al eliminar el usuario:", error);
