@@ -12,53 +12,66 @@ function Login() {
   const navigate = useNavigate();
 
   //metodo que obtien el rol del usuario logueado
-  const rolUsuario = async () => {
-    try {
-      const response = await axios.get('http://localhost:8080/api/usuario/getRolUsuarioLogueado', {
-        withCredentials: true
-      });
-      
-      if (response.status === 200) {
-        const userRole = response.data.role; 
-        setUserRole(userRole);
-      } else {
-        console.log('No hay escuelas o rol no disponible');
-      }
-    } catch (error) {
-      console.error('Error al cargar las escuelas', error);
-      setError('Error al cargar las escuelas');
+//metodo que obtien el rol del usuario logueado
+/*const rolUsuario = async () => {
+  try {
+    const response = await axios.get('http://localhost:8080/api/usuario/getRolUsuarioLogueado', {
+      withCredentials: true
+    });
+    
+    if (response.status === 200) {
+      const userRole = response.data.role; 
+      setUserRole(userRole);
+    } else {
+      console.log('No hay escuelas o rol no disponible');
     }
-  };
+  } catch (error) {
+    console.error('Error al cargar las escuelas', error);
+    setError('Error al cargar las escuelas');
+  }
+};*/
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      fetch("http://localhost:8080/login", {
-        method: "POST",
-        headers: {//seteo los headers que puse en el postman
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: new URLSearchParams({//métodos útiles
-          // para trabajar con los parámetros de búsqueda de 
-          //una URL
-          username: username,
-          password: password
-        }),
-        credentials: "include"
-      })
-        .then(response => {
-          if (response.ok) {
-            rolUsuario();
-            navigate('/admin')
-            console.log('todo bien')
-          } else {
-            console.log("todo mal")
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+   const login= await fetch("http://localhost:8080/login", {
+      method: "POST",
+      headers: {//seteo los headers que puse en el postman
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: new URLSearchParams({//métodos útiles
+        // para trabajar con los parámetros de búsqueda de 
+        //una URL
+        username: username,
+        password: password
+      }),
+      credentials: "include"
+    })
+      if(login.ok){
+        const response = await axios.get('http://localhost:8080/api/usuario/getRolUsuarioLogueado', {
+          withCredentials: true
+        });
+        if (response.status === 200) {
+          const userRole = response.data.split(': ')[1]; //separar lo que esta despues del : en el response
+          setUserRole(userRole);
+          switch(userRole){
+            case 'super admin':
+              navigate('/admin');
+            default:
+              navigate('/user');
           }
-        })
-    } catch (e) {
-      console.log("error en la solicutud", e);
-    }
-  };
+          //console.log("rol usuario: "+userRole);
+          //console.log('Complete response:', response.data);
+        } else {
+          console.log('No hay escuelas o rol no disponible');
+        }
+      }
+
+  } catch (e) {
+    console.log("error en la solicutud", e);
+  }
+};
+
 
 
 
