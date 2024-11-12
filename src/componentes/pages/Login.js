@@ -11,26 +11,7 @@ function Login() {
   const { setUserRole } = useContext(UserContext); // Accede a setUserRole desde el contexto
   const navigate = useNavigate();
 
-  //metodo que obtien el rol del usuario logueado
-//metodo que obtien el rol del usuario logueado
-/*const rolUsuario = async () => {
-  try {
-    const response = await axios.get('http://localhost:8080/api/usuario/getRolUsuarioLogueado', {
-      withCredentials: true
-    });
-    
-    if (response.status === 200) {
-      const userRole = response.data.role; 
-      setUserRole(userRole);
-    } else {
-      console.log('No hay escuelas o rol no disponible');
-    }
-  } catch (error) {
-    console.error('Error al cargar las escuelas', error);
-    setError('Error al cargar las escuelas');
-  }
-};*/
-
+  
 const handleSubmit = async (e) => {
   e.preventDefault();
   try {
