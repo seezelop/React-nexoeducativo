@@ -57,9 +57,11 @@ const handleSubmit = async (e) => {
           switch(userRole){
             case 'super admin':
               navigate('/admin');
+              break;
             default:
               navigate('/user');
           }
+          
           //console.log("rol usuario: "+userRole);
           //console.log('Complete response:', response.data);
         } else {
