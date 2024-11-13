@@ -1,27 +1,36 @@
-import React, { Component } from 'react';
+import React from 'react';
 import AltaUsuario from './AltaUsuario';
 import BajaUsuario from './BajaUsuario';
+import ModificarUsuario from './ModificarUsuario'; 
 
-class ABMJefeColegio extends Component {
-  render() {
-    /*const links=[ 
-      { name: 'Informacion sobre escuelas', path: '/pages/infoEscuelas' },
-      { name: 'Informacion sobre Jefe Colegio', path: '/pages/infoJefeC' },
-      { name: 'Chats', path: '/pages/chats' },
-      { name: 'Contacto', path: '/Contacto' },
-    ];*/
-    return (
-      <section className="d-flex flex-column min-vh-100"> {/* Contenedor que ocupa toda la altura */}
-        {/*<Header links={links} />*/}
-        <div className="container d-flex flex-column justify-content-around align-items-stretch flex-grow-1"> {/* Flex-grow para que crezca y ocupe espacio */}
-          <h1 className="mt-2 mb-4">ALTA JEFE COLEGIO</h1>
-          <AltaUsuario />
-          <h1 className="mt-2 mb-4">BAJA JEFE COLEGIO</h1>
-          <BajaUsuario />
-        </div>
-      </section>
-    );
-  }
+function ABMJefeColegio() {
+  return (
+    <section className="d-flex flex-column min-vh-100">
+      <div className="container d-flex justify-content-center align-items-center flex-grow-1">
+        <section className="col-md-8 mb-5">
+          <div className="card shadow-sm">
+            <div className="card-body">
+              <h1 className="text-center mb-4">Gestión de Jefes de Colegio</h1>
+
+              {/* Sección Alta Jefe Colegio */}
+              <h3 className="mb-4">ALTA JEFE COLEGIO</h3>
+              <AltaUsuario />
+              <hr />
+
+              {/* Sección Baja Jefe Colegio */}
+              <h3 className="mb-4">BAJA JEFE COLEGIO</h3>
+              <BajaUsuario />
+              <hr />
+
+              {/* Sección Modificación Jefe Colegio */}
+              <h3 className="mb-4">MODIFICACIÓN JEFE COLEGIO</h3>
+              <ModificarUsuario /> {/* Componente independiente para la modificación */}
+            </div>
+          </div>
+        </section>
+      </div>
+    </section>
+  );
 }
 
 export default ABMJefeColegio;

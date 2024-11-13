@@ -1,34 +1,36 @@
-import React, { Component } from 'react';
+import React from 'react';
 import AltaEscuela from './AltaEscuela';
 import BajaEscuela from './BajaEscuela';
+import ModificacionEscuela from './ModificacionEscuela'; 
 
-class ABMEscuelas extends Component {
-  render() {
-    /*const links=[ 
-      { name: 'Informacion sobre escuelas', path: '/pages/ABMEscuelas' },
-      { name: 'Informacion sobre Jefe Colegio', path: '/pages/infoJefeC' },
-      { name: 'Chats', path: '/pages/chats' },
-      { name: 'Contacto', path: '/Contacto' },
-    ];*/
-    return (
-      <section className="d-flex flex-column min-vh-100"> {/* Contenedor que ocupa toda la altura */}
-        {/*<Header links={links} />*/}
-        <div className="container d-flex flex-column justify-content-around align-items-stretch flex-grow-1"> {/* Flex-grow para que crezca y ocupe espacio */}
-          <h1 className="mt-2 mb-4">ALTA ESCUELA</h1>
-          <AltaEscuela />
-          <h1 className="mt-2 mb-4">BAJA ESCUELA</h1>
-          <BajaEscuela />
-          <h1 className="mt-2 mb-4">MODIFICACION ESCUELA</h1>
-        <AltaEscuela
-          nombreLabel="Nombre "
-          direccionLabel="Dirección"
-          emailLabel="Email"
-          buttonText="Editar"
-        />
-        </div>
-      </section>
-    );
-  }
+function ABMEscuelas() {
+  return (
+    <section className="d-flex flex-column min-vh-100">
+      <div className="container d-flex justify-content-center align-items-center flex-grow-1">
+        <section className="col-md-8 mb-5">
+          <div className="card shadow-sm">
+            <div className="card-body">
+              <h1 className="text-center mb-4">ABM de Escuelas</h1>
+
+              {/* Sección Alta Escuela */}
+              <h3 className="mb-4">ALTA ESCUELA</h3>
+              <AltaEscuela />
+              <hr />
+
+              {/* Sección Baja Escuela */}
+              <h3 className="mb-4">BAJA ESCUELA</h3>
+              <BajaEscuela />
+              <hr />
+
+              {/* Sección Modificación Escuela */}
+              <h3 className="mb-4">MODIFICAR ESCUELA</h3>
+              <ModificacionEscuela /> {/* Componente independiente para la modificación */}
+            </div>
+          </div>
+        </section>
+      </div>
+    </section>
+  );
 }
 
 export default ABMEscuelas;
