@@ -1,33 +1,37 @@
 import React from 'react';
 import AltaEscuela from './AltaEscuela';
 import BajaEscuela from './BajaEscuela';
-import ModificacionEscuela from './ModificacionEscuela'; 
+import ModificacionEscuela from './ModificacionEscuela';
 
 function ABMEscuelas() {
   return (
     <section className="d-flex flex-column min-vh-100">
-      <div className="container d-flex justify-content-center align-items-center flex-grow-1">
+      <div className="container d-flex flex-column justify-content-center align-items-center flex-grow-1">
+        
+        {/* Sección Alta Escuela */}
         <section className="col-md-8 mb-5">
-          <div className="card shadow-sm">
-            <div className="card-body">
-              <h1 className="text-center mb-4">ABM de Escuelas</h1>
-
-              {/* Sección Alta Escuela */}
-              <h3 className="mb-4">ALTA ESCUELA</h3>
-              <AltaEscuela />
-              <hr />
-
-              {/* Sección Baja Escuela */}
-              <h3 className="mb-4">BAJA ESCUELA</h3>
-              <BajaEscuela />
-              <hr />
-
-              {/* Sección Modificación Escuela */}
-              <h3 className="mb-4">MODIFICAR ESCUELA</h3>
-              <ModificacionEscuela /> {/* Componente independiente para la modificación */}
-            </div>
+          <div className="card shadow-sm p-3">
+            <h3 className="mb-4 text-center">ALTA ESCUELA</h3>
+            <AltaEscuela />
           </div>
         </section>
+
+        {/* Sección Baja Escuela */}
+        <section className="col-md-8 mb-5">
+          <div className="card shadow-sm p-3">
+            <h3 className="mb-4 text-center">BAJA ESCUELA</h3>
+            <BajaEscuela />
+          </div>
+        </section>
+
+        {/* Sección Modificación Escuela */}
+        <section className="col-md-8 mb-5">
+          <div className="card shadow-sm p-3">
+            <h3 className="mb-4 text-center">MODIFICAR ESCUELA</h3>
+            <ModificacionEscuela />
+          </div>
+        </section>
+
       </div>
     </section>
   );
