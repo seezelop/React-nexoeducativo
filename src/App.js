@@ -11,13 +11,13 @@ import Contacto from './componentes/pages/Contacto';
 import PreguntasFrecuentes from './componentes/pages/PreguntasFrecuentes';
 import QueOfrecemos from './componentes/pages/QueOfrecemos';
 import ABMEscuelas from './componentes/pages/ABMEscuelas';
-import { UserProvider } from './context/UserContext';  // Importa el UserProvider
+import ConsultarEscuelas from './componentes/pages/ConsultarEscuelas'; // Importa ConsultarEscuelas
+import { UserProvider } from './context/UserContext'; // Importa el UserProvider
 import AltaEscuela from './componentes/pages/AltaEscuela';
 import BajaEscuela from './componentes/pages/BajaEscuela'; 
 import AltaUsuario from './componentes/pages/AltaUsuario';
 import BajaUsuario from './componentes/pages/BajaUsuario';
 import ABMJefeColegio from './componentes/pages/ABMJefeColegio';
-
 
 function App() {
   return (
@@ -60,6 +60,9 @@ function App() {
             <Route path="/altaUsuario" element={<AltaUsuario />} />
             <Route path="/bajaUsuario" element={<BajaUsuario />} />
             <Route path="/ABMJefeColegio" element={<ABMJefeColegio />} />
+
+            {/* Ruta para consultar escuelas */}
+            <Route path="/consultar-escuelas" element={<ConsultarEscuelas />} />
 
             {/* Rutas para admin y user */}
             <Route path="/admin" element={<Admin />} />
