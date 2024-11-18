@@ -4,6 +4,7 @@ import { UserContext } from '../../context/UserContext';  // Importa el contexto
 import axios from 'axios';
 import Cookies from 'universal-cookie';
 
+
 function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -44,6 +45,8 @@ const handleSubmit = async (e) => {
             case 'super admin':
               //console.log('valor almacenado en la cookie'+usuarioCookie.get('rol'));
               navigate('/admin');
+              const elemento = document.getElementById("icono-login")
+              elemento.display = true;
               break;
             default:
               navigate('/user');

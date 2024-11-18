@@ -56,13 +56,15 @@ const Header = () => {
           </ul>
 
           {/* Ícono de inicio de sesión al final del navbar */}
-          <ul className="navbar-nav ms-auto">
-            <li className="nav-item">
-              <Link className="nav-link" to="/login">
-                <i className="fa-regular fa-circle-user fa-2x"></i> {/* Icono de usuario */}
-              </Link>
-            </li>
-          </ul>
+          <div id="icono-login"> 
+            <ul className="navbar-nav ms-auto">
+              <li className="nav-item">
+                <Link className="nav-link" to="/login">
+                  <i className="fa-regular fa-circle-user fa-2x"></i> {/* Icono de usuario */}
+                </Link>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
     </nav>

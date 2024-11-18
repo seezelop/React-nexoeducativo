@@ -11,7 +11,7 @@ const ConsultarEscuelas = () => {
       const response = await axios.get('http://localhost:8080/api/usuario/getEscuelas', {
         withCredentials: true
       });
-
+      
       if (response.status === 200) {
         setEscuelas(response.data); // Actualiza el estado con las escuelas
       }
