@@ -59,6 +59,7 @@ function App() {
             <Route path="/bajaEscuela" element={<BajaEscuela />} />
             <Route path="/altaUsuario" element={<AltaUsuario />} />
             <Route path="/bajaUsuario" element={<BajaUsuario />} />
+            <Route path="/header" element={<Header />} />
             <Route path="/ABMJefeColegio" element={<ABMJefeColegio />} />
 
             {/* Ruta para consultar escuelas */}

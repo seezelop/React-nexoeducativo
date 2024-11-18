@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../../context/UserContext';  // Importa el contexto
 import axios from 'axios';
+import Cookies from 'universal-cookie';
 
 function Login() {
   const [username, setUsername] = useState('');
@@ -35,8 +36,13 @@ const handleSubmit = async (e) => {
         if (response.status === 200) {
           const userRole = response.data.split(': ')[1]; //separar lo que esta despues del : en el response
           setUserRole(userRole);
+          const usuarioCookie = new Cookies();
+          const vencimiento= new Date();
+          vencimiento.setDate(vencimiento.getDate()+1)
+          usuarioCookie.set('rol', userRole, {path:'/',expires: vencimiento});
           switch(userRole){
             case 'super admin':
+              //console.log('valor almacenado en la cookie'+usuarioCookie.get('rol'));
               navigate('/admin');
               break;
             default:

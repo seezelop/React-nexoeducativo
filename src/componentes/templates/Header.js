@@ -4,7 +4,6 @@ import { UserContext } from '../../context/UserContext';  // Importa el contexto
 
 const Header = () => {
   const { userRole } = useContext(UserContext); // Accede al rol del usuario desde el contexto
-
   return (
     <nav className="navbar navbar-expand-lg bg-dark" data-bs-theme="dark">
       <div className="container-fluid">
