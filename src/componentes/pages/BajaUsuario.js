@@ -11,7 +11,7 @@ class BajaUsuario extends Component {
             nombre: '',
             apellido: '',
             dni:'',
-            id_usuario: null,
+            idUsuario: null,
             usuarios: [],
             rol:'jefe%20colegio',//el %50 indica espacio sino da eror en la request
             showModal: false,
@@ -28,7 +28,7 @@ class BajaUsuario extends Component {
               });
             //pasar lista de string a objetos
             const usuarios = response.data.map(jefe => ({
-                id_usuario: jefe.id_usuario,
+                idUsuario: jefe.idUsuario,
                 nombre: `${jefe.nombre} ${jefe.apellido} ${jefe.dni} `
             }));
 
@@ -50,10 +50,10 @@ class BajaUsuario extends Component {
         const parsedValue = JSON.parse(value);
         this.setState({
             usuarioSeleccionado: parsedValue.nombre,
-            id_usuario: parsedValue.id_usuario
+            idUsuario: parsedValue.idUsuario
         });
 
-        console.log("ID del usuario seleccionado:", parsedValue.id_usuario); // Imprimir en consola
+        console.log("ID del usuario seleccionado:", parsedValue.idUsuario); // Imprimir en consola
         //this.state.id_escuela = parsedValue.id_escuela
         //console.log("id del estado "+this.state.id_escuela)
     };
@@ -65,7 +65,7 @@ class BajaUsuario extends Component {
         try {
             // Enviar los datos al backend
            // const { id_escuela } = this.state;
-           const response = await axios.delete(`http://localhost:8080/api/usuario/borrarUsuario/${this.state.id_usuario}`);
+           const response = await axios.delete(`http://localhost:8080/api/usuario/borrarUsuario/${this.state.idUsuario}`);
 
             console.log("lo que se va a enviar: "+response)
 
@@ -91,10 +91,10 @@ class BajaUsuario extends Component {
 
     handleShowConfirmModal = () => {
         //en caso de que no se seleccione una opcion
-        console.log('id del usuario a guardar:', this.state.id_usuario); // Debug log
-        if (!this.state.id_usuario) {
+        console.log('id del usuario a guardar:', this.state.idUsuario); // Debug log
+        if (!this.state.idUsuario) {
             alert('Por favor, seleccione un usuario primero');
-            console.log("id enviado al backend"+this.state.id_usuario);
+            console.log("id enviado al backend"+this.state.idUsuario);
             return;
         }
         this.setState({ showConfirmModal: true });
@@ -121,8 +121,8 @@ class BajaUsuario extends Component {
                                     size="sm">
                                     {this.state.usuarios.map(escuela => (
                                         <Dropdown.Item
-                                            key={escuela.id_usuario}
-                                            eventKey={JSON.stringify({ id_usuario: escuela.id_usuario, nombre: escuela.nombre })}
+                                            key={escuela.idUsuario}
+                                            eventKey={JSON.stringify({ idUsuario: escuela.idUsuario, nombre: escuela.nombre })}
                                         >
                                             {escuela.nombre}
                                         </Dropdown.Item>

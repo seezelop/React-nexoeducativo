@@ -16,7 +16,7 @@ class ModificarUsuario extends React.Component {
                       <input
                         type="text"
                         className="form-control"
-                        id="nombre"
+                        id="nombre2"
                         placeholder="Ingresa el nuevo nombre"
                         required
                       />
@@ -28,7 +28,7 @@ class ModificarUsuario extends React.Component {
                       <input
                         type="text"
                         className="form-control"
-                        id="apellido"
+                        id="apellido2"
                         placeholder="Ingresa el nuevo apellido"
                         required
                       />
@@ -41,7 +41,7 @@ class ModificarUsuario extends React.Component {
                     <input
                       type="email"
                       className="form-control"
-                      id="email"
+                      id="email2"
                       placeholder="Ingresa el nuevo email"
                       required
                     />
@@ -53,7 +53,7 @@ class ModificarUsuario extends React.Component {
                     <input
                       type="text"
                       className="form-control"
-                      id="direccion"
+                      id="direccion2"
                       placeholder="Ingresa la nueva dirección"
                       required
                     />
