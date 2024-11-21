@@ -9,8 +9,8 @@ function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [escuelas, setEscuelas] = useState([]);
-  const { setUserRole } = useContext(UserContext); // Accede a setUserRole desde el contexto
+  //const [escuelas, setEscuelas] = useState([]);
+  const { setUserRole, setInfoSesion } = useContext(UserContext); // Accede a setUserRole desde el contexto
   const navigate = useNavigate();
 
   
@@ -37,6 +37,7 @@ const handleSubmit = async (e) => {
         if (response.status === 200) {
           const userRole = response.data.split(': ')[1]; //separar lo que esta despues del : en el response
           setUserRole(userRole);
+          setInfoSesion(response.data); /*ACA SE GUARDA LA INFO PARA LUEGO MOSTRAR*/ 
           const usuarioCookie = new Cookies();
           const vencimiento= new Date();
           vencimiento.setDate(vencimiento.getDate()+1)

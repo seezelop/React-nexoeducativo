@@ -1,9 +1,28 @@
-import React, { useContext } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { Link } from 'react-router-dom'; // Importamos Link
 import { UserContext } from '../../context/UserContext';  // Importa el contexto
-
+import axios from 'axios';
 const Header = () => {
-  const { userRole } = useContext(UserContext); // Accede al rol del usuario desde el contexto
+  const { userRole, infoSesion  } = useContext(UserContext); // Accede al rol del usuario desde el contexto
+  const [info, setInfo] = useState([]);
+  const nombreCompleto = async ()=>{
+    try {
+      const response = await axios.get('http://localhost:8080/api/usuario//getRolUsuarioLogueado', {
+        withCredentials: true
+      });
+      
+      if (response.status === 200) {
+        setInfo(response.data); // Actualiza el estado con las escuelas
+      }
+    } catch (error) {
+      console.error('Error al obtener las escuelas', error);
+    }
+  }
+
+  useEffect(() => {
+    nombreCompleto();
+    
+  }, []);
   return (
     <nav className="navbar navbar-expand-lg bg-dark" data-bs-theme="dark">
       <div className="container-fluid">
@@ -51,16 +70,29 @@ const Header = () => {
                 <li className="nav-item me-3">
                   <Link className="nav-link active" to="/Contacto">Contacto</Link>
                 </li>
+                <div id="icono-login"> 
+              <ul className="navbar-nav ms-auto">
+                <li className="nav-item">
+                  <Link className="nav-link" to="/login">
+                    <i className="fa-regular fa-circle-user fa-2x"></i> {/* Icono de usuario logueado */}
+                  </Link>
+                </li>
+              </ul>
+            </div>
               </>
+              
             )}
           </ul>
 
           {/* Ícono de inicio de sesión al final del navbar */}
+          
           <div id="icono-login"> 
             <ul className="navbar-nav ms-auto">
               <li className="nav-item">
                 <Link className="nav-link" to="/login">
-                  <i className="fa-regular fa-circle-user fa-2x"></i> {/* Icono de usuario */}
+                <div className="text-light">
+                          <div>{infoSesion} </div>
+                        </div> {/* Icono de usuario no logueado */}
                 </Link>
               </li>
             </ul>
