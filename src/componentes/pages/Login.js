@@ -38,6 +38,7 @@ const handleSubmit = async (e) => {
           const userRole = response.data.split(': ')[1]; //separar lo que esta despues del : en el response
           setUserRole(userRole);
           setInfoSesion(response.data); /*ACA SE GUARDA LA INFO PARA LUEGO MOSTRAR*/ 
+          console.log("lo que llega al infoSesion "+response.data)
           const usuarioCookie = new Cookies();
           const vencimiento= new Date();
           vencimiento.setDate(vencimiento.getDate()+1)

@@ -7,7 +7,7 @@ const Header = () => {
   const [info, setInfo] = useState([]);
   const nombreCompleto = async ()=>{
     try {
-      const response = await axios.get('http://localhost:8080/api/usuario//getRolUsuarioLogueado', {
+      const response = await axios.get('http://localhost:8080/api/usuario/getRolUsuarioLogueado', {
         withCredentials: true
       });
       
@@ -19,10 +19,10 @@ const Header = () => {
     }
   }
 
-  useEffect(() => {
+ /* useEffect(() => {
     nombreCompleto();
     
-  }, []);
+  }, []);*/
   return (
     <nav className="navbar navbar-expand-lg bg-dark" data-bs-theme="dark">
       <div className="container-fluid">
@@ -74,7 +74,7 @@ const Header = () => {
               <ul className="navbar-nav ms-auto">
                 <li className="nav-item">
                   <Link className="nav-link" to="/login">
-                    <i className="fa-regular fa-circle-user fa-2x"></i> {/* Icono de usuario logueado */}
+                    <i className="fa-regular fa-circle-user fa-2x" onClick={nombreCompleto}></i> {/* Icono de usuario logueado */}
                   </Link>
                 </li>
               </ul>
