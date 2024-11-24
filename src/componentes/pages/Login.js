@@ -4,70 +4,84 @@ import { UserContext } from '../../context/UserContext';  // Importa el contexto
 import axios from 'axios';
 import Cookies from 'universal-cookie';
 
-
 function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  //const [escuelas, setEscuelas] = useState([]);
   const { setUserRole, setInfoSesion } = useContext(UserContext); // Accede a setUserRole desde el contexto
   const navigate = useNavigate();
 
-  
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  try {
-   const login= await fetch("http://localhost:8080/login", {
-      method: "POST",
-      headers: {//seteo los headers que puse en el postman
-        'Content-Type': 'application/x-www-form-urlencoded'
-      },
-      body: new URLSearchParams({//métodos útiles
-        // para trabajar con los parámetros de búsqueda de 
-        //una URL
-        username: username,
-        password: password
-      }),
-      credentials: "include"
-    })
-      if(login.ok){
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const login = await fetch("http://localhost:8080/login", {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({
+          username: username,
+          password: password
+        }),
+        credentials: "include"
+      });
+
+      if (login.ok) {
         const response = await axios.get('http://localhost:8080/api/usuario/getRolUsuarioLogueado', {
           withCredentials: true
         });
+
         if (response.status === 200) {
-          const userRole = response.data.split(': ')[1]; //separar lo que esta despues del : en el response
+          const userRole = response.data.split(': ')[1]; // Obtén el nombre del rol del usuario
           setUserRole(userRole);
-          setInfoSesion(response.data); /*ACA SE GUARDA LA INFO PARA LUEGO MOSTRAR*/ 
-          console.log("lo que llega al infoSesion "+response.data)
+          setInfoSesion(response.data); // Guarda la información para mostrarla más tarde
+          console.log("Rol obtenido: " + userRole);
+
           const usuarioCookie = new Cookies();
-          const vencimiento= new Date();
-          vencimiento.setDate(vencimiento.getDate()+1)
-          usuarioCookie.set('rol', userRole, {path:'/',expires: vencimiento});
-          switch(userRole){
+          const vencimiento = new Date();
+          vencimiento.setDate(vencimiento.getDate() + 1);
+          usuarioCookie.set('rol', userRole, { path: '/', expires: vencimiento });
+
+          // Redireccionar según el nombre del rol
+          switch (userRole) {
             case 'super admin':
-              //console.log('valor almacenado en la cookie'+usuarioCookie.get('rol'));
               navigate('/admin');
-              const elemento = document.getElementById("icono-login")
-              elemento.display = true;
+              break;
+            case 'jefe colegio':
+              navigate('/jefeColegio');
+              break;
+            case 'administrativo':
+              navigate('/administrativo');
+              break;
+            case 'preceptor':
+              navigate('/preceptor');
+              break;
+            case 'profesor':
+              navigate('/profesor');
+              break;
+            case 'padre':
+              navigate('/padre');
+              break;
+            case 'alumno':
+              navigate('/alumno');
               break;
             default:
-              navigate('/user');
+              console.error('Rol no reconocido');
+              setError('Error: Rol no reconocido');
           }
-          
-          //console.log("rol usuario: "+userRole);
-          //console.log('Complete response:', response.data);
         } else {
-          console.log('No hay escuelas o rol no disponible');
+          console.error('Error al obtener el rol del usuario');
+          setError('Error al obtener el rol del usuario');
         }
+      } else {
+        console.error('Error en el inicio de sesión');
+        setError('Credenciales incorrectas');
       }
-
-  } catch (e) {
-    console.log("error en la solicutud", e);
-  }
-};
-
-
-
+    } catch (e) {
+      console.error("Error en la solicitud", e);
+      setError('Error al conectar con el servidor');
+    }
+  };
 
   return (
     <section className="d-flex flex-column min-vh-100">
@@ -109,5 +123,3 @@ const handleSubmit = async (e) => {
 }
 
 export default Login;
-
-
