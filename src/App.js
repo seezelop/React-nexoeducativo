@@ -5,6 +5,12 @@ import Carousel from './componentes/templates/Carousel';
 import Footer from './componentes/templates/Footer';
 import Login from './componentes/pages/Login';
 import Admin from './componentes/pages/Admin';
+import JeFeColegio from './componentes/pages/JefeColegio';
+import Administrativo from './componentes/pages/Administrativo';
+import Preceptor from './componentes/pages/Preceptor';
+import Profesor from './componentes/pages/Profesor';
+import Padre from './componentes/pages/Padre';
+import Alumno from './componentes/pages/Alumno';
 import User from './componentes/pages/User';
 import SobreNosotros from './componentes/pages/SobreNosotros';
 import Contacto from './componentes/pages/Contacto';
@@ -67,6 +73,12 @@ function App() {
 
             {/* Rutas para admin y user */}
             <Route path="/admin" element={<Admin />} />
+            <Route path="/jefeColegio" element={<JeFeColegio />} />
+            <Route path="/administrativo" element={<Administrativo />} />
+            <Route path="/preceptor" element={<Preceptor />} />
+            <Route path="/profesor" element={<Profesor />} />
+            <Route path="/padre" element={<Padre />} />
+            <Route path="/alumno" element={<Alumno />} />
             <Route path="/user" element={<User />} />
           </Routes>
 
