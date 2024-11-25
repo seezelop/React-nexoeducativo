@@ -4,22 +4,24 @@ import AdminNavigation from "./comp-navegacion/AdminNavigation"; // Importa la n
 import UserNavigation from "./comp-navegacion/UserNavigation"; // Importa la navegación del usuario
 import { UserContext } from "../../context/UserContext"; // Importa el contexto del usuario
 import axios from "axios";
+import Cookies from 'universal-cookie';
 
 const Header = () => {
   const { userRole, infoSesion, setUserRole, setInfoSesion } = useContext(UserContext); // Accede al contexto
   const navigate = useNavigate();
+  const cookies = new Cookies();
 
   console.log("llamando al infoSesion: " + infoSesion)
 
   const handleLogout = async () => {
     try {
       // Opcional: Llama a una API para cerrar sesión en el backend
-      await axios.post("http://localhost:8080/api/logout", {}, { withCredentials: true });
+      await axios.post("http://localhost:8080/logout", {}, { withCredentials: true });
 
       // Limpia el contexto del usuario
       setUserRole(null);
       setInfoSesion(null);
-      //ver como borrar la cookie llamada rol
+      cookies.remove('rol')
 
       // Redirige a la página de inicio de sesión
       navigate("/login");
