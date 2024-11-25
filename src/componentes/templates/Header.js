@@ -17,8 +17,6 @@ const Header = () => {
   const navigate = useNavigate();
   const cookies = new Cookies();
 
-  console.log("llamando al infoSesion: " + infoSesion);
-
   const handleLogout = async () => {
     try {
       // Opcional: Llama a una API para cerrar sesión en el backend
@@ -42,15 +40,15 @@ const Header = () => {
         return <AdminNavigation />;
       case "jefe colegio":
         return <JefeColegioNavigation />;
-        case "administrativo":
+      case "administrativo":
         return <AdministrativoNavigation />;
-        case "preceptor":
+      case "preceptor":
         return <PreceptorNavigation />;
-        case "profesor":
+      case "profesor":
         return <ProfesorNavigation />;
-        case "padre":
+      case "padre":
         return <PadreNavigation />;
-        case "alumno":
+      case "alumno":
         return <AlumnoNavigation />;
       default:
         return <UserNavigation />;
