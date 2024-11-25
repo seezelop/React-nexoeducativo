@@ -1,17 +1,23 @@
 import React, { useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import AdminNavigation from "./comp-navegacion/AdminNavigation"; // Importa la navegación del admin
-import UserNavigation from "./comp-navegacion/UserNavigation"; // Importa la navegación del usuario
-import { UserContext } from "../../context/UserContext"; // Importa el contexto del usuario
+import AdminNavigation from "./comp-navegacion/AdminNavigation"; // Navegación del admin
+import JefeColegioNavigation from "./comp-navegacion/JefeColegioNavigation"; // Navegación del jefe colegio
+import AdministrativoNavigation from "./comp-navegacion/AdministrativoNavigation"; // Navegación del administrativo
+import PreceptorNavigation from "./comp-navegacion/PreceptorNavigation"; // Navegación del preceptor
+import ProfesorNavigation from "./comp-navegacion/ProfesorNavigation"; // Navegación del profesor
+import PadreNavigation from "./comp-navegacion/PadreNavigation"; // Navegación del padre
+import AlumnoNavigation from "./comp-navegacion/AlumnoNavigation"; // Navegación del alumno
+import UserNavigation from "./comp-navegacion/UserNavigation"; // Navegación del usuario generico
+import { UserContext } from "../../context/UserContext"; // Contexto del usuario
 import axios from "axios";
-import Cookies from 'universal-cookie';
+import Cookies from "universal-cookie";
 
 const Header = () => {
   const { userRole, infoSesion, setUserRole, setInfoSesion } = useContext(UserContext); // Accede al contexto
   const navigate = useNavigate();
   const cookies = new Cookies();
 
-  console.log("llamando al infoSesion: " + infoSesion)
+  console.log("llamando al infoSesion: " + infoSesion);
 
   const handleLogout = async () => {
     try {
@@ -21,7 +27,7 @@ const Header = () => {
       // Limpia el contexto del usuario
       setUserRole(null);
       setInfoSesion(null);
-      cookies.remove('rol')
+      cookies.remove("rol");
 
       // Redirige a la página de inicio de sesión
       navigate("/login");
@@ -30,11 +36,34 @@ const Header = () => {
     }
   };
 
+  const renderNavigation = () => {
+    switch (userRole) {
+      case "super admin":
+        return <AdminNavigation />;
+      case "jefe colegio":
+        return <JefeColegioNavigation />;
+        case "administrativo":
+        return <AdministrativoNavigation />;
+        case "preceptor":
+        return <PreceptorNavigation />;
+        case "profesor":
+        return <ProfesorNavigation />;
+        case "padre":
+        return <PadreNavigation />;
+        case "alumno":
+        return <AlumnoNavigation />;
+      default:
+        return <UserNavigation />;
+    }
+  };
+
   return (
     <nav className="navbar navbar-expand-lg bg-dark" data-bs-theme="dark">
       <div className="container-fluid">
         {/* Enlace al inicio */}
-        <Link className="nav-link active me-3" to="/">Inicio</Link>
+        <Link className="nav-link active me-3" to="/">
+          Inicio
+        </Link>
 
         {/* Botón para la versión móvil */}
         <button
@@ -52,12 +81,7 @@ const Header = () => {
         {/* Opciones de navegación */}
         <div className="collapse navbar-collapse" id="navbarColor02">
           <ul className="navbar-nav me-auto">
-            {/* Determina qué navegación mostrar según el rol del usuario */}
-            {userRole === "super admin" || userRole === "jefe colegio" || userRole === "administrativo" ? (
-              <AdminNavigation />
-            ) : (
-              <UserNavigation />
-            )}
+            {renderNavigation()}
           </ul>
 
           {/* Botón de inicio de sesión o cierre de sesión */}
