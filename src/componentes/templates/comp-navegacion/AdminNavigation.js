@@ -24,6 +24,11 @@ const AdminNavigation = () => {
           ABM Jefe Colegio
         </Link>
       </li>
+      <li className="nav-item me-3">
+        <Link className="nav-link active" to="/admin">
+          Mi Perfil
+        </Link>
+      </li>
     </>
   );
 };
