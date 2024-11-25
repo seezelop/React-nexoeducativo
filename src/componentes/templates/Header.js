@@ -9,6 +9,8 @@ const Header = () => {
   const { userRole, infoSesion, setUserRole, setInfoSesion } = useContext(UserContext); // Accede al contexto
   const navigate = useNavigate();
 
+  console.log("llamando al infoSesion: " + infoSesion)
+
   const handleLogout = async () => {
     try {
       // Opcional: Llama a una API para cerrar sesión en el backend
@@ -17,6 +19,7 @@ const Header = () => {
       // Limpia el contexto del usuario
       setUserRole(null);
       setInfoSesion(null);
+      //ver como borrar la cookie llamada rol
 
       // Redirige a la página de inicio de sesión
       navigate("/login");

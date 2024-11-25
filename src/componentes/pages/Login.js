@@ -31,11 +31,16 @@ function Login() {
           withCredentials: true
         });
 
+        const response2 = await axios.get('http://localhost:8080/auth/info', {
+          withCredentials: true
+        });
+
         if (response.status === 200) {
           const userRole = response.data.split(': ')[1]; // Obtén el nombre del rol del usuario
           setUserRole(userRole);
-          setInfoSesion(response.data); // Guarda la información para mostrarla más tarde
+          //setInfoSesion(response.data); // Guarda la información para mostrarla más tarde
           console.log("Rol obtenido: " + userRole);
+         setInfoSesion(response2.data) //aca se guarda el nombre y apellido del usuario para despues mostrarlo
 
           const usuarioCookie = new Cookies();
           const vencimiento = new Date();
