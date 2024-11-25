@@ -3,33 +3,35 @@ import { DropdownButton, Dropdown } from 'react-bootstrap';
 import axios from 'axios';
 
 class AltaEscuela extends Component {
-    //se setean las propiedades que van a ser enviadas
+    // Se setean las propiedades que van a ser enviadas
     constructor(props) {
-         super(props);
-          this.state =
-           { nombre: '',
-             direccion: '', 
-             activo: 1, 
-             planSeleccionado: '', 
-             idPlan: null, 
-             jefeColegioSeleccionado: '', 
-             id_usuario: null, 
-             planes: [], 
-             showModal:false,
-             jefesColegio: [] }; 
-            }
-    //esto es para rellenar los tipos de plan
+        super(props);
+        this.state = {
+            nombre: '',
+            direccion: '', 
+            activo: 1, 
+            planSeleccionado: '', 
+            idPlan: null, 
+            jefeColegioSeleccionado: '', 
+            id_usuario: null, 
+            planes: [], 
+            showModal: false,
+            jefesColegio: [] 
+        };
+    }
+
+    // Esto es para rellenar los tipos de plan
     cargarPlanes = async () => {
         try {
-            const response = await axios.get('http://localhost:8080/api/usuario/getNombrePlanes',{
+            const response = await axios.get('http://localhost:8080/api/usuario/getNombrePlanes', {
                 withCredentials: true
             });
-            //pasar lista de string a objetos
+            // Pasar lista de string a objetos
             const planes = response.data.map(item => {
                 const [idPlan, descripcion] = item.split(','); // Divide la cadena en partes
                 return { idPlan: parseInt(idPlan, 10), descripcion }; // 10 por base decimal
             });
-    
+
             this.setState({ planes });
 
         } catch (error) {
@@ -37,10 +39,10 @@ class AltaEscuela extends Component {
         }
     };
 
-    //esto es para rellenar que muestre los jefes colegios sin colegios asignados
+    // Esto es para rellenar que muestre los jefes de colegio sin colegios asignados
     cargarJefeColegio = async () => {
         try {
-            const response = await axios.get('http://localhost:8080/api/usuario/getJefeColegioSinEscuela',{
+            const response = await axios.get('http://localhost:8080/api/usuario/getJefeColegioSinEscuela', {
                 withCredentials: true
             });
             if (response.status === 200) {
@@ -48,12 +50,11 @@ class AltaEscuela extends Component {
                     id_usuario: jefe.id_usuario,
                     nombre: `${jefe.nombre} ${jefe.apellido}`
                 }));
-                //console.log("data:"+JSON.stringify(response.data));
                 this.setState({ jefesColegio });
             } else if (response.status === 404) {
                 console.log('Todos los jefes colegios registrados tienen un colegio asignado');
             } else {
-                console.log('Hubo un error y no sabemos que paso');
+                console.log('Hubo un error y no sabemos qué pasó');
             }
         } catch (error) {
             console.error('Error al cargar los jefes de colegio:', error);
@@ -80,38 +81,44 @@ class AltaEscuela extends Component {
             [`id${field.charAt(0).toUpperCase() + field.slice(1)}`]: parsedValue.id,
             id_usuario: parsedValue.id // Update id_usuario state
         });
-
-        //console.log("id "+parsedValue.id)
     };
 
-    //envio del formulario
+    // Envío del formulario
     handleSubmit = async (event) => {
         event.preventDefault(); 
         const { nombre, direccion, activo, idPlan, id_usuario } = this.state;
-    
-       
+
         try {
             // Enviar los datos al backend
             const response = await axios.post('http://localhost:8080/api/usuario/saveEscuela', {
-                withCredentials:true,
                 nombre,
                 direccion,
                 activo,
                 idPlan,
                 jefeColegio: id_usuario
-            });
-    
+            }, { withCredentials: true });
+
             if (response.status === 200) {
+                alert("Escuela creada exitosamente."); // Mostrar el mensaje de confirmación
                 console.log("Escuela creada exitosamente:", response.data);
-                // Aquí puedes agregar un mensaje de éxito o redirigir al usuario
+                // Limpiar los campos del formulario
+                this.setState({
+                    nombre: '',
+                    direccion: '',
+                    planSeleccionado: '',
+                    jefeColegioSeleccionado: '',
+                    idPlan: null,
+                    id_usuario: null
+                });
             }
         } catch (error) {
             console.error("Error al crear la escuela:", error);
+            alert("Ocurrió un error al intentar crear la escuela. Por favor, inténtalo nuevamente.");
         }
     };
 
     render() {
-        //valores por defecto
+        // Valores por defecto
         const {
             nombre = "Nombre:",
             direccion = "Dirección:",
@@ -194,27 +201,6 @@ class AltaEscuela extends Component {
                                     ))}
                                 </DropdownButton>
                             </div>
-                             {/* Modal */}
-                             {this.state.showModal && (
-                                <div className="modal show d-block" tabindex="-1" role="dialog">
-                                    <div className="modal-dialog" role="document">
-                                        <div className="modal-content">
-                                            <div className="modal-header">
-                                                <h5 className="modal-title">Nexo Educativo</h5>
-                                                <button type="button" className="close"  data-dismiss="modal" aria-label="Close">
-                                                    <span aria-hidden="true">&times;</span>
-                                                </button>
-                                            </div>
-                                            <div className="modal-body">
-                                                <p>Escuela creada exitosamente</p>
-                                            </div>
-                                            <div className="modal-footer">
-                                                <button type="button" className="btn btn-secondary"  data-dismiss="modal">Cerrar</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
 
                             <div className="d-grid gap-2 mb-4">
                                 <button type="submit" className="btn btn-primary btn-lg">{buttonText}</button>
@@ -226,4 +212,5 @@ class AltaEscuela extends Component {
         );
     }
 }
+
 export default AltaEscuela;
