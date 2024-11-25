@@ -65,7 +65,9 @@ class BajaUsuario extends Component {
         try {
             // Enviar los datos al backend
            // const { id_escuela } = this.state;
-           const response = await axios.delete(`http://localhost:8080/api/usuario/borrarUsuario/${this.state.idUsuario}`);
+           const response = await axios.delete(`http://localhost:8080/api/usuario/borrarUsuario/${this.state.idUsuario}`,{
+            withCredentials: true
+        });
 
             console.log("lo que se va a enviar: "+response)
 

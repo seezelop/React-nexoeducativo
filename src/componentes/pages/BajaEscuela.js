@@ -19,7 +19,9 @@ class BajaEscuela extends Component {
     //esto es para rellenar los tipos de plan
     cargarEscuelas = async () => {
         try {
-            const response = await axios.get('http://localhost:8080/api/usuario/getEscuelas');
+            const response = await axios.get('http://localhost:8080/api/usuario/getEscuelas',{
+                withCredentials: true
+            });
             //pasar lista de string a objetos
             const escuelas = response.data.map(jefe => ({
                 id_escuela: jefe.id_escuela,
@@ -59,7 +61,9 @@ class BajaEscuela extends Component {
         try {
             // Enviar los datos al backend
            // const { id_escuela } = this.state;
-           const response = await axios.delete(`http://localhost:8080/api/usuario/borrarEscuela/${this.state.id_escuela}`);
+           const response = await axios.delete(`http://localhost:8080/api/usuario/borrarEscuela/${this.state.id_escuela}`,{
+            withCredentials: true
+        });
 
             console.log("lo que se va a enviar: "+response)
 

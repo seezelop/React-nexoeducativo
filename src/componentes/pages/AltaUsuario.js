@@ -22,6 +22,7 @@ constructor(props) {
     e.preventDefault();
     fetch('http://localhost:8080/api/usuario/saveUsuario', {
       method: 'POST',
+      withCredentials: true,
       headers: {
         'Content-Type': 'application/json'
       },
