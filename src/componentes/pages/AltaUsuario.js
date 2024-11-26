@@ -22,7 +22,7 @@ constructor(props) {
     e.preventDefault();
     fetch('http://localhost:8080/api/usuario/saveUsuario', {
       method: 'POST',
-      withCredentials: true,
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json'
       },
@@ -30,10 +30,11 @@ constructor(props) {
       
     })
     .then(response => {
+        console.log('lo que se envia: ',response)
         if(response.ok){
             this.setState({ showModal: true })
         }
-        return response.json();
+        return response.text();
     })
     .then(data => console.log('User created:', data))
     .catch(error => console.error('Error creating user:', error));
@@ -43,6 +44,12 @@ constructor(props) {
     const { id, value } = event.target;
     this.setState({ [id]: value });
   };
+
+  //boton para cerrar el modal
+  closeModal = () => {
+    this.setState({ showModal: false });
+};
+
      
     render() {
         //valores por defecto
@@ -164,7 +171,7 @@ constructor(props) {
                                         <div className="modal-content">
                                             <div className="modal-header">
                                                 <h5 className="modal-title">Nexo Educativo</h5>
-                                                <button type="button" className="close"  data-dismiss="modal" aria-label="Close">
+                                                <button type="button" className="close"  data-dismiss="modal" aria-label="Close" onClick={this.closeModal}>
                                                     <span aria-hidden="true">&times;</span>
                                                 </button>
                                             </div>
