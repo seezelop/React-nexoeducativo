@@ -17,28 +17,29 @@ constructor(props) {
     };
 }
 
- handleSubmit = (e) => {
-   // console.log("cuerpo:"+JSON.stringify(this.props))
+handleSubmit = (e) => {
     e.preventDefault();
     fetch('http://localhost:8080/api/usuario/saveUsuario', {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(this.state)
-      
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(this.state)
     })
     .then(response => {
-        console.log('lo que se envia: ',response)
-        if(response.ok){
-            this.setState({ showModal: true })
+        console.log('lo que se envia: ', response);
+        if (response.ok) {
+            this.setState({ showModal: true });
+            // Mostrar el alert de confirmación
+            alert("Jefe Colegio creado correctamente");
         }
         return response.text();
     })
     .then(data => console.log('User created:', data))
     .catch(error => console.error('Error creating user:', error));
-  };
+};
+
 
   handleChange = (event) => {
     const { id, value } = event.target;
