@@ -12,7 +12,7 @@ class ModificarUsuario extends Component {
             nombre: '',
             apellido: '',
             dni: '',
-            email: '',
+            mail: '',
             telefono: '',
             activo: false,
         };
@@ -49,8 +49,8 @@ class ModificarUsuario extends Component {
                 withCredentials: true,
             });
 
-            const { nombre, apellido, dni, email, telefono, activo } = response.data;
-            this.setState({ nombre, apellido, dni, email, telefono, activo });
+            const { nombre, apellido, dni, mail, telefono, activo } = response.data;
+            this.setState({ nombre, apellido, dni, mail, telefono, activo });
         } catch (error) {
             console.error('Error al cargar los datos del usuario:', error);
         }
@@ -66,12 +66,12 @@ class ModificarUsuario extends Component {
     handleSubmit = async (event) => {
         event.preventDefault();
 
-        const { idUsuario, nombre, apellido, dni, email, telefono, activo } = this.state;
+        const { idUsuario, nombre, apellido, dni, mail, telefono, activo } = this.state;
 
         try {
             const response = await axios.patch(
                 `http://localhost:8080/api/usuario/modificarUsuario/${idUsuario}`,
-                { nombre, apellido, dni, email, telefono, activo },
+                { nombre, apellido, dni, mail, telefono, activo },
                 { withCredentials: true }
             );
 
@@ -84,7 +84,7 @@ class ModificarUsuario extends Component {
                     nombre: '',
                     apellido: '',
                     dni: '',
-                    email: '',
+                    mail: '',
                     telefono: '',
                     activo: false,
                 });
@@ -101,7 +101,7 @@ class ModificarUsuario extends Component {
     }
 
     render() {
-        const { usuarios, usuarioSeleccionado, nombre, apellido, dni, email, telefono, activo } = this.state;
+        const { usuarios, usuarioSeleccionado, nombre, apellido, dni, mail, telefono, activo } = this.state;
 
         return (
             <section className="d-flex flex-column">
@@ -165,9 +165,9 @@ class ModificarUsuario extends Component {
                                     <div className="mb-3">
                                         <label htmlFor="email" className="form-label">Email:</label>
                                         <Form.Control
-                                            id="email"
+                                            id="mail"
                                             type="email"
-                                            value={email}
+                                            value={mail}
                                             onChange={this.handleInputChange}
                                             required
                                         />
