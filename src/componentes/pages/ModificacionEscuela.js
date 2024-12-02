@@ -1,76 +1,205 @@
-import React from 'react';
+import React, { Component } from 'react';
+import { Dropdown, DropdownButton, Button, Form } from 'react-bootstrap';
+import axios from 'axios';
 
-class ModificacionEscuela extends React.Component {
+class ModificarEscuela extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      escuelaSeleccionada: 'Seleccione un colegio',
+      id_escuela: null,
+      nombre: '',
+      direccion: '',
+      activo: false,
+      plan_id_plan: null,
+      escuelas: [],
+      cargandoDatos: false, // Indica si se están cargando datos
+    };
+  }
+
+  // Cargar las escuelas disponibles
+  cargarEscuelas = async () => {
+    try {
+      const response = await axios.get('http://localhost:8080/api/usuario/getEscuelas', {
+        withCredentials: true,
+      });
+      const escuelas = response.data.map((escuela) => ({
+        id_escuela: escuela.id_escuela,
+        nombre: `${escuela.nombre} ${escuela.direccion}`,
+      }));
+      this.setState({ escuelas });
+    } catch (error) {
+      console.error('Error al cargar las escuelas:', error);
+    }
+  };
+
+  // Cargar datos de la escuela seleccionada
+  cargarDatosEscuela = async (id_escuela) => {
+    this.setState({ cargandoDatos: true });
+    try {
+      const response = await axios.get(`http://localhost:8080/api/usuario/getEscuela/${id_escuela}`, {
+        withCredentials: true,
+      });
+      const { nombre, direccion, activo, plan_id_plan } = response.data;
+      this.setState({ nombre, direccion, activo, plan_id_plan, cargandoDatos: false });
+    } catch (error) {
+      console.error('Error al cargar los datos de la escuela:', error);
+      this.setState({ cargandoDatos: false });
+    }
+  };
+
+  // Al montar el componente, cargar las escuelas
+  componentDidMount() {
+    this.cargarEscuelas();
+  }
+
+  // Manejar cambios en el dropdown
+  handleDropdownChange = (value) => {
+    const parsedValue = JSON.parse(value);
+    this.setState(
+      {
+        escuelaSeleccionada: parsedValue.nombre,
+        id_escuela: parsedValue.id_escuela,
+        nombre: '',
+        direccion: '',
+        activo: false,
+        plan_id_plan: null,
+      },
+      () => this.cargarDatosEscuela(parsedValue.id_escuela) // Cargar datos de la escuela seleccionada
+    );
+  };
+
+  // Manejar cambios en los campos del formulario
+  handleInputChange = (event) => {
+    const { id, value, type, checked } = event.target;
+    this.setState({ [id]: type === 'checkbox' ? checked : value });
+  };
+
+  // Manejar envío del formulario
+  handleSubmit = async (event) => {
+    event.preventDefault();
+    const { id_escuela, nombre, direccion, activo, plan_id_plan } = this.state;
+
+    try {
+      const response = await axios.patch(
+        `http://localhost:8080/api/modificarEscuela/${id_escuela}`,
+        { nombre, direccion, activo, plan_id_plan },
+        { withCredentials: true }
+      );
+
+      if (response.status === 200) {
+        alert('Escuela modificada exitosamente!');
+        this.cargarEscuelas(); // Actualizar lista de escuelas si es necesario
+      }
+    } catch (error) {
+      console.error('Error al modificar la escuela:', error);
+      alert('Ocurrió un error al intentar modificar la escuela.');
+    }
+  };
+
   render() {
+    const { escuelaSeleccionada, escuelas, nombre, direccion, activo, plan_id_plan, cargandoDatos, id_escuela } = this.state;
+
     return (
-      <section className="d-flex flex-column">
-        <section className="container d-flex justify-content-center align-items-center flex-grow-1">
+      <section className="d-flex flex-column min-vh-100">
+        <div className="container d-flex flex-column justify-content-center align-items-center flex-grow-1">
+
+          {/* Sección Modificación Escuela */}
           <section className="col-md-8 mb-5">
-            <div className="card shadow-sm">
-              <div className="card-body">
-                <form>
-                  <div className="row">
-                    {/* Campo para el Nombre */}
-                    <div className="col-md-6 mb-3">
+            <div className="card shadow-sm p-3">
+              <h3 className="mb-4 text-center">MODIFICACIÓN ESCUELA</h3>
+
+              <Form onSubmit={this.handleSubmit}>
+                {/* Dropdown para seleccionar la escuela */}
+                <div className="mb-4">
+                  <label htmlFor="dropdown-basic-button" className="form-label">Seleccionar escuela:</label>
+                  <DropdownButton
+                    id="dropdown-basic-button"
+                    title={escuelaSeleccionada}
+                    onSelect={(value) => this.handleDropdownChange(value)}
+                  >
+                    {escuelas.map((escuela) => (
+                      <Dropdown.Item
+                        key={escuela.id_escuela}
+                        eventKey={JSON.stringify({ id_escuela: escuela.id_escuela, nombre: escuela.nombre })}
+                      >
+                        {escuela.nombre}
+                      </Dropdown.Item>
+                    ))}
+                  </DropdownButton>
+                </div>
+
+                {/* Mostrar mensaje mientras se cargan los datos */}
+                {cargandoDatos && <p className="text-center">Cargando datos de la escuela...</p>}
+
+                {/* Formulario para modificar la escuela, visible solo si se seleccionó una escuela */}
+                {id_escuela && !cargandoDatos && (
+                  <>
+                    <div className="mb-3">
                       <label htmlFor="nombre" className="form-label">Nombre:</label>
                       <input
                         type="text"
                         className="form-control"
                         id="nombre"
-                        placeholder="Ingresa el nuevo nombre"
+                        value={nombre}
+                        onChange={this.handleInputChange}
+                        placeholder="Nuevo nombre"
                         required
                       />
                     </div>
 
-                    {/* Campo para el Apellido */}
-                    <div className="col-md-6 mb-3">
-                      <label htmlFor="apellido" className="form-label">Apellido:</label>
+                    <div className="mb-3">
+                      <label htmlFor="direccion" className="form-label">Dirección:</label>
                       <input
                         type="text"
                         className="form-control"
-                        id="apellido"
-                        placeholder="Ingresa el nuevo apellido"
+                        id="direccion"
+                        value={direccion}
+                        onChange={this.handleInputChange}
+                        placeholder="Nueva dirección"
                         required
                       />
                     </div>
-                  </div>
 
-                  {/* Campo para la Dirección */}
-                  <div className="mb-3">
-                    <label htmlFor="direccion" className="form-label">Dirección:</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      id="direccion"
-                      placeholder="Ingresa la nueva dirección"
-                      required
-                    />
-                  </div>
+                    <div className="mb-3">
+                      <label htmlFor="activo" className="form-label">Activo:</label>
+                      <input
+                        type="checkbox"
+                        className="form-check-input"
+                        id="activo"
+                        checked={activo}
+                        onChange={this.handleInputChange}
+                      />
+                    </div>
 
-                  {/* Campo para el Email */}
-                  <div className="mb-3">
-                    <label htmlFor="email" className="form-label">Email:</label>
-                    <input
-                      type="email"
-                      className="form-control"
-                      id="email"
-                      placeholder="Ingresa el nuevo email"
-                      required
-                    />
-                  </div>
+                    <div className="mb-3">
+                      <label htmlFor="plan_id_plan" className="form-label">Plan:</label>
+                      <select
+                        className="form-select"
+                        id="plan_id_plan"
+                        value={plan_id_plan || ''}
+                        onChange={this.handleInputChange}
+                        required
+                      >
+                        <option value="" disabled>Seleccione un plan</option>
+                        <option value={1}>1 - Básico</option>
+                        <option value={2}>2 - Premium</option>
+                      </select>
+                    </div>
 
-                  {/* Botón de acción */}
-                  <div className="d-grid gap-2 mb-4">
-                    <button type="submit" className="btn btn-primary btn-lg">Confirmar Modificacion</button>
-                  </div>
-                </form>
-              </div>
+                    <div className="d-grid gap-2">
+                      <Button type="submit" className="btn btn-primary">Guardar cambios</Button>
+                    </div>
+                  </>
+                )}
+              </Form>
             </div>
           </section>
-        </section>
+
+        </div>
       </section>
     );
   }
 }
 
-export default ModificacionEscuela;
+export default ModificarEscuela;
