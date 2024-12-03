@@ -29,6 +29,8 @@ import SeleccionarCurso from './componentes/pages/SeleccionarCurso';
 import SeleccionarProfesor from './componentes/pages/SeleccionarProfesor'; 
 import ABMmaterias from './componentes/pages/ABMmaterias'; 
 import ABMprofesor from './componentes/pages/ABMprofesor'; 
+import ABMpadre from './componentes/pages/ABMpadre'; 
+import ABMalumno from './componentes/pages/ABMalumno'; 
 
 
 function App() {
@@ -93,6 +95,8 @@ function App() {
              {/* Rutas para ADMINISTRATIVO  */}
              <Route path="/ABMmaterias" element={<ABMmaterias />} />
              <Route path="/ABMprofesor" element={<ABMprofesor />} />
+             <Route path="/ABMpadre" element={<ABMpadre />} />
+             <Route path="/ABMalumno" element={<ABMalumno />} />
 
             
           </Routes>
