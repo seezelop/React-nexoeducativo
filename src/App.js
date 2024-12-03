@@ -25,6 +25,8 @@ import AltaUsuario from './componentes/pages/AltaUsuario';
 import BajaUsuario from './componentes/pages/BajaUsuario';
 import ABMJefeColegio from './componentes/pages/ABMJefeColegio';
 import ABMadministrativo from './componentes/pages/ABMadministrativo'; 
+import SeleccionarCurso from './componentes/pages/SeleccionarCurso'; 
+import SeleccionarProfesor from './componentes/pages/SeleccionarProfesor'; 
 
 function App() {
   return (
@@ -67,8 +69,11 @@ function App() {
             <Route path="/ABMJefeColegio" element={<ABMJefeColegio />} />
             <Route path="/consultar-escuelas" element={<ConsultarEscuelas />} />
 
-            {/* Ruta para ABM Administrativo */}
+            {/* Ruta para ABM JEFE COLEGIO */}
             <Route path="/ABMadministrativo" element={<ABMadministrativo />} />
+            <Route path="/SeleccionarCurso" element={<SeleccionarCurso />} />
+            <Route path="/SeleccionarProfesor" element={<SeleccionarProfesor />} />
+            
 
             {/* Rutas para admin y user */}
             <Route path="/admin" element={<Admin />} />
