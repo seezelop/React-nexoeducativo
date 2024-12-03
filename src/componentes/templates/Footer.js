@@ -31,8 +31,16 @@ class Footer extends Component {
               </a>
             </div>
 
-            {/* Columna central: espacio en blanco */}
-            <div className='col-md-4'></div>
+            {/* Columna central: Enlace al formulario de contacto */}
+            <div className='col-md-4 d-flex justify-content-center align-items-center'>
+              <a
+                href='/contacto'
+                className='btn btn-light btn-lg text-dark'
+                role='button'
+              >
+                Formulario de Contacto
+              </a>
+            </div>
 
             {/* Columna derecha: Redes sociales */}
             <div className='col-md-4 d-flex justify-content-end'>
