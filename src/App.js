@@ -31,7 +31,8 @@ import ABMmaterias from './componentes/pages/ABMmaterias';
 import ABMprofesor from './componentes/pages/ABMprofesor'; 
 import ABMpadre from './componentes/pages/ABMpadre'; 
 import ABMalumno from './componentes/pages/ABMalumno'; 
-
+import ABMcurso from './componentes/pages/ABMcurso'; 
+import ABMpreceptor from './componentes/pages/ABMpreceptor'; 
 
 function App() {
   return (
@@ -97,6 +98,8 @@ function App() {
              <Route path="/ABMprofesor" element={<ABMprofesor />} />
              <Route path="/ABMpadre" element={<ABMpadre />} />
              <Route path="/ABMalumno" element={<ABMalumno />} />
+             <Route path="/ABMcurso" element={<ABMcurso />} />
+             <Route path="/ABMpreceptor" element={<ABMpreceptor />} />
 
             
           </Routes>
