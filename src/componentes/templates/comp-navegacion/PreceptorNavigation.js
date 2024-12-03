@@ -15,6 +15,11 @@ const PreceptorNavigation = () => {
         </Link>
       </li>
       <li className="nav-item me-3">
+        <Link className="nav-link active" to="/ABMcurso">
+          ABM Curso
+        </Link>
+      </li>
+      <li className="nav-item me-3">
         <Link className="nav-link active" to="/GestionarAsistenciaAlumno">
             Asistencia alumno
         </Link>

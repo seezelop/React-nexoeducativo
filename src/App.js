@@ -33,6 +33,8 @@ import ABMpadre from './componentes/ABM/ABMpadre';
 import ABMalumno from './componentes/ABM/ABMalumno'; 
 import ABMcurso from './componentes/ABM/ABMcurso'; 
 import ABMpreceptor from './componentes/ABM/ABMpreceptor'; 
+import GestionarAsistenciaAlumno from './componentes/pages/GestionarAsistenciaAlumno'; 
+import GestionarAsistenciaProfesor from './componentes/pages/GestionarAsistenciaProfesor';
 
 function App() {
   return (
@@ -100,6 +102,10 @@ function App() {
              <Route path="/ABMalumno" element={<ABMalumno />} />
              <Route path="/ABMcurso" element={<ABMcurso />} />
              <Route path="/ABMpreceptor" element={<ABMpreceptor />} />
+
+              {/* Rutas para PRECEPTOR  */}
+              <Route path="/GestionarAsistenciaAlumno" element={<GestionarAsistenciaAlumno />} />
+              <Route path="/GestionarAsistenciaProfesor" element={<GestionarAsistenciaProfesor />} />
 
             
           </Routes>
