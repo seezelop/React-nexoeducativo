@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Header from './componentes/templates/Header';
+import Header from './componentes/templates/NavBar';
 import Carousel from './componentes/templates/Carousel';
 import Footer from './componentes/templates/Footer';
 import Login from './componentes/pages/Login';
