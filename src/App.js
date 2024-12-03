@@ -16,23 +16,23 @@ import SobreNosotros from './componentes/pages/SobreNosotros';
 import Contacto from './componentes/pages/Contacto';
 import PreguntasFrecuentes from './componentes/pages/PreguntasFrecuentes';
 import QueOfrecemos from './componentes/pages/QueOfrecemos';
-import ABMEscuelas from './componentes/pages/ABMEscuelas';
+import ABMEscuelas from './componentes/ABM/ABMEscuelas';
 import ConsultarEscuelas from './componentes/pages/ConsultarEscuelas';
 import { UserProvider } from './context/UserContext';
-import AltaEscuela from './componentes/pages/AltaEscuela';
-import BajaEscuela from './componentes/pages/BajaEscuela';
-import AltaUsuario from './componentes/pages/AltaUsuario';
-import BajaUsuario from './componentes/pages/BajaUsuario';
-import ABMJefeColegio from './componentes/pages/ABMJefeColegio';
-import ABMadministrativo from './componentes/pages/ABMadministrativo'; 
+import AltaEscuela from './componentes/ABM/AltaEscuela';
+import BajaEscuela from './componentes/ABM/BajaEscuela';
+import AltaUsuario from './componentes/ABM/AltaUsuario';
+import BajaUsuario from './componentes/ABM/BajaUsuario';
+import ABMJefeColegio from './componentes/ABM/ABMJefeColegio';
+import ABMadministrativo from './componentes/ABM/ABMadministrativo'; 
 import SeleccionarCurso from './componentes/pages/SeleccionarCurso'; 
 import SeleccionarProfesor from './componentes/pages/SeleccionarProfesor'; 
-import ABMmaterias from './componentes/pages/ABMmaterias'; 
-import ABMprofesor from './componentes/pages/ABMprofesor'; 
-import ABMpadre from './componentes/pages/ABMpadre'; 
-import ABMalumno from './componentes/pages/ABMalumno'; 
-import ABMcurso from './componentes/pages/ABMcurso'; 
-import ABMpreceptor from './componentes/pages/ABMpreceptor'; 
+import ABMmaterias from './componentes/ABM/ABMmaterias'; 
+import ABMprofesor from './componentes/ABM/ABMprofesor'; 
+import ABMpadre from './componentes/ABM/ABMpadre'; 
+import ABMalumno from './componentes/ABM/ABMalumno'; 
+import ABMcurso from './componentes/ABM/ABMcurso'; 
+import ABMpreceptor from './componentes/ABM/ABMpreceptor'; 
 
 function App() {
   return (
