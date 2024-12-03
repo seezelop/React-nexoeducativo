@@ -15,7 +15,7 @@ const JefeColegioNavigation = () => {
         </Link>
       </li>
       <li className="nav-item me-3">
-        <Link className="nav-link active" to="/ABMadministrativos">
+        <Link className="nav-link active" to="/ABMadministrativo">
           ABM administrativos
         </Link>
       </li>
