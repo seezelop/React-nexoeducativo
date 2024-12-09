@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import AltaEscuela from './AltaEscuela';
 import BajaEscuela from './BajaEscuela';
-import ModificacionEscuela from './ModificacionEscuela';
+import ModificacionEscuela from './ModificarEscuela';
 
 function ABMEscuelas() {
   const navigate = useNavigate(); // Hook para redirigir

@@ -100,6 +100,9 @@ class AltaEscuela extends Component {
 
             if (response.status === 200) {
                 alert("Escuela creada exitosamente."); // Mostrar el mensaje de confirmación
+
+                 // Refrescar la página
+                window.location.reload();
                 console.log("Escuela creada exitosamente:", response.data);
                 // Limpiar los campos del formulario
                 this.setState({
