@@ -82,9 +82,12 @@ class BajaUsuario extends Component {
             await this.cargarUsuarios();
             if(response.status===200) {
                 alert("Usuario eliminado exitosamente!")
+                window.location.reload(); // Recarga la página
             }else{
                 alert("error al eliminar usuario")
             }
+
+          
 
         } catch (error) {
             console.error("Error al eliminar el usuario:", error);
