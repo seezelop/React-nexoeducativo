@@ -15,8 +15,62 @@ class ModificarAdministrativo extends Component {
             mail: '',
             telefono: '',
             activo: false,
+            errores: {}, // Almacena los errores de validación
         };
     }
+
+    // Validaciones por campo
+    validarCampo = (id, value) => {
+        let error = '';
+
+        switch (id) {
+            case 'nombre':
+                if (!/^[a-zA-Z]{3,30}$/.test(value)) {
+                    error = 'El nombre debe tener entre 3 y 30 letras.';
+                }
+                break;
+
+            case 'apellido':
+                if (!/^[a-zA-Z]{4,30}$/.test(value)) {
+                    error = 'El apellido debe tener entre 4 y 30 letras.';
+                }
+                break;
+
+            case 'dni':
+                if (!/^\d{6,8}$/.test(value)) {
+                    error = 'El DNI debe tener entre 6 y 8 dígitos.';
+                }
+                break;
+
+            case 'mail':
+                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+                    error = 'Formato de email inválido.';
+                }
+                break;
+
+            case 'telefono':
+                if (!/^\d{7,9}$/.test(value)) {
+                    error = 'El teléfono debe tener entre 7 y 9 dígitos.';
+                }
+                break;
+
+            default:
+                break;
+        }
+
+        return error;
+    };
+
+    // Manejar cambios en los inputs y aplicar validaciones
+    handleInputChange = (event) => {
+        const { id, value } = event.target;
+        const error = this.validarCampo(id, value);
+
+        this.setState((prevState) => ({
+            [id]: value,
+            errores: { ...prevState.errores, [id]: error },
+        }));
+    };
 
     // Cargar la lista de administrativos
     cargarAdministrativos = async () => {
@@ -54,12 +108,6 @@ class ModificarAdministrativo extends Component {
         } catch (error) {
             console.error('Error al cargar los datos del administrativo:', error);
         }
-    };
-
-    // Manejar cambios en los campos del formulario
-    handleInputChange = (event) => {
-        const { id, value, type, checked } = event.target;
-        this.setState({ [id]: type === 'checkbox' ? checked : value });
     };
 
     // Manejar envío del formulario
@@ -101,7 +149,7 @@ class ModificarAdministrativo extends Component {
     }
 
     render() {
-        const { administrativos, administrativoSeleccionado, nombre, apellido, dni, mail, telefono, activo } = this.state;
+        const { administrativos, administrativoSeleccionado, nombre, apellido, dni, mail, telefono, activo, errores } = this.state;
 
         return (
             <section className="d-flex flex-column">
@@ -132,55 +180,27 @@ class ModificarAdministrativo extends Component {
 
                             {administrativoSeleccionado !== 'Seleccione un administrativo' && (
                                 <>
-                                    <div className="mb-3">
-                                        <label htmlFor="nombre" className="form-label">Nombre:</label>
-                                        <Form.Control
-                                            id="nombre"
-                                            type="text"
-                                            value={nombre}
-                                            onChange={this.handleInputChange}
-                                            required
-                                        />
-                                    </div>
-                                    <div className="mb-3">
-                                        <label htmlFor="apellido" className="form-label">Apellido:</label>
-                                        <Form.Control
-                                            id="apellido"
-                                            type="text"
-                                            value={apellido}
-                                            onChange={this.handleInputChange}
-                                            required
-                                        />
-                                    </div>
-                                    <div className="mb-3">
-                                        <label htmlFor="dni" className="form-label">DNI:</label>
-                                        <Form.Control
-                                            id="dni"
-                                            type="text"
-                                            value={dni}
-                                            onChange={this.handleInputChange}
-                                            required
-                                        />
-                                    </div>
-                                    <div className="mb-3">
-                                        <label htmlFor="email" className="form-label">Email:</label>
-                                        <Form.Control
-                                            id="mail"
-                                            type="email"
-                                            value={mail}
-                                            onChange={this.handleInputChange}
-                                            required
-                                        />
-                                    </div>
-                                    <div className="mb-3">
-                                        <label htmlFor="telefono" className="form-label">Teléfono:</label>
-                                        <Form.Control
-                                            id="telefono"
-                                            type="text"
-                                            value={telefono}
-                                            onChange={this.handleInputChange}
-                                        />
-                                    </div>
+                                    {[
+                                        { id: "nombre", label: "Nombre", type: "text" },
+                                        { id: "apellido", label: "Apellido", type: "text" },
+                                        { id: "dni", label: "DNI", type: "number" },
+                                        { id: "mail", label: "Email", type: "email" },
+                                        { id: "telefono", label: "Teléfono", type: "number" }
+                                    ].map(({ id, label, type }) => (
+                                        <div className="mb-3" key={id}>
+                                            <label htmlFor={id} className="form-label">{label}</label>
+                                            <Form.Control
+                                                id={id}
+                                                type={type}
+                                                value={this.state[id]}
+                                                onChange={this.handleInputChange}
+                                                isInvalid={!!errores[id]}
+                                            />
+                                            <Form.Control.Feedback type="invalid">
+                                                {errores[id]}
+                                            </Form.Control.Feedback>
+                                        </div>
+                                    ))}
                                     <div className="mb-3">
                                         <label htmlFor="activo" className="form-label">Activo:</label>
                                         <Form.Check

@@ -1,188 +1,221 @@
-import React, { Component } from 'react';
+import React, { Component } from "react";
 
 class AltaAdministrativo extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            nombre: '',
-            apellido: '',
-            dni: '',
-            mail: '',
-            clave: '',
-            telefono: '',
-            activo: 1,
-            rol: 3, // Por defecto, se da de alta como administrativo
-            showModal: false
-        };
+  constructor(props) {
+    super(props);
+    this.state = {
+      nombre: "",
+      apellido: "",
+      dni: "",
+      mail: "",
+      clave: "",
+      telefono: "",
+      activo: 1,
+      rol: 3, // Por defecto, administrativo
+      showModal: false,
+      errores: {}, // Almacena los errores de validación
+    };
+  }
+
+  // Validaciones por campo
+  validarCampo = (id, value) => {
+    let error = "";
+
+    switch (id) {
+      case "nombre":
+        if (!/^[a-zA-Z]{3,30}$/.test(value)) {
+          error = "El nombre debe tener entre 3 y 30 letras.";
+        }
+        break;
+
+      case "apellido":
+        if (!/^[a-zA-Z]{4,30}$/.test(value)) {
+          error = "El apellido debe tener entre 4 y 30 letras.";
+        }
+        break;
+
+      case "dni":
+        if (!/^\d{6,8}$/.test(value)) {
+          error = "El DNI debe tener entre 6 y 8 dígitos.";
+        }
+        break;
+
+      case "mail":
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+          error = "Formato de email inválido.";
+        }
+        break;
+
+      case "clave":
+        if (
+          !/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&+])[A-Za-z\d@$!%*?&+]{8,32}$/.test(
+            value
+          )
+        ) {
+          error =
+            "La clave debe tener entre 8 y 32 caracteres, al menos una letra mayúscula, una minúscula, un número y un carácter especial.";
+        }
+        break;
+
+      case "telefono":
+        if (!/^\d{7,9}$/.test(value)) {
+          error = "El teléfono debe tener entre 7 y 9 dígitos.";
+        }
+        break;
+
+      default:
+        break;
     }
 
-    handleSubmit = (e) => {
-        e.preventDefault();
-        fetch('http://localhost:8080/api/usuario/saveUsuario', {
-            method: 'POST',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(this.state)
-        })
-        .then(response => {
-            console.log('lo que se envia: ', response);
-            if (response.ok) {
-                this.setState({ showModal: true });
-                alert("Administrativo creado correctamente");
-            }
-            return response.text();
-        })
-        .then(data => console.log('Administrativo creado:', data))
-        .catch(error => console.error('Error al crear administrativo:', error));
-    };
+    return error;
+  };
 
-    handleChange = (event) => {
-        const { id, value } = event.target;
-        this.setState({ [id]: value });
-    };
+  // Maneja cambios en los inputs y aplica validaciones
+  handleChange = (event) => {
+    const { id, value } = event.target;
+    const error = this.validarCampo(id, value);
 
-    closeModal = () => {
-        this.setState({ showModal: false });
-    };
+    this.setState((prevState) => ({
+      [id]: value,
+      errores: { ...prevState.errores, [id]: error },
+    }));
+  };
 
-    render() {
-        const {
-            nombre = "Nombre:",
-            apellido = "Apellido:",
-            dni = "DNI:",
-            mail = "Email:",
-            clave = "Clave:",
-            telefono = "Teléfono:",
-            buttonText = "Crear Administrativo"
-        } = this.props;
+  // Maneja el envío del formulario con validación
+  handleSubmit = (e) => {
+    e.preventDefault();
 
-        return (
-            <section className="d-flex flex-column">
-                <section className="container d-flex justify-content-center align-items-center flex-grow-1">
-                    <section className="col-lg-12">
-                        <form onSubmit={this.handleSubmit}>
-                            <div className="row">
-                                <div className="mb-3">
-                                    <label htmlFor="nombre" className="form-label">{nombre}</label>
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        id="nombre"
-                                        value={this.state.nombre}
-                                        onChange={this.handleChange}
-                                        placeholder="Ingresa el nombre"
-                                        required
-                                    />
-                                </div>
-                            </div>
+    const { errores, ...datosUsuario } = this.state;
 
-                            <div className="row">
-                                <div className="col mb-3">
-                                    <label htmlFor="apellido" className="form-label">{apellido}</label>
-                                    <input
-                                        type="text"
-                                        className="form-control"
-                                        id="apellido"
-                                        value={this.state.apellido}
-                                        onChange={this.handleChange}
-                                        placeholder="Ingresa el apellido"
-                                        required
-                                    />
-                                </div>
-                            </div>
+    // Verifica si hay errores
+    const erroresPendientes = Object.keys(datosUsuario).reduce((acc, key) => {
+      const error = this.validarCampo(key, datosUsuario[key]);
+      if (error) {
+        acc[key] = error;
+      }
+      return acc;
+    }, {});
 
-                            <div className="row">
-                                <div className="col-lg-12 mb-3">
-                                    <label htmlFor="dni" className="form-label">{dni}</label>
-                                    <input
-                                        type="number"
-                                        className="form-control"
-                                        id="dni"
-                                        value={this.state.dni}
-                                        onChange={this.handleChange}
-                                        placeholder="Ingresa el DNI"
-                                        required
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="row">
-                                <div className="col-lg-12 mb-3">
-                                    <label htmlFor="mail" className="form-label">{mail}</label>
-                                    <input
-                                        type="email"
-                                        className="form-control"
-                                        id="mail"
-                                        value={this.state.mail}
-                                        onChange={this.handleChange}
-                                        placeholder="Ingresa el email"
-                                        required
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="row">
-                                <div className="col-lg-12 mb-3">
-                                    <label htmlFor="clave" className="form-label">{clave}</label>
-                                    <input
-                                        type="password"
-                                        className="form-control"
-                                        id="clave"
-                                        value={this.state.clave}
-                                        onChange={this.handleChange}
-                                        placeholder="Ingresa la clave"
-                                        required
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="row">
-                                <div className="col-lg-12 mb-3">
-                                    <label htmlFor="telefono" className="form-label">{telefono}</label>
-                                    <input
-                                        type="number"
-                                        className="form-control"
-                                        id="telefono"
-                                        value={this.state.telefono}
-                                        onChange={this.handleChange}
-                                        placeholder="Ingresa el teléfono"
-                                        required
-                                    />
-                                </div>
-                            </div>
-
-                            {this.state.showModal && (
-                                <div className="modal show d-block" tabIndex="-1" role="dialog">
-                                    <div className="modal-dialog" role="document">
-                                        <div className="modal-content">
-                                            <div className="modal-header">
-                                                <h5 className="modal-title">Nexo Educativo</h5>
-                                                <button type="button" className="close" data-dismiss="modal" aria-label="Close" onClick={this.closeModal}>
-                                                    <span aria-hidden="true">&times;</span>
-                                                </button>
-                                            </div>
-                                            <div className="modal-body">
-                                                <p>Administrativo creado exitosamente</p>
-                                            </div>
-                                            <div className="modal-footer">
-                                                <button type="button" className="btn btn-secondary" data-dismiss="modal" onClick={this.closeModal}>Cerrar</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-
-                            <div className="d-grid gap-2 mb-4">
-                                <button type="submit" className="btn btn-primary btn-lg">{buttonText}</button>
-                            </div>
-                        </form>
-                    </section>
-                </section>
-            </section>
-        );
+    if (Object.keys(erroresPendientes).length > 0) {
+      this.setState({ errores: erroresPendientes });
+      alert("Por favor, corrija los errores antes de enviar.");
+      return;
     }
+
+    // Enviar datos al backend
+    fetch("http://localhost:8080/api/usuario/saveUsuario", {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(datosUsuario),
+    })
+      .then((response) => {
+        if (response.ok) {
+          this.setState({ showModal: true });
+          alert("Administrativo creado correctamente.");
+          window.location.reload(); // Recarga la página
+        }
+        return response.text();
+      })
+      .then((data) => console.log("Administrativo creado:", data))
+      .catch((error) => console.error("Error al crear administrativo:", error));
+  };
+
+  closeModal = () => {
+    this.setState({ showModal: false });
+  };
+
+  render() {
+    const { errores } = this.state;
+
+    return (
+      <section className="d-flex flex-column">
+        <section className="container d-flex justify-content-center align-items-center flex-grow-1">
+          <section className="col-lg-12">
+            <form onSubmit={this.handleSubmit}>
+              {[{ id: "nombre", label: "Nombre", type: "text" },
+                { id: "apellido", label: "Apellido", type: "text" },
+                { id: "dni", label: "DNI", type: "number" },
+                { id: "mail", label: "Email", type: "email" },
+                { id: "clave", label: "Clave", type: "password" },
+                { id: "telefono", label: "Teléfono", type: "number" }].map(
+                ({ id, label, type }) => (
+                  <div className="mb-3" key={id}>
+                    <label htmlFor={id} className="form-label">
+                      {label}
+                    </label>
+                    <input
+                      type={type}
+                      className={`form-control ${errores[id] ? "is-invalid" : ""}`}
+                      id={id}
+                      value={this.state[id]}
+                      onChange={this.handleChange}
+                      placeholder={`Ingresa tu ${label.toLowerCase()}`}
+                      required
+                    />
+                    {errores[id] && (
+                      <div
+                        style={{
+                          color: "black",
+                          fontWeight: "bold",
+                          fontSize: "0.9rem",
+                          marginTop: "0.3rem",
+                        }}
+                      >
+                        {errores[id]}
+                      </div>
+                    )}
+                  </div>
+                )
+              )}
+
+              {this.state.showModal && (
+                <div className="modal show d-block" tabIndex="-1" role="dialog">
+                  <div className="modal-dialog" role="document">
+                    <div className="modal-content">
+                      <div className="modal-header">
+                        <h5 className="modal-title">Nexo Educativo</h5>
+                        <button
+                          type="button"
+                          className="close"
+                          data-dismiss="modal"
+                          aria-label="Close"
+                          onClick={this.closeModal}
+                        >
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div className="modal-body">
+                        <p>Administrativo creado exitosamente</p>
+                      </div>
+                      <div className="modal-footer">
+                        <button
+                          type="button"
+                          className="btn btn-secondary"
+                          data-dismiss="modal"
+                          onClick={this.closeModal}
+                        >
+                          Cerrar
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="d-grid gap-2 mb-4">
+                <button type="submit" className="btn btn-primary btn-lg">
+                  Crear Administrativo
+                </button>
+              </div>
+            </form>
+          </section>
+        </section>
+      </section>
+    );
+  }
 }
 
 export default AltaAdministrativo;
