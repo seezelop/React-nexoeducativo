@@ -18,7 +18,7 @@ class SeleccionarCurso extends Component {
     // Cargar la lista de cursos
     cargarCursos = async () => {
         try {
-            const response = await axios.get('http://localhost:8080/api/verCursos', {
+            const response = await axios.get('http://localhost:8080/api/usuario/verCursos', {
                 withCredentials: true,
             });
 
