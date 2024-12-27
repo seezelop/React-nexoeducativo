@@ -1,0 +1,7 @@
+/* CSS personalizado para los mensajes de error */
+.error-feedback {
+    color: black;
+    background-color: yellow;
+    padding: 5px;
+    border-radius: 5px;
+}
