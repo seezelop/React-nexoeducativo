@@ -13,7 +13,6 @@ class ModificarEscuela extends Component {
       activo: false,
       plan_id_plan: null,
       escuelas: [],
-      cargandoDatos: false, // Indica si se están cargando datos
     };
   }
 
@@ -33,21 +32,6 @@ class ModificarEscuela extends Component {
     }
   };
 
-  // Cargar datos de la escuela seleccionada
-  cargarDatosEscuela = async (id_escuela) => {
-    this.setState({ cargandoDatos: true });
-    try {
-      const response = await axios.get(`http://localhost:8080/api/usuario/getEscuela/${id_escuela}`, {
-        withCredentials: true,
-      });
-      const { nombre, direccion, activo, plan_id_plan } = response.data;
-      this.setState({ nombre, direccion, activo, plan_id_plan, cargandoDatos: false });
-    } catch (error) {
-      console.error('Error al cargar los datos de la escuela:', error);
-      this.setState({ cargandoDatos: false });
-    }
-  };
-
   // Al montar el componente, cargar las escuelas
   componentDidMount() {
     this.cargarEscuelas();
@@ -56,17 +40,14 @@ class ModificarEscuela extends Component {
   // Manejar cambios en el dropdown
   handleDropdownChange = (value) => {
     const parsedValue = JSON.parse(value);
-    this.setState(
-      {
-        escuelaSeleccionada: parsedValue.nombre,
-        id_escuela: parsedValue.id_escuela,
-        nombre: '',
-        direccion: '',
-        activo: false,
-        plan_id_plan: null,
-      },
-      () => this.cargarDatosEscuela(parsedValue.id_escuela) // Cargar datos de la escuela seleccionada
-    );
+    this.setState({
+      escuelaSeleccionada: parsedValue.nombre,
+      id_escuela: parsedValue.id_escuela,
+      nombre: '', // Campos inicializados vacíos
+      direccion: '',
+      activo: false,
+      plan_id_plan: null,
+    });
   };
 
   // Manejar cambios en los campos del formulario
@@ -81,9 +62,17 @@ class ModificarEscuela extends Component {
     const { id_escuela, nombre, direccion, activo, plan_id_plan } = this.state;
 
     try {
+      // Transformar `activo` a 1 o 0 según su valor
+      const datos = {
+        nombre,
+        direccion,
+        activo: activo ? 1 : 0, // Transformar booleano a short
+        plan_id_plan,
+      };
+
       const response = await axios.patch(
-        `http://localhost:8080/api/modificarEscuela/${id_escuela}`,
-        { nombre, direccion, activo, plan_id_plan },
+        `http://localhost:8080/api/usuario/modificarEscuela/${id_escuela}`,
+        datos,
         { withCredentials: true }
       );
 
@@ -98,7 +87,7 @@ class ModificarEscuela extends Component {
   };
 
   render() {
-    const { escuelaSeleccionada, escuelas, nombre, direccion, activo, plan_id_plan, cargandoDatos, id_escuela } = this.state;
+    const { escuelaSeleccionada, escuelas, nombre, direccion, activo, plan_id_plan, id_escuela } = this.state;
 
     return (
       <section className="d-flex flex-column min-vh-100">
@@ -129,11 +118,8 @@ class ModificarEscuela extends Component {
                   </DropdownButton>
                 </div>
 
-                {/* Mostrar mensaje mientras se cargan los datos */}
-                {cargandoDatos && <p className="text-center">Cargando datos de la escuela...</p>}
-
                 {/* Formulario para modificar la escuela, visible solo si se seleccionó una escuela */}
-                {id_escuela && !cargandoDatos && (
+                {id_escuela && (
                   <>
                     <div className="mb-3">
                       <label htmlFor="nombre" className="form-label">Nombre:</label>
@@ -144,7 +130,6 @@ class ModificarEscuela extends Component {
                         value={nombre}
                         onChange={this.handleInputChange}
                         placeholder="Nuevo nombre"
-                        required
                       />
                     </div>
 
@@ -157,7 +142,6 @@ class ModificarEscuela extends Component {
                         value={direccion}
                         onChange={this.handleInputChange}
                         placeholder="Nueva dirección"
-                        required
                       />
                     </div>
 
@@ -179,7 +163,6 @@ class ModificarEscuela extends Component {
                         id="plan_id_plan"
                         value={plan_id_plan || ''}
                         onChange={this.handleInputChange}
-                        required
                       >
                         <option value="" disabled>Seleccione un plan</option>
                         <option value={1}>1 - Básico</option>
