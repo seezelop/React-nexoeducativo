@@ -4,22 +4,26 @@ import axios from 'axios';
 
 const AltaCurso = () => {
   const [formData, setFormData] = useState({
-    nombre: '',
-    descripcion: ''
+    numeroCurso: '',
+    division: '',
+    activo: 1 // Valor por defecto en 1 (activo)
   });
 
   const handleInputChange = (e) => {
-    const { id, value } = e.target;
+    const { id, value, type, checked } = e.target;
+
     setFormData({
       ...formData,
-      [id]: value
+      [id]: type === 'checkbox' ? (checked ? 1 : 0) : value // Si es checkbox, enviar 1 si está tildado, 0 si no lo está
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('Datos enviados al backend:', formData); // Verifica los datos
+  
     try {
-      const response = await axios.post('http://localhost:8080/api/curso/alta', formData, { withCredentials: true });
+      const response = await axios.post('http://localhost:8080/api/usuario/saveCurso', formData, { withCredentials: true });
       if (response.status === 200) {
         alert('Curso registrado exitosamente!');
       } else {
@@ -27,18 +31,28 @@ const AltaCurso = () => {
       }
     } catch (error) {
       console.error('Error al registrar el curso:', error);
+      alert('Hubo un error al registrar el curso. Ver consola para más detalles.');
     }
   };
+  
 
   return (
     <Form onSubmit={handleSubmit}>
-      <Form.Group controlId="nombre">
-        <Form.Label>Nombre</Form.Label>
-        <Form.Control type="text" value={formData.nombre} onChange={handleInputChange} required />
+      <Form.Group controlId="numeroCurso">
+        <Form.Label>Número del Curso</Form.Label>
+        <Form.Control type="number" value={formData.numeroCurso} onChange={handleInputChange} required />
       </Form.Group>
-      <Form.Group controlId="descripcion">
-        <Form.Label>Descripción</Form.Label>
-        <Form.Control type="text" value={formData.descripcion} onChange={handleInputChange} required />
+      <Form.Group controlId="division">
+        <Form.Label>División (letra)</Form.Label>
+        <Form.Control type="text" value={formData.division} onChange={handleInputChange} required />
+      </Form.Group>
+      <Form.Group controlId="activo">
+        <Form.Check 
+          type="checkbox"
+          label="Curso Activo"
+          checked={formData.activo === 1} // Si el valor es 1, el checkbox estará tildado
+          onChange={handleInputChange}
+        />
       </Form.Group>
       <Button variant="primary" type="submit">
         Registrar Curso
