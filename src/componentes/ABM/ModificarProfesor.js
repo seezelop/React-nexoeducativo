@@ -16,6 +16,7 @@ class ModificarProfesor extends Component {
             telefono: '',
             activo: false,
             errores: {}, // Almacena los errores de validación
+            rol: 'profesor',
         };
     }
 
@@ -75,7 +76,7 @@ class ModificarProfesor extends Component {
     // Cargar la lista de profesores
     cargarProfesores = async () => {
         try {
-            const response = await axios.get(`http://localhost:8080/api/profesor/getProfesores`, {
+            const response = await axios.get(`http://localhost:8080/api/usuario/getUsuarios/${this.state.rol}`, {
                 withCredentials: true,
             });
 
@@ -103,8 +104,18 @@ class ModificarProfesor extends Component {
                 withCredentials: true,
             });
 
+            console.log(response.data); // Revisa la respuesta de la API
+
+            // Asignar correctamente los datos a los campos
             const { nombre, apellido, dni, mail, telefono, activo } = response.data;
-            this.setState({ nombre, apellido, dni, mail, telefono, activo });
+            this.setState({
+                nombre: nombre || '',
+                apellido: apellido || '',
+                dni: dni || '',
+                mail: mail || '',
+                telefono: telefono || '',
+                activo: activo || false,
+            });
         } catch (error) {
             console.error('Error al cargar los datos del profesor:', error);
         }
