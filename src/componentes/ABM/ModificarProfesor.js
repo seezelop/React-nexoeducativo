@@ -16,7 +16,11 @@ class ModificarProfesor extends Component {
             telefono: '',
             activo: false,
             errores: {}, // Almacena los errores de validación
+<<<<<<< HEAD
             rol: 'profesor',
+=======
+            rol:'profesor'
+>>>>>>> 5ba917e4a28cfb72cd1e163eaedbea9157a2eea6
         };
     }
 
