@@ -16,6 +16,7 @@ class ModificarProfesor extends Component {
             telefono: '',
             activo: false,
             errores: {}, // Almacena los errores de validación
+            rol:'profesor'
         };
     }
 
@@ -75,7 +76,7 @@ class ModificarProfesor extends Component {
     // Cargar la lista de profesores
     cargarProfesores = async () => {
         try {
-            const response = await axios.get(`http://localhost:8080/api/profesor/getProfesores`, {
+            const response = await axios.get(`http://localhost:8080/api/usuario/getUsuarios/${this.state.rol}`, {
                 withCredentials: true,
             });
 
