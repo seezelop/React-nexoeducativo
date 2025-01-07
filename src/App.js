@@ -35,6 +35,8 @@ import ABMcurso from './componentes/ABM/ABMcurso';
 import ABMpreceptor from './componentes/ABM/ABMpreceptor'; 
 import GestionarAsistenciaAlumno from './componentes/pages/GestionarAsistenciaAlumno'; 
 import GestionarAsistenciaProfesor from './componentes/pages/GestionarAsistenciaProfesor';
+import RealizarPago from './componentes/ABM//RealizarPago';
+
 
 function App() {
   return (
@@ -106,6 +108,9 @@ function App() {
               {/* Rutas para PRECEPTOR  */}
               <Route path="/GestionarAsistenciaAlumno" element={<GestionarAsistenciaAlumno />} />
               <Route path="/GestionarAsistenciaProfesor" element={<GestionarAsistenciaProfesor />} />
+
+              {/* Ruta para realizar pagos  */}
+              <Route path="/RealizarPago" element={<RealizarPago />} />
 
             
           </Routes>
