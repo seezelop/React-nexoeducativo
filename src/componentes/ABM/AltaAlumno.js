@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import axios from "axios";
 
 class AltaAlumno extends Component {
   constructor(props) {
@@ -11,10 +12,32 @@ class AltaAlumno extends Component {
       clave: "",
       telefono: "",
       activo: 1,
-      rol: 7, 
+      rol: 7,
+      cursoSeleccionado: "",
+      padreSeleccionado: "",
+      cursos: [], // Opciones de cursos
+      padres: [], // Opciones de padres
       showModal: false,
       errores: {}, // Almacena los errores de validación
     };
+  }
+
+  componentDidMount() {
+    // Cargar cursos 
+    axios
+      .get("http://localhost:8080/api/usuario/verCursoAdministrativo", { withCredentials: true })
+      .then((response) => {
+        this.setState({ cursos: response.data });
+      })
+      .catch((error) => console.error("Error al cargar los cursos:", error));
+
+    // Cargar padres
+    axios
+      .get("http://localhost:8080/", { withCredentials: true })
+      .then((response) => {
+        this.setState({ padres: response.data });
+      })
+      .catch((error) => console.error("Error al cargar los padres:", error));
   }
 
   // Validaciones por campo
@@ -22,52 +45,66 @@ class AltaAlumno extends Component {
     let error = "";
 
     switch (id) {
+      case "cursoSeleccionado":
+        if (!value) {
+          error = "Debe seleccionar un curso.";
+        }
+        break;
+
+      case "padreSeleccionado":
+        if (!value) {
+          error = "Debe seleccionar un padre.";
+        }
+        break;
+
+      // Resto de las validaciones
+      default:
+        error = this.validarCampoGenerico(id, value);
+    }
+
+    return error;
+  };
+
+  validarCampoGenerico = (id, value) => {
+    switch (id) {
       case "nombre":
         if (!/^[a-zA-Z]{3,30}$/.test(value)) {
-          error = "El nombre debe tener entre 3 y 30 letras.";
+          return "El nombre debe tener entre 3 y 30 letras.";
         }
         break;
-
       case "apellido":
         if (!/^[a-zA-Z]{4,30}$/.test(value)) {
-          error = "El apellido debe tener entre 4 y 30 letras.";
+          return "El apellido debe tener entre 4 y 30 letras.";
         }
         break;
-
       case "dni":
         if (!/^\d{6,8}$/.test(value)) {
-          error = "El DNI debe tener entre 6 y 8 dígitos.";
+          return "El DNI debe tener entre 6 y 8 dígitos.";
         }
         break;
-
       case "mail":
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-          error = "Formato de email inválido.";
+          return "Formato de email inválido.";
         }
         break;
-
       case "clave":
         if (
           !/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&+])[A-Za-z\d@$!%*?&+]{8,32}$/.test(
             value
           )
         ) {
-          error =
-            "La clave debe tener entre 8 y 32 caracteres, al menos una letra mayúscula, una minúscula, un número y un carácter especial.";
+          return "La clave debe tener entre 8 y 32 caracteres, al menos una letra mayúscula, una minúscula, un número y un carácter especial.";
         }
         break;
-
       case "telefono":
         if (!/^\d{7,9}$/.test(value)) {
-          error = "El teléfono debe tener entre 7 y 9 dígitos.";
+          return "El teléfono debe tener entre 7 y 9 dígitos.";
         }
         break;
-
       default:
         break;
     }
-
-    return error;
+    return "";
   };
 
   // Maneja cambios en los inputs y aplica validaciones
@@ -103,33 +140,24 @@ class AltaAlumno extends Component {
     }
 
     // Enviar datos al backend
-    fetch("http://localhost:8080/api/usuario/saveUsuario", {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(datosUsuario),
-    })
+    axios
+      .post("http://localhost:8080/api/usuario/saveAlumno/", datosUsuario, { withCredentials: true })
       .then((response) => {
-        if (response.ok) {
-          alert("Alumno creado correctamente.");
-          window.location.reload(); // Recarga la página
-        }
-        return response.text();
+        alert("Alumno creado correctamente.");
+        window.location.reload();
       })
-      .then((data) => console.log("User created:", data))
-      .catch((error) => console.error("Error creating user:", error));
+      .catch((error) => console.error("Error al crear el alumno:", error));
   };
 
   render() {
-    const { errores } = this.state;
+    const { errores, cursos, padres } = this.state;
 
     return (
       <section className="d-flex flex-column">
         <section className="container d-flex justify-content-center align-items-center flex-grow-1">
           <section className="col-lg-12">
             <form onSubmit={this.handleSubmit}>
+              {/* Campos de texto */}
               {[{ id: "nombre", label: "Nombre", type: "text" },
                 { id: "apellido", label: "Apellido", type: "text" },
                 { id: "dni", label: "DNI", type: "number" },
@@ -151,20 +179,58 @@ class AltaAlumno extends Component {
                       required
                     />
                     {errores[id] && (
-                      <div
-                        style={{
-                          color: "black",
-                          fontWeight: "bold",
-                          fontSize: "0.9rem",
-                          marginTop: "0.3rem",
-                        }}
-                      >
-                        {errores[id]}
-                      </div>
+                      <div className="invalid-feedback">{errores[id]}</div>
                     )}
                   </div>
                 )
               )}
+
+              {/* Campo desplegable para cursos */}
+              <div className="mb-3">
+                <label htmlFor="cursoSeleccionado" className="form-label">
+                  Curso
+                </label>
+                <select
+                  id="cursoSeleccionado"
+                  className={`form-select ${errores.cursoSeleccionado ? "is-invalid" : ""}`}
+                  value={this.state.cursoSeleccionado}
+                  onChange={this.handleChange}
+                >
+                  <option value="">Seleccione un curso</option>
+                  {cursos.map((curso) => (
+                    <option key={curso.id} value={curso.id}>
+                      {curso.nombre}
+                    </option>
+                  ))}
+                </select>
+                {errores.cursoSeleccionado && (
+                  <div className="invalid-feedback">{errores.cursoSeleccionado}</div>
+                )}
+              </div>
+
+              {/* Campo desplegable para padres */}
+              <div className="mb-3">
+                <label htmlFor="padreSeleccionado" className="form-label">
+                  Padre
+                </label>
+                <select
+                  id="padreSeleccionado"
+                  className={`form-select ${errores.padreSeleccionado ? "is-invalid" : ""}`}
+                  value={this.state.padreSeleccionado}
+                  onChange={this.handleChange}
+                >
+                  <option value="">Seleccione un padre</option>
+                  {padres.map((padre) => (
+                    <option key={padre.id} value={padre.id}>
+                      {padre.nombreCompleto}
+                    </option>
+                  ))}
+                </select>
+                {errores.padreSeleccionado && (
+                  <div className="invalid-feedback">{errores.padreSeleccionado}</div>
+                )}
+              </div>
+
               <div className="d-grid gap-2 mb-4">
                 <button type="submit" className="btn btn-primary btn-lg">
                   Confirmar
