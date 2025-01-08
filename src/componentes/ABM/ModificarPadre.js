@@ -1,170 +1,241 @@
-import React, { useState, useEffect } from 'react';
-import { Form, Button } from 'react-bootstrap';
+import React, { Component } from 'react';
+import { Dropdown, DropdownButton, Button, Form } from 'react-bootstrap';
 import axios from 'axios';
 
-const ModificarPadre = () => {
-  const [formData, setFormData] = useState({
-    id_usuario: '',
-    nombre: '',
-    apellido: '',
-    dni: '',
-    mail: '',
-    clave: '',
-    telefono: '',
-    activo: true,
-    pago_cuota: false,
-    Rol_id_rol: ''
-  });
+class ModificarPadre extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            padres: [],
+            padreSeleccionado: 'Seleccione un padre',
+            idPadre: null,
+            nombre: '',
+            apellido: '',
+            dni: '',
+            mail: '',
+            telefono: '',
+            activo: false,
+            errores: {}, // Almacena los errores de validación
+            rol: 'padre',
+        };
+    }
 
-  useEffect(() => {
-    if (formData.id_usuario) {
-      // Cargar datos del padre a modificar
-      const fetchData = async () => {
-        try {
-          const response = await axios.get(
-            `http://localhost:8080/api/padre/${formData.id_usuario}`,
-            { withCredentials: true }
-          );
-          if (response.status === 200) {
-            setFormData(response.data);
-          }
-        } catch (error) {
-          console.error('Error al cargar los datos del padre:', error);
+    // Validaciones por campo
+    validarCampo = (id, value) => {
+        let error = '';
+
+        switch (id) {
+            case 'nombre':
+                if (!/^[a-zA-Z]{3,30}$/.test(value)) {
+                    error = 'El nombre debe tener entre 3 y 30 letras.';
+                }
+                break;
+
+            case 'apellido':
+                if (!/^[a-zA-Z]{4,30}$/.test(value)) {
+                    error = 'El apellido debe tener entre 4 y 30 letras.';
+                }
+                break;
+
+            case 'dni':
+                if (!/^\d{6,8}$/.test(value)) {
+                    error = 'El DNI debe tener entre 6 y 8 dígitos.';
+                }
+                break;
+
+            case 'mail':
+                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+                    error = 'Formato de email inválido.';
+                }
+                break;
+
+            case 'telefono':
+                if (!/^\d{7,9}$/.test(value)) {
+                    error = 'El teléfono debe tener entre 7 y 9 dígitos.';
+                }
+                break;
+
+            default:
+                break;
         }
-      };
-      fetchData();
+
+        return error;
+    };
+
+    // Manejar cambios en los inputs y aplicar validaciones
+    handleInputChange = (event) => {
+        const { id, value } = event.target;
+        const error = this.validarCampo(id, value);
+
+        this.setState((prevState) => ({
+            [id]: value,
+            errores: { ...prevState.errores, [id]: error },
+        }));
+    };
+
+    // Cargar la lista de padres
+    cargarPadres = async () => {
+        try {
+            const response = await axios.get(`http://localhost:8080/api/usuario/getUsuarios/${this.state.rol}`, {
+                withCredentials: true,
+            });
+
+            const padres = response.data.map((padre) => ({
+                idPadre: padre.idProfesor, // Usa el mismo endpoint, por eso la clave sigue siendo idProfesor
+                nombre: `${padre.nombre} ${padre.apellido} ${padre.dni}`,
+            }));
+
+            this.setState({ padres });
+        } catch (error) {
+            console.error('Error al cargar los padres:', error);
+        }
+    };
+
+    // Manejar selección de padre en el Dropdown
+    handleDropdownChange = async (value) => {
+        const parsedValue = JSON.parse(value);
+        this.setState({
+            padreSeleccionado: parsedValue.nombre,
+            idPadre: parsedValue.idPadre,
+        });
+
+        try {
+            const response = await axios.get(`http://localhost:8080/api/usuario/getUsuario/${parsedValue.idPadre}`, {
+                withCredentials: true,
+            });
+
+            console.log(response.data); // Revisa la respuesta de la API
+
+            // Asignar correctamente los datos a los campos
+            const { nombre, apellido, dni, mail, telefono, activo } = response.data;
+            this.setState({
+                nombre: nombre || '',
+                apellido: apellido || '',
+                dni: dni || '',
+                mail: mail || '',
+                telefono: telefono || '',
+                activo: activo || false,
+            });
+        } catch (error) {
+            console.error('Error al cargar los datos del padre:', error);
+        }
+    };
+
+    // Manejar envío del formulario
+    handleSubmit = async (event) => {
+        event.preventDefault();
+
+        const { idPadre, nombre, apellido, dni, mail, telefono, activo } = this.state;
+
+        try {
+            const response = await axios.patch(
+                `http://localhost:8080/api/usuario/modificarUsuario/${idPadre}`,
+                { nombre, apellido, dni, mail, telefono, activo },
+                { withCredentials: true }
+            );
+
+            if (response.status === 200) {
+                alert('Padre modificado exitosamente!');
+                this.cargarPadres();
+                this.setState({
+                    padreSeleccionado: 'Seleccione un padre',
+                    idPadre: null,
+                    nombre: '',
+                    apellido: '',
+                    dni: '',
+                    mail: '',
+                    telefono: '',
+                    activo: false,
+                });
+                window.location.reload(); // Refresca la página
+            } else {
+                alert('Error al modificar el padre');
+            }
+        } catch (error) {
+            console.error('Error al modificar el padre:', error);
+        }
+    };
+
+    componentDidMount() {
+        this.cargarPadres();
     }
-  }, [formData.id_usuario]);
 
-  const handleInputChange = (e) => {
-    const { id, value } = e.target;
-    setFormData({
-      ...formData,
-      [id]: value
-    });
-  };
+    render() {
+        const { padres, padreSeleccionado, nombre, apellido, dni, mail, telefono, activo, errores } = this.state;
 
-  const handleCheckboxChange = (e) => {
-    const { id, checked } = e.target;
-    setFormData({
-      ...formData,
-      [id]: checked
-    });
-  };
+        return (
+            <section className="d-flex flex-column">
+                <section className="container d-flex justify-content-center align-items-center flex-grow-1">
+                    <section className="col-lg-12">
+                        <form onSubmit={this.handleSubmit}>
+                            <div className="pb-5">
+                                <label htmlFor="dropdown-basic-button" className="form-label">Padre</label>
+                                <DropdownButton
+                                    id="dropdown-basic-button"
+                                    title={padreSeleccionado}
+                                    onSelect={this.handleDropdownChange}
+                                    size="sm"
+                                >
+                                    {padres.map((padre) => (
+                                        <Dropdown.Item
+                                            key={padre.idPadre}
+                                            eventKey={JSON.stringify({
+                                                idPadre: padre.idPadre,
+                                                nombre: padre.nombre,
+                                            })}
+                                        >
+                                            {padre.nombre}
+                                        </Dropdown.Item>
+                                    ))}
+                                </DropdownButton>
+                            </div>
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await axios.put(
-        `http://localhost:8080/api/padre/modificar/${formData.id_usuario}`, 
-        formData,
-        { withCredentials: true }
-      );
-      if (response.status === 200) {
-        alert('Padre modificado exitosamente!');
-      } else {
-        alert('Error al modificar el padre');
-      }
-    } catch (error) {
-      console.error('Error al modificar el padre:', error);
+                            {padreSeleccionado !== 'Seleccione un padre' && (
+                                <>
+                                    {[{ id: "nombre", label: "Nombre", type: "text" },
+                                    { id: "apellido", label: "Apellido", type: "text" },
+                                    { id: "dni", label: "DNI", type: "number" },
+                                    { id: "mail", label: "Email", type: "email" },
+                                    { id: "telefono", label: "Teléfono", type: "number" }].map(({ id, label, type }) => (
+                                        <div className="mb-3" key={id}>
+                                            <label htmlFor={id} className="form-label">{label}</label>
+                                            <Form.Control
+                                                id={id}
+                                                type={type}
+                                                value={this.state[id]}
+                                                onChange={this.handleInputChange}
+                                                className={errores[id] ? "is-invalid" : ""}
+                                                placeholder={`Ingresa ${label.toLowerCase()}`}
+                                                required
+                                            />
+                                            {errores[id] && <div style={{
+                                                color: "black", fontWeight: "bold",
+                                                fontSize: "0.9rem", marginTop: "0.3rem"
+                                            }}>{errores[id]}</div>}
+                                        </div>
+                                    ))}
+
+                                    <div className="mb-3">
+                                        <label htmlFor="activo" className="form-label">Activo:</label>
+                                        <Form.Check
+                                            id="activo"
+                                            type="checkbox"
+                                            checked={activo}
+                                            onChange={this.handleInputChange}
+                                        />
+                                    </div>
+
+                                    <div className="d-grid gap-2 mb-4">
+                                        <Button type="submit" className="btn btn-primary">Guardar Cambios</Button>
+                                    </div>
+                                </>
+                            )}
+                        </form>
+                    </section>
+                </section>
+            </section>
+        );
     }
-  };
-
-  return (
-    <Form onSubmit={handleSubmit}>
-      <Form.Group controlId="id_usuario">
-        <Form.Label>ID Usuario</Form.Label>
-        <Form.Control 
-          type="text" 
-          value={formData.id_usuario} 
-          onChange={handleInputChange} 
-          required 
-        />
-      </Form.Group>
-      <Form.Group controlId="nombre">
-        <Form.Label>Nombre</Form.Label>
-        <Form.Control 
-          type="text" 
-          value={formData.nombre} 
-          onChange={handleInputChange} 
-          required 
-        />
-      </Form.Group>
-      <Form.Group controlId="apellido">
-        <Form.Label>Apellido</Form.Label>
-        <Form.Control 
-          type="text" 
-          value={formData.apellido} 
-          onChange={handleInputChange} 
-          required 
-        />
-      </Form.Group>
-      <Form.Group controlId="dni">
-        <Form.Label>DNI</Form.Label>
-        <Form.Control 
-          type="text" 
-          value={formData.dni} 
-          onChange={handleInputChange} 
-          required 
-        />
-      </Form.Group>
-      <Form.Group controlId="mail">
-        <Form.Label>Email</Form.Label>
-        <Form.Control 
-          type="email" 
-          value={formData.mail} 
-          onChange={handleInputChange} 
-          required 
-        />
-      </Form.Group>
-      <Form.Group controlId="clave">
-        <Form.Label>Contraseña</Form.Label>
-        <Form.Control 
-          type="password" 
-          value={formData.clave} 
-          onChange={handleInputChange} 
-          required 
-        />
-      </Form.Group>
-      <Form.Group controlId="telefono">
-        <Form.Label>Teléfono</Form.Label>
-        <Form.Control 
-          type="text" 
-          value={formData.telefono} 
-          onChange={handleInputChange} 
-          required 
-        />
-      </Form.Group>
-      <Form.Group controlId="activo">
-        <Form.Check 
-          type="checkbox" 
-          label="Activo" 
-          checked={formData.activo} 
-          onChange={handleCheckboxChange} 
-        />
-      </Form.Group>
-      <Form.Group controlId="pago_cuota">
-        <Form.Check 
-          type="checkbox" 
-          label="Pago de cuota" 
-          checked={formData.pago_cuota} 
-          onChange={handleCheckboxChange} 
-        />
-      </Form.Group>
-      <Form.Group controlId="Rol_id_rol">
-        <Form.Label>Rol ID</Form.Label>
-        <Form.Control 
-          type="text" 
-          value={formData.Rol_id_rol} 
-          onChange={handleInputChange} 
-          required 
-        />
-      </Form.Group>
-      <Button variant="primary" type="submit">
-        Modificar Padre
-      </Button>
-    </Form>
-  );
-};
+}
 
 export default ModificarPadre;
