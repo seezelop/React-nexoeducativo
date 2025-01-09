@@ -1,7 +1,7 @@
 import React from 'react';
 import AltaUsuario from './AltaUsuario';
 import BajaUsuario from './BajaUsuario';
-import ModificarUsuario from './ModificarUsuario';
+import ModificarJefeColegio from './ModificarJefeColegio';
 
 function ABMJefeColegio() {
   return (
@@ -28,7 +28,7 @@ function ABMJefeColegio() {
         <section className="col-md-8 mb-5">
           <div className="card shadow-sm p-3">
             <h3 className="mb-4 text-center">MODIFICACIÓN JEFE COLEGIO</h3>
-            <ModificarUsuario />
+            <ModificarJefeColegio />
           </div>
         </section>
 

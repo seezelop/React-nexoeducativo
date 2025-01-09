@@ -12,23 +12,25 @@ class AltaAlumno extends Component {
       clave: "",
       telefono: "",
       activo: 1,
-      rol: 7,
-      cursoSeleccionado: "",
-      padreSeleccionado: "",
+      idCurso: "",
+      idPadre: "",
       cursos: [], // Opciones de cursos
       padres: [], // Opciones de padres
-      showModal: false,
       errores: {}, // Almacena los errores de validación
     };
   }
 
   componentDidMount() {
-    // Cargar cursos 
+    // Cargar cursos
     axios
       .get("http://localhost:8080/api/usuario/verCursoAdministrativo", { withCredentials: true })
       .then((response) => {
-        console.log("Cursos recibidos:", response.data); //esto esta bien, pero no se muestra
-        this.setState({ cursos: response.data });
+        if (response.data && Array.isArray(response.data)) {
+          console.log("Cursos recibidos:", response.data);
+          this.setState({ cursos: response.data });
+        } else {
+          console.error("Formato inesperado en cursos:", response.data);
+        }
       })
       .catch((error) => console.error("Error al cargar los cursos:", error));
 
@@ -36,13 +38,16 @@ class AltaAlumno extends Component {
     axios
       .get("http://localhost:8080/api/usuario/obtenerPadres", { withCredentials: true })
       .then((response) => {
-        console.log("padres recibidos:", response.data); // esto esta bien, pero no se muestra
-        this.setState({ padres: response.data });
+        if (response.data && Array.isArray(response.data)) {
+          console.log("Padres recibidos:", response.data);
+          this.setState({ padres: response.data });
+        } else {
+          console.error("Formato inesperado en padres:", response.data);
+        }
       })
       .catch((error) => console.error("Error al cargar los padres:", error));
   }
 
-  // Validaciones por campo
   validarCampo = (id, value) => {
     let error = "";
 
@@ -52,14 +57,11 @@ class AltaAlumno extends Component {
           error = "Debe seleccionar un curso.";
         }
         break;
-
       case "padreSeleccionado":
         if (!value) {
           error = "Debe seleccionar un padre.";
         }
         break;
-
-      // Resto de las validaciones
       default:
         error = this.validarCampoGenerico(id, value);
     }
@@ -109,7 +111,6 @@ class AltaAlumno extends Component {
     return "";
   };
 
-  // Maneja cambios en los inputs y aplica validaciones
   handleChange = (event) => {
     const { id, value } = event.target;
     const error = this.validarCampo(id, value);
@@ -120,13 +121,11 @@ class AltaAlumno extends Component {
     }));
   };
 
-  // Maneja el envío del formulario con validación
   handleSubmit = (e) => {
     e.preventDefault();
 
-    const { errores, ...datosUsuario } = this.state;
+    const { errores, cursos, padres, ...datosUsuario } = this.state;
 
-    // Verifica si hay errores
     const erroresPendientes = Object.keys(datosUsuario).reduce((acc, key) => {
       const error = this.validarCampo(key, datosUsuario[key]);
       if (error) {
@@ -141,10 +140,9 @@ class AltaAlumno extends Component {
       return;
     }
 
-    // Enviar datos al backend
     axios
       .post("http://localhost:8080/api/usuario/saveAlumno", datosUsuario, { withCredentials: true })
-      .then((response) => {
+      .then(() => {
         alert("Alumno creado correctamente.");
         window.location.reload();
       })
@@ -155,93 +153,87 @@ class AltaAlumno extends Component {
     const { errores, cursos, padres } = this.state;
 
     return (
-      <section className="d-flex flex-column">
-        <section className="container d-flex justify-content-center align-items-center flex-grow-1">
-          <section className="col-lg-12">
-            <form onSubmit={this.handleSubmit}>
-              {/* Campos de texto */}
-              {[{ id: "nombre", label: "Nombre", type: "text" },
-                { id: "apellido", label: "Apellido", type: "text" },
-                { id: "dni", label: "DNI", type: "number" },
-                { id: "mail", label: "Email", type: "email" },
-                { id: "clave", label: "Clave", type: "password" },
-                { id: "telefono", label: "Teléfono", type: "number" }].map(
-                ({ id, label, type }) => (
-                  <div className="mb-3" key={id}>
-                    <label htmlFor={id} className="form-label">
-                      {label}
-                    </label>
-                    <input
-                      type={type}
-                      className={`form-control ${errores[id] ? "is-invalid" : ""}`}
-                      id={id}
-                      value={this.state[id]}
-                      onChange={this.handleChange}
-                      placeholder={`Ingresa tu ${label.toLowerCase()}`}
-                      required
-                    />
-                    {errores[id] && (
-                      <div className="invalid-feedback">{errores[id]}</div>
-                    )}
-                  </div>
-                )
-              )}
+      <form onSubmit={this.handleSubmit}>
+        {/* Campos de texto */}
+        {[
+          { id: "nombre", label: "Nombre", type: "text" },
+          { id: "apellido", label: "Apellido", type: "text" },
+          { id: "dni", label: "DNI", type: "number" },
+          { id: "mail", label: "Email", type: "email" },
+          { id: "clave", label: "Clave", type: "password" },
+          { id: "telefono", label: "Teléfono", type: "number" },
+        ].map(({ id, label, type }) => (
+          <div className="mb-3" key={id}>
+            <label htmlFor={id} className="form-label">
+              {label}
+            </label>
+            <input
+              type={type}
+              className={`form-control ${errores[id] ? "is-invalid" : ""}`}
+              id={id}
+              value={this.state[id]}
+              onChange={this.handleChange}
+              placeholder={`Ingrese ${label.toLowerCase()}`}
+              required
+            />
+            {errores[id] && <div className="invalid-feedback">{errores[id]}</div>}
+          </div>
+        ))}
 
-              {/* Campo desplegable para cursos */}
-              <div className="mb-3">
-                <label htmlFor="cursoSeleccionado" className="form-label">
-                  Curso
-                </label>
-                <select
-                  id="cursoSeleccionado"
-                  className={`form-select ${errores.cursoSeleccionado ? "is-invalid" : ""}`}
-                  value={this.state.cursoSeleccionado}
-                  onChange={this.handleChange}
-                >
-                  <option value="">Seleccione un curso</option>
-                  {cursos.map((curso) => (
-                    <option key={curso.idCurso} value={curso.idCurso}>
-                      {curso.numero + curso.division}
-                    </option>
-                  ))}
-                </select>
-                {errores.cursoSeleccionado && (
-                  <div className="invalid-feedback">{errores.cursoSeleccionado}</div>
-                )}
-              </div>
+        {/* Cursos */}
+        <div className="mb-3">
+          <label htmlFor="idCurso" className="form-label">
+            Curso
+          </label>
+          <select
+            id="idCurso"
+            className={`form-select ${errores.idCurso ? "is-invalid" : ""}`}
+            value={this.state.idCurso}
+            onChange={this.handleChange}
+          >
+            <option value="">Seleccione un curso</option>
+            {cursos.length > 0 ? (
+              cursos.map((curso) => (
+                <option key={curso.idCurso} value={curso.idCurso}>
+                  {curso.numero + curso.division}
+                </option>
+              ))
+            ) : (
+              <option disabled>No hay cursos disponibles</option>
+            )}
+          </select>
+          {errores.idCurso && <div className="invalid-feedback">{errores.idCurso}</div>}
+        </div>
 
-              {/* Campo desplegable para padres */}
-              <div className="mb-3">
-                <label htmlFor="padreSeleccionado" className="form-label">
-                  Padre
-                </label>
-                <select
-                  id="padreSeleccionado"
-                  className={`form-select ${errores.padreSeleccionado ? "is-invalid" : ""}`}
-                  value={this.state.padreSeleccionado}
-                  onChange={this.handleChange}
-                >
-                  <option value="">Seleccione un padre</option>
-                  {padres.map((padre) => (
-                    <option key={padre.id_usuario} value={padre.id_usuario}>
-                      {padre.nombre+" "+padre.apellido}
-                    </option>
-                  ))}
-                </select>
-                {errores.padreSeleccionado && (
-                  <div className="invalid-feedback">{errores.padreSeleccionado}</div>
-                )}
-              </div>
+        {/* Padres */}
+        <div className="mb-3">
+          <label htmlFor="idPadre" className="form-label">
+            Padre
+          </label>
+          <select
+            id="idPadre"
+            className={`form-select ${errores.idPadre ? "is-invalid" : ""}`}
+            value={this.state.idPadre}
+            onChange={this.handleChange}
+          >
+            <option value="">Seleccione un padre</option>
+            {padres.length > 0 ? (
+              padres.map((padre) => (
+                <option key={padre.id_usuario} value={padre.id_usuario}>
+                  {padre.nombre + " " + padre.apellido}
+                </option>
+              ))
+            ) : (
+              <option disabled>No hay padres disponibles</option>
+            )}
+          </select>
+          {errores.idPadre && <div className="invalid-feedback">{errores.idPadre}</div>}
+        </div>
 
-              <div className="d-grid gap-2 mb-4">
-                <button type="submit" className="btn btn-primary btn-lg">
-                  Confirmar
-                </button>
-              </div>
-            </form>
-          </section>
-        </section>
-      </section>
+        <button type="submit" className="btn btn-primary">
+          Confirmar
+        </button>
+      </form>
     );
   }
 }
