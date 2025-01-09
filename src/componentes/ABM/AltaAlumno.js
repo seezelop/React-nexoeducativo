@@ -27,14 +27,16 @@ class AltaAlumno extends Component {
     axios
       .get("http://localhost:8080/api/usuario/verCursoAdministrativo", { withCredentials: true })
       .then((response) => {
+        console.log("Cursos recibidos:", response.data); //esto esta bien, pero no se muestra
         this.setState({ cursos: response.data });
       })
       .catch((error) => console.error("Error al cargar los cursos:", error));
 
     // Cargar padres
     axios
-      .get("http://localhost:8080/", { withCredentials: true })
+      .get("http://localhost:8080/api/usuario/obtenerPadres", { withCredentials: true })
       .then((response) => {
+        console.log("padres recibidos:", response.data); // esto esta bien, pero no se muestra
         this.setState({ padres: response.data });
       })
       .catch((error) => console.error("Error al cargar los padres:", error));
@@ -141,7 +143,7 @@ class AltaAlumno extends Component {
 
     // Enviar datos al backend
     axios
-      .post("http://localhost:8080/api/usuario/saveAlumno/", datosUsuario, { withCredentials: true })
+      .post("http://localhost:8080/api/usuario/saveAlumno", datosUsuario, { withCredentials: true })
       .then((response) => {
         alert("Alumno creado correctamente.");
         window.location.reload();
@@ -198,8 +200,8 @@ class AltaAlumno extends Component {
                 >
                   <option value="">Seleccione un curso</option>
                   {cursos.map((curso) => (
-                    <option key={curso.id} value={curso.id}>
-                      {curso.nombre}
+                    <option key={curso.idCurso} value={curso.idCurso}>
+                      {curso.numero + curso.division}
                     </option>
                   ))}
                 </select>
@@ -221,8 +223,8 @@ class AltaAlumno extends Component {
                 >
                   <option value="">Seleccione un padre</option>
                   {padres.map((padre) => (
-                    <option key={padre.id} value={padre.id}>
-                      {padre.nombreCompleto}
+                    <option key={padre.id_usuario} value={padre.id_usuario}>
+                      {padre.nombre+" "+padre.apellido}
                     </option>
                   ))}
                 </select>
