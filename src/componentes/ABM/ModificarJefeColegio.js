@@ -69,7 +69,7 @@ class ModificarJefeColegio extends Component {
     cargarJefes = async () => {
         try {
             const response = await axios.get(
-                `http://localhost:8080/api/usuario/getUsuarios/2`, // Endpoint correcto para id_rol=2
+                `http://localhost:8080/api/usuario/modificarUsuario/2`, // Endpoint correcto para id_rol=2
                 { withCredentials: true }
             );
 
