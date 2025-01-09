@@ -22,42 +22,35 @@ class ModificarJefeColegio extends Component {
     // Validar campo individual
     validarCampo = (id, value) => {
         let error = '';
-
         switch (id) {
             case 'nombre':
                 if (!/^[a-zA-Z]{3,30}$/.test(value)) {
                     error = 'El nombre debe tener entre 3 y 30 letras.';
                 }
                 break;
-
             case 'apellido':
                 if (!/^[a-zA-Z]{4,30}$/.test(value)) {
                     error = 'El apellido debe tener entre 4 y 30 letras.';
                 }
                 break;
-
             case 'dni':
                 if (!/^\d{6,8}$/.test(value)) {
                     error = 'El DNI debe tener entre 6 y 8 dígitos.';
                 }
                 break;
-
             case 'mail':
                 if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
                     error = 'Formato de email inválido.';
                 }
                 break;
-
             case 'telefono':
                 if (!/^\d{7,9}$/.test(value)) {
                     error = 'El teléfono debe tener entre 7 y 9 dígitos.';
                 }
                 break;
-
             default:
                 break;
         }
-
         return error;
     };
 
@@ -76,13 +69,12 @@ class ModificarJefeColegio extends Component {
     cargarJefes = async () => {
         try {
             const response = await axios.get(
-                `http://localhost:8080/api/usuario/getUsuarios/jefe`,
+                `http://localhost:8080/api/usuario/getUsuarios/2`, // Endpoint correcto para id_rol=2
                 { withCredentials: true }
             );
 
             console.log('Respuesta del servidor:', response.data);
 
-            // Verifica si la respuesta es un array antes de usar .map
             const jefesColegio = Array.isArray(response.data)
                 ? response.data.map((jefe) => ({
                       idJefeColegio: jefe.idJefeColegio,
