@@ -21,7 +21,7 @@ import ConsultarEscuelas from './componentes/pages/ConsultarEscuelas';
 import { UserProvider } from './context/UserContext';
 import AltaEscuela from './componentes/ABM/AltaEscuela';
 import BajaEscuela from './componentes/ABM/BajaEscuela';
-import AltaUsuario from './componentes/ABM/AltaUsuario';
+import AltaJefeColegio from './componentes/ABM/AltaJefeColegio';
 import BajaUsuario from './componentes/ABM/BajaUsuario';
 import ABMJefeColegio from './componentes/ABM/ABMJefeColegio';
 import ABMadministrativo from './componentes/ABM/ABMadministrativo'; 
@@ -73,7 +73,7 @@ function App() {
             <Route path="/ABMEscuelas" element={<ABMEscuelas />} />
             <Route path="/altaEscuela" element={<AltaEscuela />} />
             <Route path="/bajaEscuela" element={<BajaEscuela />} />
-            <Route path="/altaUsuario" element={<AltaUsuario />} />
+            <Route path="/altaJefeColegio" element={<AltaJefeColegio />} />
             <Route path="/bajaUsuario" element={<BajaUsuario />} />
             <Route path="/header" element={<Header />} />
             <Route path="/ABMJefeColegio" element={<ABMJefeColegio />} />

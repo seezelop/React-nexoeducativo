@@ -1,5 +1,5 @@
 import React from 'react';
-import AltaUsuario from './AltaUsuario';
+import AltaUsuario from './AltaJefeColegio';
 import BajaUsuario from './BajaUsuario';
 import ModificarJefeColegio from './ModificarJefeColegio';
 

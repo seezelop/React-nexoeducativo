@@ -103,7 +103,7 @@ class AltaAdministrativo extends Component {
     }
 
     // Enviar datos al backend
-    fetch("http://localhost:8080/api/usuario/saveUsuario", {
+    fetch("http://localhost:8080/api/usuario/altaUsuario", {
       method: "POST",
       credentials: "include",
       headers: {

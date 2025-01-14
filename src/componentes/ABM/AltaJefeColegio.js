@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 
-class AltaUsuario extends Component {
+class AltaJefeColegio extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -103,7 +103,7 @@ class AltaUsuario extends Component {
     }
 
     // Enviar datos al backend
-    fetch("http://localhost:8080/api/usuario/saveUsuario", {
+    fetch("http://localhost:8080/api/usuario/saveUsuarioJefeColegio", {
       method: "POST",
       credentials: "include",
       headers: {
@@ -178,4 +178,4 @@ class AltaUsuario extends Component {
   }
 }
 
-export default AltaUsuario;
+export default AltaJefeColegio;
