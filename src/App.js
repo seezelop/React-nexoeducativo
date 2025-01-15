@@ -36,6 +36,7 @@ import ABMpreceptor from './componentes/ABM/ABMpreceptor';
 import GestionarAsistenciaAlumno from './componentes/pages/GestionarAsistenciaAlumno'; 
 import GestionarAsistenciaProfesor from './componentes/pages/GestionarAsistenciaProfesor';
 import RealizarPago from './componentes/pages/RealizarPago';
+import EstablecerPrecioCuota from './componentes/pages/EstablecerPrecioCuota';
 
 
 function App() {
@@ -110,6 +111,7 @@ function App() {
               <Route path="/GestionarAsistenciaProfesor" element={<GestionarAsistenciaProfesor />} />
 
               {/* Ruta para realizar pagos  */}
+              <Route path="/EstablecerPrecioCuota" element={<EstablecerPrecioCuota/>} />
               <Route path="/RealizarPago" element={<RealizarPago />} />
 
             
