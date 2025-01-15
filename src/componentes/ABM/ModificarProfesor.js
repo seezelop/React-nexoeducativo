@@ -14,9 +14,10 @@ class ModificarProfesor extends Component {
             dni: '',
             mail: '',
             telefono: '',
-            activo: false,
+            activo: 0,
             errores: {}, // Almacena los errores de validación
             rol: 'profesor',
+            valoresOriginales: {}, // Nuevo estado para almacenar los valores originales
         };
     }
 
@@ -76,10 +77,11 @@ class ModificarProfesor extends Component {
     // Cargar la lista de profesores
     cargarProfesores = async () => {
         try {
-            const response = await axios.get(`http://localhost:8080/api/usuario/getUsuarios/${this.state.rol}`, {
+            const response = await axios.get(`http://localhost:8080/api/usuario/getUsuarios/profesor`, {
                 withCredentials: true,
             });
 
+            console.log("respuesta api: "+response.data)
             const profesores = response.data.map((profesor) => ({
                 idProfesor: profesor.idProfesor,
                 nombre: `${profesor.nombre} ${profesor.apellido} ${profesor.dni}`,
@@ -99,8 +101,15 @@ class ModificarProfesor extends Component {
             idProfesor: parsedValue.idProfesor,
         });
 
+        console.log("Estado actualizado:", {
+            profesorSeleccionado: this.state.profesorSeleccionado,
+            idProfesor: this.state.idProfesor,
+        });
+        
+
         try {
             const response = await axios.get(`http://localhost:8080/api/usuario/getUsuario/${parsedValue.idProfesor}`, {
+                 
                 withCredentials: true,
             });
 
@@ -125,12 +134,24 @@ class ModificarProfesor extends Component {
     handleSubmit = async (event) => {
         event.preventDefault();
 
-        const { idProfesor, nombre, apellido, dni, mail, telefono, activo } = this.state;
+        const { idProfesor,valoresOriginales, nombre, apellido, dni, mail, telefono, activo } = this.state;
 
+        if (!idProfesor) {
+            alert('Por favor selecciona un profesor antes de guardar los cambios.');
+            return;
+        }
+        // Construir un objeto con solo los campos modificados
+        const datosModificados = {};
+        if (nombre !== valoresOriginales.nombre) datosModificados.nombre = nombre;
+        if (apellido !== valoresOriginales.apellido) datosModificados.apellido = apellido;
+        if (dni !== valoresOriginales.dni) datosModificados.dni = dni;
+        if (mail !== valoresOriginales.mail) datosModificados.mail = mail;
+        if (telefono !== valoresOriginales.telefono) datosModificados.telefono = telefono;
+        if (activo !== valoresOriginales.activo) datosModificados.activo = activo;
         try {
             const response = await axios.patch(
                 `http://localhost:8080/api/usuario/modificarUsuario/${idProfesor}`,
-                { nombre, apellido, dni, mail, telefono, activo },
+                datosModificados,
                 { withCredentials: true }
             );
 
@@ -145,7 +166,8 @@ class ModificarProfesor extends Component {
                     dni: '',
                     mail: '',
                     telefono: '',
-                    activo: false,
+                    activo: 0,
+                    valoresOriginales:{}
                 });
                 window.location.reload(); // Refresca la página
             } else {
@@ -158,6 +180,7 @@ class ModificarProfesor extends Component {
 
     componentDidMount() {
         this.cargarProfesores();
+        
     }
 
     render() {
@@ -206,7 +229,7 @@ class ModificarProfesor extends Component {
                                                 onChange={this.handleInputChange}
                                                 className={errores[id] ? "is-invalid" : ""}
                                                 placeholder={`Ingresa ${label.toLowerCase()}`}
-                                                required
+                                                
                                             />
                                             {errores[id] && <div style={{
                                                 color: "black", fontWeight: "bold",

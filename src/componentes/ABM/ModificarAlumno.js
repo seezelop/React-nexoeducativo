@@ -80,6 +80,8 @@ class ModificarAlumno extends Component {
                 withCredentials: true,
             });
 
+            console.log("INFO API"+response.data)
+
             const alumnos = response.data.map((alumno) => ({
                 idAlumno: alumno.idAlumno,
                 nombre: `${alumno.nombre} ${alumno.apellido} ${alumno.dni}`,
