@@ -80,7 +80,7 @@ class ModificarAlumno extends Component {
                 withCredentials: true,
             });
 
-            console.log("INFO API"+response.data)
+            console.log("INFO API" + response.data);
 
             const alumnos = response.data.map((alumno) => ({
                 idAlumno: alumno.idAlumno,
@@ -95,14 +95,13 @@ class ModificarAlumno extends Component {
 
     // Manejar selección de alumno en el Dropdown
     handleDropdownChange = async (value) => {
-        const parsedValue = JSON.parse(value);
         this.setState({
-            alumnoSeleccionado: parsedValue.nombre,
-            idAlumno: parsedValue.idAlumno,
+            alumnoSeleccionado: value.nombre,
+            idAlumno: value.idAlumno,
         });
 
         try {
-            const response = await axios.get(`http://localhost:8080/api/usuario/getUsuario/${parsedValue.idAlumno}`, {
+            const response = await axios.get(`http://localhost:8080/api/usuario/getUsuario/${value.idAlumno}`, {
                 withCredentials: true,
             });
 
@@ -178,10 +177,7 @@ class ModificarAlumno extends Component {
                                     {alumnos.map((alumno) => (
                                         <Dropdown.Item
                                             key={alumno.idAlumno}
-                                            eventKey={JSON.stringify({
-                                                idAlumno: alumno.idAlumno,
-                                                nombre: alumno.nombre,
-                                            })}
+                                            eventKey={alumno} // Pasa el objeto alumno directamente
                                         >
                                             {alumno.nombre}
                                         </Dropdown.Item>
