@@ -12,10 +12,29 @@ class AltaPreceptor extends Component {
       telefono: "",
       activo: 1,
       rol: 4, 
+      cursoSeleccionado: "", // Curso seleccionado
+      cursosDisponibles: [],  // Lista de cursos
       showModal: false,
-      errores: {}, // Almacena los errores de validación
+      errores: {},
     };
   }
+
+  componentDidMount() {
+    this.obtenerCursos();
+  }
+
+  // Obtener cursos disponibles desde el backend
+  obtenerCursos = () => {
+    fetch("http://localhost:8080/api/usuario/verCursoAdministrativo", {
+      method: "GET",
+      credentials: "include",
+    })
+      .then((response) => response.json())
+      .then((data) => this.setState({ cursosDisponibles: data }))
+      .catch((error) =>
+        console.error("Error al obtener los cursos:", error)
+      );
+  };
 
   // Validaciones por campo
   validarCampo = (id, value) => {
@@ -47,19 +66,20 @@ class AltaPreceptor extends Component {
         break;
 
       case "clave":
-        if (
-          !/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&+])[A-Za-z\d@$!%*?&+]{8,32}$/.test(
-            value
-          )
-        ) {
-          error =
-            "La clave debe tener entre 8 y 32 caracteres, al menos una letra mayúscula, una minúscula, un número y un carácter especial.";
+        if (!/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&+])[A-Za-z\d@$!%*?&+]{8,32}$/.test(value)) {
+          error = "La clave debe tener entre 8 y 32 caracteres, con mayúsculas, minúsculas, números y un carácter especial.";
         }
         break;
 
       case "telefono":
         if (!/^\d{7,9}$/.test(value)) {
           error = "El teléfono debe tener entre 7 y 9 dígitos.";
+        }
+        break;
+
+      case "cursoSeleccionado":
+        if (!value) {
+          error = "Debe seleccionar un curso.";
         }
         break;
 
@@ -70,7 +90,7 @@ class AltaPreceptor extends Component {
     return error;
   };
 
-  // Maneja cambios en los inputs y aplica validaciones
+  // Maneja cambios en los inputs
   handleChange = (event) => {
     const { id, value } = event.target;
     const error = this.validarCampo(id, value);
@@ -81,13 +101,13 @@ class AltaPreceptor extends Component {
     }));
   };
 
-  // Maneja el envío del formulario con validación
+  // Manejar envío del formulario
   handleSubmit = (e) => {
     e.preventDefault();
 
     const { errores, ...datosUsuario } = this.state;
 
-    // Verifica si hay errores
+    // Validar campos
     const erroresPendientes = Object.keys(datosUsuario).reduce((acc, key) => {
       const error = this.validarCampo(key, datosUsuario[key]);
       if (error) {
@@ -102,72 +122,98 @@ class AltaPreceptor extends Component {
       return;
     }
 
-    // Enviar datos al backend
-    fetch("http://localhost:8080/api/usuario/altaUsuario", {
+    // Datos a enviar
+    const datos = {
+      nombre: this.state.nombre,
+      apellido: this.state.apellido,
+      dni: this.state.dni,
+      mail: this.state.mail,
+      clave: this.state.clave,
+      telefono: this.state.telefono,
+      activo: this.state.activo,
+      rol: this.state.rol,
+      cursoId: this.state.cursoSeleccionado, // ID del curso seleccionado
+    };
+
+    // Enviar al backend
+    fetch("http://localhost:8080/api/usuario/asignarPreceptor", {
       method: "POST",
       credentials: "include",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(datosUsuario),
+      body: JSON.stringify(datos),
     })
       .then((response) => {
         if (response.ok) {
-          alert("Preceptor creado correctamente.");
-          window.location.reload(); // Recarga la página
+          alert("Preceptor asignado correctamente al curso.");
+          window.location.reload();
         }
         return response.text();
       })
-      .then((data) => console.log("User created:", data))
-      .catch((error) => console.error("Error creating user:", error));
+      .then((data) => console.log("Asignación exitosa:", data))
+      .catch((error) => console.error("Error al asignar preceptor:", error));
   };
 
   render() {
-    const { errores } = this.state;
+    const { errores, cursosDisponibles, cursoSeleccionado } = this.state;
 
     return (
       <section className="d-flex flex-column">
         <section className="container d-flex justify-content-center align-items-center flex-grow-1">
           <section className="col-lg-12">
             <form onSubmit={this.handleSubmit}>
-              {[{ id: "nombre", label: "Nombre", type: "text" },
+              {/* Campos de usuario */}
+              {[
+                { id: "nombre", label: "Nombre", type: "text" },
                 { id: "apellido", label: "Apellido", type: "text" },
                 { id: "dni", label: "DNI", type: "number" },
                 { id: "mail", label: "Email", type: "email" },
                 { id: "clave", label: "Clave", type: "password" },
-                { id: "telefono", label: "Teléfono", type: "number" }].map(
-                ({ id, label, type }) => (
-                  <div className="mb-3" key={id}>
-                    <label htmlFor={id} className="form-label">
-                      {label}
-                    </label>
-                    <input
-                      type={type}
-                      className={`form-control ${errores[id] ? "is-invalid" : ""}`}
-                      id={id}
-                      value={this.state[id]}
-                      onChange={this.handleChange}
-                      placeholder={`Ingresa tu ${label.toLowerCase()}`}
-                      required
-                    />
-                    {errores[id] && (
-                      <div
-                        style={{
-                          color: "black",
-                          fontWeight: "bold",
-                          fontSize: "0.9rem",
-                          marginTop: "0.3rem",
-                        }}
-                      >
-                        {errores[id]}
-                      </div>
-                    )}
-                  </div>
-                )
-              )}
+                { id: "telefono", label: "Teléfono", type: "number" },
+              ].map(({ id, label, type }) => (
+                <div className="mb-3" key={id}>
+                  <label htmlFor={id} className="form-label">{label}</label>
+                  <input
+                    type={type}
+                    className={`form-control ${errores[id] ? "is-invalid" : ""}`}
+                    id={id}
+                    value={this.state[id]}
+                    onChange={this.handleChange}
+                    placeholder={`Ingrese su ${label.toLowerCase()}`}
+                    required
+                  />
+                  {errores[id] && (
+                    <div className="invalid-feedback">{errores[id]}</div>
+                  )}
+                </div>
+              ))}
+
+              {/* Desplegable de cursos */}
+              <div className="mb-3">
+                <label htmlFor="cursoSeleccionado" className="form-label">Seleccionar Curso</label>
+                <select
+                  id="cursoSeleccionado"
+                  className={`form-select ${errores.cursoSeleccionado ? "is-invalid" : ""}`}
+                  value={cursoSeleccionado}
+                  onChange={this.handleChange}
+                  required
+                >
+                  <option value="">Seleccione un curso</option>
+                  {cursosDisponibles.map((curso) => (
+                    <option key={curso.idCurso} value={curso.idCurso}>
+                      {`${curso.numeroCurso}° ${curso.division}`}
+                    </option>
+                  ))}
+                </select>
+                {errores.cursoSeleccionado && (
+                  <div className="invalid-feedback">{errores.cursoSeleccionado}</div>
+                )}
+              </div>
+
               <div className="d-grid gap-2 mb-4">
                 <button type="submit" className="btn btn-primary btn-lg">
-                  Confirmar
+                  Confirmar Asignación
                 </button>
               </div>
             </form>
