@@ -35,7 +35,7 @@ import ABMcurso from './componentes/ABM/ABMcurso';
 import ABMpreceptor from './componentes/ABM/ABMpreceptor'; 
 import GestionarAsistenciaAlumno from './componentes/pages/GestionarAsistenciaAlumno'; 
 import GestionarAsistenciaProfesor from './componentes/pages/GestionarAsistenciaProfesor';
-import RealizarPago from './componentes/ABM//RealizarPago';
+import RealizarPago from './componentes/pages/RealizarPago';
 
 
 function App() {
