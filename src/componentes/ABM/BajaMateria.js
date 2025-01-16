@@ -107,7 +107,7 @@ class BajaMateria extends Component {
             <option value="">Seleccione un curso</option>
             {cursos.map((curso) => (
               <option key={curso.idCurso} value={curso.idCurso}>
-                {curso.nombre}
+                {curso.numero+curso.division}
               </option>
             ))}
           </Form.Select>
