@@ -4,7 +4,7 @@ import axios from 'axios';
 
 const AltaCurso = () => {
   const [formData, setFormData] = useState({
-    numeroCurso: '',
+    numero: '',
     division: '',
     activo: 1 // Valor por defecto en 1 (activo)
   });
@@ -26,7 +26,7 @@ const AltaCurso = () => {
     e.preventDefault();
 
     // Validación básica
-    if (!formData.numeroCurso || !formData.division) {
+    if (!formData.numero || !formData.division) {
       alert('Por favor, complete todos los campos.');
       return;
     }
@@ -40,7 +40,7 @@ const AltaCurso = () => {
         alert('Curso registrado exitosamente!');
         // Reiniciar el formulario
         setFormData({
-          numeroCurso: '',
+          numero: '',
           division: '',
           activo: 1
         });
@@ -57,12 +57,12 @@ const AltaCurso = () => {
 
   return (
     <Form onSubmit={handleSubmit}>
-      <Form.Group controlId="numeroCurso" className="mb-3">
+      <Form.Group controlId="numero" className="mb-3">
         <Form.Label>Número del Curso</Form.Label>
         <Form.Control
           type="number"
           min="1"
-          value={formData.numeroCurso}
+          value={formData.numero}
           onChange={handleInputChange}
           required
         />
