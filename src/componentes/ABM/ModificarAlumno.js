@@ -105,6 +105,8 @@ class ModificarAlumno extends Component {
                 withCredentials: true,
             });
 
+            console.log("id que ingresa al endpoint:"+value.idAlumno)
+
             const { nombre, apellido, dni, mail, telefono, activo } = response.data;
             this.setState({
                 nombre: nombre || '',

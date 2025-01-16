@@ -8,7 +8,7 @@ class ModificarProfesor extends Component {
         this.state = {
             profesores: [],
             profesorSeleccionado: 'Seleccione un profesor',
-            idProfesor: null,
+            idUsuario: null,
             nombre: '',
             apellido: '',
             dni: '',
@@ -17,7 +17,7 @@ class ModificarProfesor extends Component {
             activo: 0,
             errores: {}, // Almacena los errores de validación
             rol: 'profesor',
-            valoresOriginales: {}, // Nuevo estado para almacenar los valores originales
+            valoresOriginales:  {}, // Nuevo estado para almacenar los valores originales
         };
     }
 
@@ -81,9 +81,9 @@ class ModificarProfesor extends Component {
                 withCredentials: true,
             });
 
-            console.log("respuesta api: "+response.data)
+            console.log("respuesta api: "+JSON.stringify(response.data))
             const profesores = response.data.map((profesor) => ({
-                idProfesor: profesor.idProfesor,
+                idUsuario: profesor.idUsuario,
                 nombre: `${profesor.nombre} ${profesor.apellido} ${profesor.dni}`,
             }));
 
@@ -95,48 +95,56 @@ class ModificarProfesor extends Component {
 
     // Manejar selección de profesor en el Dropdown
     handleDropdownChange = async (value) => {
-        const parsedValue = JSON.parse(value);
-        this.setState({
-            profesorSeleccionado: parsedValue.nombre,
-            idProfesor: parsedValue.idProfesor,
-        });
-
-        console.log("Estado actualizado:", {
-            profesorSeleccionado: this.state.profesorSeleccionado,
-            idProfesor: this.state.idProfesor,
-        });
-        
-
         try {
-            const response = await axios.get(`http://localhost:8080/api/usuario/getUsuario/${parsedValue.idProfesor}`, {
-                 
-                withCredentials: true,
-            });
-
-            console.log(response.data); // Revisa la respuesta de la API
-
-            // Asignar correctamente los datos a los campos
-            const { nombre, apellido, dni, mail, telefono, activo } = response.data;
-            this.setState({
-                nombre: nombre || '',
-                apellido: apellido || '',
-                dni: dni || '',
-                mail: mail || '',
-                telefono: telefono || '',
-                activo: activo || false,
-            });
+            const parsedValue = JSON.parse(value);
+            this.setState(
+                {
+                    profesorSeleccionado: parsedValue.nombre,
+                    idUsuario: parsedValue.idUsuario, // Corregido: asegurar que se use idProfesor
+                },
+                async () => {
+                    console.log("Estado actualizado:", {
+                        profesorSeleccionado: this.state.profesorSeleccionado,
+                        idUsuario: this.state.idUsuario, // Ahora sí tendrá el valor actualizado
+                    });
+    
+                    try {
+                        const response = await axios.get(
+                            `http://localhost:8080/api/usuario/getUsuario/${this.state.idUsuario}`,
+                            { withCredentials: true }
+                        );
+    
+                        console.log("Datos obtenidos del profesor:", response.data);
+    
+                        const { nombre, apellido, dni, mail, telefono, activo } = response.data;
+    
+                        this.setState({
+                            nombre: nombre || '',
+                            apellido: apellido || '',
+                            dni: dni || '',
+                            mail: mail || '',
+                            telefono: telefono || '',
+                            activo: activo || false,
+                            valoresOriginales: { nombre, apellido, dni, mail, telefono, activo }, 
+                        });
+                    } catch (error) {
+                        console.error("Error al cargar los datos del profesor:", error);
+                    }
+                }
+            );
         } catch (error) {
-            console.error('Error al cargar los datos del profesor:', error);
+            console.error("Error al procesar el profesor seleccionado:", error);
         }
     };
+    
 
     // Manejar envío del formulario
     handleSubmit = async (event) => {
         event.preventDefault();
 
-        const { idProfesor,valoresOriginales, nombre, apellido, dni, mail, telefono, activo } = this.state;
+        const { idUsuario,valoresOriginales, nombre, apellido, dni, mail, telefono, activo } = this.state;
 
-        if (!idProfesor) {
+        if (!idUsuario) {
             alert('Por favor selecciona un profesor antes de guardar los cambios.');
             return;
         }
@@ -150,7 +158,7 @@ class ModificarProfesor extends Component {
         if (activo !== valoresOriginales.activo) datosModificados.activo = activo;
         try {
             const response = await axios.patch(
-                `http://localhost:8080/api/usuario/modificarUsuario/${idProfesor}`,
+                `http://localhost:8080/api/usuario/modificarUsuario/${idUsuario}`,
                 datosModificados,
                 { withCredentials: true }
             );
@@ -160,7 +168,7 @@ class ModificarProfesor extends Component {
                 this.cargarProfesores();
                 this.setState({
                     profesorSeleccionado: 'Seleccione un profesor',
-                    idProfesor: null,
+                    idUsuario: null,
                     nombre: '',
                     apellido: '',
                     dni: '',
@@ -201,9 +209,9 @@ class ModificarProfesor extends Component {
                                 >
                                     {profesores.map((profesor) => (
                                         <Dropdown.Item
-                                            key={profesor.idProfesor}
+                                            key={profesor.idUsuario}
                                             eventKey={JSON.stringify({
-                                                idProfesor: profesor.idProfesor,
+                                                idUsuario: profesor.idUsuario,
                                                 nombre: profesor.nombre,
                                             })}
                                         >
