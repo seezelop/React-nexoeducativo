@@ -8,6 +8,10 @@ function Padre() {
     navigate('/RealizarPago');
   };
 
+  const irAHistorialPagos = () => {
+    navigate('/HistorialPagos');
+  };
+
   return (
     <section className="d-flex flex-column min-vh-100">
       <div className="container flex-grow-1">
@@ -20,7 +24,7 @@ function Padre() {
           <button className="btn btn-info">Información del Curso</button>
           <button className="btn btn-warning">Enviar Mensaje Privado</button>
           <button className="btn btn-danger">Cantidad de Faltas</button>
-          <button className="btn btn-success">Historial de Pagos</button>
+          <button className="btn btn-success" onClick={irAHistorialPagos}>Historial de Pagos</button>
           <button className="btn btn-info" onClick={irARealizarPago}>Realizar Pagos</button>
         </div>
       </div>

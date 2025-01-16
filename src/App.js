@@ -37,6 +37,7 @@ import GestionarAsistenciaAlumno from './componentes/pages/GestionarAsistenciaAl
 import GestionarAsistenciaProfesor from './componentes/pages/GestionarAsistenciaProfesor';
 import RealizarPago from './componentes/pages/RealizarPago';
 import EstablecerPrecioCuota from './componentes/pages/EstablecerPrecioCuota';
+import HistorialPagos from './componentes/pages/HistorialPagos';
 
 
 function App() {
@@ -113,6 +114,7 @@ function App() {
               {/* Ruta para realizar pagos  */}
               <Route path="/EstablecerPrecioCuota" element={<EstablecerPrecioCuota/>} />
               <Route path="/RealizarPago" element={<RealizarPago />} />
+              <Route path="/HistorialPagos" element={<HistorialPagos />} />
 
             
           </Routes>
