@@ -1,39 +1,71 @@
-import React, { useState } from 'react';
+import React, { Component } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import axios from 'axios';
 
-const BajaCurso = () => {
-  const [idCurso, setIdCurso] = useState('');
+class BajaCurso extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      cursos: [],
+      cursoSeleccionado: '',
+    };
+  }
 
-  const handleChange = (e) => {
-    setIdCurso(e.target.value);
-  };
+  componentDidMount() {
+    this.cargarCursos();
+  }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // Cargar cursos desde el endpoint
+  cargarCursos = async () => {
     try {
-      const response = await axios.delete(`http://localhost:8080/api/curso/baja/${idCurso}`, { withCredentials: true });
-      if (response.status === 200) {
-        alert('Curso dado de baja exitosamente!');
-      } else {
-        alert('Error al dar de baja el curso');
-      }
+      const response = await axios.get('http://localhost:8080/api/usuario/verCursoAdministrativo', {
+        withCredentials: true,
+      });
+      this.setState({ cursos: response.data });
     } catch (error) {
-      console.error('Error al dar de baja el curso:', error);
+      console.error('Error al cargar los cursos:', error);
+      alert('Error al cargar los cursos.');
     }
   };
 
-  return (
-    <Form onSubmit={handleSubmit}>
-      <Form.Group controlId="idCurso">
-        <Form.Label>ID Curso</Form.Label>
-        <Form.Control type="text" value={idCurso} onChange={handleChange} required />
-      </Form.Group>
-      <Button variant="danger" type="submit">
-        Dar de Baja Curso
-      </Button>
-    </Form>
-  );
-};
+  // Manejar cambio en el desplegable de curso
+  handleCursoChange = (event) => {
+    const cursoSeleccionado = event.target.value;
+    this.setState({ cursoSeleccionado});
+  };
+
+  // Manejar envío del formulario para eliminar la materia
+  handleSubmit = async (event) => {
+  }
+
+  render() {
+    const { cursos,cursoSeleccionado} = this.state;
+
+    return (
+      <form onSubmit={this.handleSubmit}>
+        {/* Desplegable de Cursos */}
+        <div className="mb-3">
+          <label htmlFor="cursoSeleccionado" className="form-label">Seleccionar Curso:</label>
+          <Form.Select
+            id="cursoSeleccionado"
+            value={cursoSeleccionado}
+            onChange={this.handleCursoChange}
+            required
+          >
+            <option value="">Seleccione un curso</option>
+            {cursos.map((curso) => (
+              <option key={curso.idCurso} value={curso.idCurso}>
+                {curso.numero+curso.division}
+              </option>
+            ))}
+          </Form.Select>
+        </div>
+
+
+        <Button type="submit" className="btn btn-danger">Eliminar Curso</Button>
+      </form>
+    );
+  }
+}
 
 export default BajaCurso;
