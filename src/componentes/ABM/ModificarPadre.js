@@ -6,17 +6,18 @@ class ModificarPadre extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            padres: [],
-            padreSeleccionado: 'Seleccione un padre',
-            idPadre: null,
+            profesores: [],
+            profesorSeleccionado: 'Seleccione un padre',
+            idUsuario: null,
             nombre: '',
             apellido: '',
             dni: '',
             mail: '',
             telefono: '',
-            activo: false,
+            activo: 0,
             errores: {}, // Almacena los errores de validación
             rol: 'padre',
+            valoresOriginales:  {}, // Nuevo estado para almacenar los valores originales
         };
     }
 
@@ -73,79 +74,108 @@ class ModificarPadre extends Component {
         }));
     };
 
-    // Cargar la lista de padres
-    cargarPadres = async () => {
+    // Cargar la lista de profesores
+    cargarProfesores = async () => {
         try {
-            const response = await axios.get(`http://localhost:8080/api/usuario/getUsuarios/${this.state.rol}`, {
+            const response = await axios.get(`http://localhost:8080/api/usuario/getUsuarios/padre`, {
                 withCredentials: true,
             });
 
-            const padres = response.data.map((padre) => ({
-                idPadre: padre.idProfesor, // Usa el mismo endpoint, por eso la clave sigue siendo idProfesor
-                nombre: `${padre.nombre} ${padre.apellido} ${padre.dni}`,
+            //console.log("respuesta api: "+JSON.stringify(response.data))
+            const profesores = response.data.map((profesor) => ({
+                idUsuario: profesor.idUsuario,
+                nombre: `${profesor.nombre} ${profesor.apellido} ${profesor.dni}`,
             }));
 
-            this.setState({ padres });
+            this.setState({ profesores });
         } catch (error) {
             console.error('Error al cargar los padres:', error);
         }
     };
 
-    // Manejar selección de padre en el Dropdown
+    // Manejar selección de profesor en el Dropdown
     handleDropdownChange = async (value) => {
-        const parsedValue = JSON.parse(value);
-        this.setState({
-            padreSeleccionado: parsedValue.nombre,
-            idPadre: parsedValue.idPadre,
-        });
-
         try {
-            const response = await axios.get(`http://localhost:8080/api/usuario/getUsuario/${parsedValue.idPadre}`, {
-                withCredentials: true,
-            });
-
-            console.log(response.data); // Revisa la respuesta de la API
-
-            // Asignar correctamente los datos a los campos
-            const { nombre, apellido, dni, mail, telefono, activo } = response.data;
-            this.setState({
-                nombre: nombre || '',
-                apellido: apellido || '',
-                dni: dni || '',
-                mail: mail || '',
-                telefono: telefono || '',
-                activo: activo || false,
-            });
+            const parsedValue = JSON.parse(value);
+            this.setState(
+                {
+                    profesorSeleccionado: parsedValue.nombre,
+                    idUsuario: parsedValue.idUsuario, // Corregido: asegurar que se use idProfesor
+                },
+                async () => {
+                    console.log("Estado actualizado:", {
+                        profesorSeleccionado: this.state.profesorSeleccionado,
+                        idUsuario: this.state.idUsuario, // Ahora sí tendrá el valor actualizado
+                    });
+    
+                    try {
+                        const response = await axios.get(
+                            `http://localhost:8080/api/usuario/getUsuario/${this.state.idUsuario}`,
+                            { withCredentials: true }
+                        );
+    
+                        console.log("Datos obtenidos del profesor:", response.data);
+    
+                        const { nombre, apellido, dni, mail, telefono, activo } = response.data;
+    
+                        this.setState({
+                            nombre: nombre || '',
+                            apellido: apellido || '',
+                            dni: dni || '',
+                            mail: mail || '',
+                            telefono: telefono || '',
+                            activo: activo || false,
+                            valoresOriginales: { nombre, apellido, dni, mail, telefono, activo }, 
+                        });
+                    } catch (error) {
+                        console.error("Error al cargar los datos del padre:", error);
+                    }
+                }
+            );
         } catch (error) {
-            console.error('Error al cargar los datos del padre:', error);
+            console.error("Error al procesar el padre seleccionado:", error);
         }
     };
+    
 
     // Manejar envío del formulario
     handleSubmit = async (event) => {
         event.preventDefault();
 
-        const { idPadre, nombre, apellido, dni, mail, telefono, activo } = this.state;
+        const { idUsuario,valoresOriginales, nombre, apellido, dni, mail, telefono, activo } = this.state;
 
+        if (!idUsuario) {
+            alert('Por favor selecciona un padre antes de guardar los cambios.');
+            return;
+        }
+        // Construir un objeto con solo los campos modificados
+        const datosModificados = {};
+        if (nombre !== valoresOriginales.nombre) datosModificados.nombre = nombre;
+        if (apellido !== valoresOriginales.apellido) datosModificados.apellido = apellido;
+        if (dni !== valoresOriginales.dni) datosModificados.dni = dni;
+        if (mail !== valoresOriginales.mail) datosModificados.mail = mail;
+        if (telefono !== valoresOriginales.telefono) datosModificados.telefono = telefono;
+        if (activo !== valoresOriginales.activo) datosModificados.activo = activo;
         try {
             const response = await axios.patch(
-                `http://localhost:8080/api/usuario/modificarUsuario/${idPadre}`,
-                { nombre, apellido, dni, mail, telefono, activo },
+                `http://localhost:8080/api/usuario/modificarUsuario/${idUsuario}`,
+                datosModificados,
                 { withCredentials: true }
             );
 
             if (response.status === 200) {
                 alert('Padre modificado exitosamente!');
-                this.cargarPadres();
+                this.cargarProfesores();
                 this.setState({
-                    padreSeleccionado: 'Seleccione un padre',
-                    idPadre: null,
+                    profesorSeleccionado: 'Seleccione un profesor',
+                    idUsuario: null,
                     nombre: '',
                     apellido: '',
                     dni: '',
                     mail: '',
                     telefono: '',
-                    activo: false,
+                    activo: 0,
+                    valoresOriginales:{}
                 });
                 window.location.reload(); // Refresca la página
             } else {
@@ -157,11 +187,12 @@ class ModificarPadre extends Component {
     };
 
     componentDidMount() {
-        this.cargarPadres();
+        this.cargarProfesores();
+        
     }
 
     render() {
-        const { padres, padreSeleccionado, nombre, apellido, dni, mail, telefono, activo, errores } = this.state;
+        const { profesores, profesorSeleccionado, nombre, apellido, dni, mail, telefono, activo, errores } = this.state;
 
         return (
             <section className="d-flex flex-column">
@@ -172,25 +203,25 @@ class ModificarPadre extends Component {
                                 <label htmlFor="dropdown-basic-button" className="form-label">Padre</label>
                                 <DropdownButton
                                     id="dropdown-basic-button"
-                                    title={padreSeleccionado}
+                                    title={profesorSeleccionado}
                                     onSelect={this.handleDropdownChange}
                                     size="sm"
                                 >
-                                    {padres.map((padre) => (
+                                    {profesores.map((profesor) => (
                                         <Dropdown.Item
-                                            key={padre.idPadre}
+                                            key={profesor.idUsuario}
                                             eventKey={JSON.stringify({
-                                                idPadre: padre.idPadre,
-                                                nombre: padre.nombre,
+                                                idUsuario: profesor.idUsuario,
+                                                nombre: profesor.nombre,
                                             })}
                                         >
-                                            {padre.nombre}
+                                            {profesor.nombre}
                                         </Dropdown.Item>
                                     ))}
                                 </DropdownButton>
                             </div>
 
-                            {padreSeleccionado !== 'Seleccione un padre' && (
+                            {profesorSeleccionado !== 'Seleccione un padre' && (
                                 <>
                                     {[{ id: "nombre", label: "Nombre", type: "text" },
                                     { id: "apellido", label: "Apellido", type: "text" },
@@ -206,7 +237,7 @@ class ModificarPadre extends Component {
                                                 onChange={this.handleInputChange}
                                                 className={errores[id] ? "is-invalid" : ""}
                                                 placeholder={`Ingresa ${label.toLowerCase()}`}
-                                                required
+                                                
                                             />
                                             {errores[id] && <div style={{
                                                 color: "black", fontWeight: "bold",
