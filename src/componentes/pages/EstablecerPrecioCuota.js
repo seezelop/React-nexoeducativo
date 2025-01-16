@@ -4,13 +4,20 @@ import { useNavigate } from "react-router-dom";
 const EstablecerPrecioCuota = () => {
   const [detalle, setDetalle] = useState("");
   const [precio, setPrecio] = useState("");
-  const navigate = useNavigate();  // Para navegar a otra página
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Aquí navegas hacia la página RealizarPago y pasas los valores
-    navigate("/RealizarPago", { state: { detalle, precio } });
+    // Guardar los datos en localStorage
+    localStorage.setItem("detalleCuota", detalle);
+    localStorage.setItem("precioCuota", precio);
+
+    // Mostrar notificación
+    alert("La información de la cuota fue actualizada correctamente.");
+
+    // Redirigir al panel Administrativo
+    navigate("/Administrativo");
   };
 
   return (
