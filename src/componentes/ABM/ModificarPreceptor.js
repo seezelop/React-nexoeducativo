@@ -6,17 +6,18 @@ class ModificarPreceptor extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            preceptores: [],
-            preceptorSeleccionado: 'Seleccione un preceptor',
-            idPreceptor: null,
+            profesores: [],
+            profesorSeleccionado: 'Seleccione un preceptor',
+            idUsuario: null,
             nombre: '',
             apellido: '',
             dni: '',
             mail: '',
             telefono: '',
-            activo: false,
+            activo: 0,
             errores: {}, // Almacena los errores de validación
-            rol: 'preceptor',
+            rol: 'padre',
+            valoresOriginales:  {}, // Nuevo estado para almacenar los valores originales
         };
     }
 
@@ -73,76 +74,108 @@ class ModificarPreceptor extends Component {
         }));
     };
 
-    // Cargar la lista de preceptores
-    cargarPreceptores = async () => {
+    // Cargar la lista de profesores
+    cargarProfesores = async () => {
         try {
-            const response = await axios.get(`http://localhost:8080/api/usuario/getUsuarios/${this.state.rol}`, {
+            const response = await axios.get(`http://localhost:8080/api/usuario/getUsuarios/preceptor`, {
                 withCredentials: true,
             });
 
-            const preceptores = response.data.map((preceptor) => ({
-                idPreceptor: preceptor.idPreceptor,
-                nombre: `${preceptor.nombre} ${preceptor.apellido} ${preceptor.dni}`,
+            //console.log("respuesta api: "+JSON.stringify(response.data))
+            const profesores = response.data.map((profesor) => ({
+                idUsuario: profesor.idUsuario,
+                nombre: `${profesor.nombre} ${profesor.apellido} ${profesor.dni}`,
             }));
 
-            this.setState({ preceptores });
+            this.setState({ profesores });
         } catch (error) {
             console.error('Error al cargar los preceptores:', error);
         }
     };
 
-    // Manejar selección de preceptor en el Dropdown
+    // Manejar selección de profesor en el Dropdown
     handleDropdownChange = async (value) => {
-        const parsedValue = JSON.parse(value);
-        this.setState({
-            preceptorSeleccionado: parsedValue.nombre,
-            idPreceptor: parsedValue.idPreceptor,
-        });
-
         try {
-            const response = await axios.get(`http://localhost:8080/api/usuario/getUsuario/${parsedValue.idPreceptor}`, {
-                withCredentials: true,
-            });
-
-            const { nombre, apellido, dni, mail, telefono, activo } = response.data;
-            this.setState({
-                nombre: nombre || '',
-                apellido: apellido || '',
-                dni: dni || '',
-                mail: mail || '',
-                telefono: telefono || '',
-                activo: activo || false,
-            });
+            const parsedValue = JSON.parse(value);
+            this.setState(
+                {
+                    profesorSeleccionado: parsedValue.nombre,
+                    idUsuario: parsedValue.idUsuario, // Corregido: asegurar que se use idProfesor
+                },
+                async () => {
+                    console.log("Estado actualizado:", {
+                        profesorSeleccionado: this.state.profesorSeleccionado,
+                        idUsuario: this.state.idUsuario, // Ahora sí tendrá el valor actualizado
+                    });
+    
+                    try {
+                        const response = await axios.get(
+                            `http://localhost:8080/api/usuario/getUsuario/${this.state.idUsuario}`,
+                            { withCredentials: true }
+                        );
+    
+                        console.log("Datos obtenidos del profesor:", response.data);
+    
+                        const { nombre, apellido, dni, mail, telefono, activo } = response.data;
+    
+                        this.setState({
+                            nombre: nombre || '',
+                            apellido: apellido || '',
+                            dni: dni || '',
+                            mail: mail || '',
+                            telefono: telefono || '',
+                            activo: activo || false,
+                            valoresOriginales: { nombre, apellido, dni, mail, telefono, activo }, 
+                        });
+                    } catch (error) {
+                        console.error("Error al cargar los datos del padre:", error);
+                    }
+                }
+            );
         } catch (error) {
-            console.error('Error al cargar los datos del preceptor:', error);
+            console.error("Error al procesar el padre seleccionado:", error);
         }
     };
+    
 
     // Manejar envío del formulario
     handleSubmit = async (event) => {
         event.preventDefault();
 
-        const { idPreceptor, nombre, apellido, dni, mail, telefono, activo } = this.state;
+        const { idUsuario,valoresOriginales, nombre, apellido, dni, mail, telefono, activo } = this.state;
 
+        if (!idUsuario) {
+            alert('Por favor selecciona un preceptor antes de guardar los cambios.');
+            return;
+        }
+        // Construir un objeto con solo los campos modificados
+        const datosModificados = {};
+        if (nombre !== valoresOriginales.nombre) datosModificados.nombre = nombre;
+        if (apellido !== valoresOriginales.apellido) datosModificados.apellido = apellido;
+        if (dni !== valoresOriginales.dni) datosModificados.dni = dni;
+        if (mail !== valoresOriginales.mail) datosModificados.mail = mail;
+        if (telefono !== valoresOriginales.telefono) datosModificados.telefono = telefono;
+        if (activo !== valoresOriginales.activo) datosModificados.activo = activo;
         try {
             const response = await axios.patch(
-                `http://localhost:8080/api/usuario/modificarUsuario/${idPreceptor}`,
-                { nombre, apellido, dni, mail, telefono, activo },
+                `http://localhost:8080/api/usuario/modificarUsuario/${idUsuario}`,
+                datosModificados,
                 { withCredentials: true }
             );
 
             if (response.status === 200) {
                 alert('Preceptor modificado exitosamente!');
-                this.cargarPreceptores();
+                this.cargarProfesores();
                 this.setState({
-                    preceptorSeleccionado: 'Seleccione un preceptor',
-                    idPreceptor: null,
+                    profesorSeleccionado: 'Seleccione un preceptor',
+                    idUsuario: null,
                     nombre: '',
                     apellido: '',
                     dni: '',
                     mail: '',
                     telefono: '',
-                    activo: false,
+                    activo: 0,
+                    valoresOriginales:{}
                 });
                 window.location.reload(); // Refresca la página
             } else {
@@ -154,11 +187,12 @@ class ModificarPreceptor extends Component {
     };
 
     componentDidMount() {
-        this.cargarPreceptores();
+        this.cargarProfesores();
+        
     }
 
     render() {
-        const { preceptores, preceptorSeleccionado, nombre, apellido, dni, mail, telefono, activo, errores } = this.state;
+        const { profesores, profesorSeleccionado, nombre, apellido, dni, mail, telefono, activo, errores } = this.state;
 
         return (
             <section className="d-flex flex-column">
@@ -169,25 +203,25 @@ class ModificarPreceptor extends Component {
                                 <label htmlFor="dropdown-basic-button" className="form-label">Preceptor</label>
                                 <DropdownButton
                                     id="dropdown-basic-button"
-                                    title={preceptorSeleccionado}
+                                    title={profesorSeleccionado}
                                     onSelect={this.handleDropdownChange}
                                     size="sm"
                                 >
-                                    {preceptores.map((preceptor) => (
+                                    {profesores.map((profesor) => (
                                         <Dropdown.Item
-                                            key={preceptor.idPreceptor}
+                                            key={profesor.idUsuario}
                                             eventKey={JSON.stringify({
-                                                idPreceptor: preceptor.idPreceptor,
-                                                nombre: preceptor.nombre,
+                                                idUsuario: profesor.idUsuario,
+                                                nombre: profesor.nombre,
                                             })}
                                         >
-                                            {preceptor.nombre}
+                                            {profesor.nombre}
                                         </Dropdown.Item>
                                     ))}
                                 </DropdownButton>
                             </div>
 
-                            {preceptorSeleccionado !== 'Seleccione un preceptor' && (
+                            {profesorSeleccionado !== 'Seleccione un padre' && (
                                 <>
                                     {[{ id: "nombre", label: "Nombre", type: "text" },
                                     { id: "apellido", label: "Apellido", type: "text" },
@@ -203,7 +237,7 @@ class ModificarPreceptor extends Component {
                                                 onChange={this.handleInputChange}
                                                 className={errores[id] ? "is-invalid" : ""}
                                                 placeholder={`Ingresa ${label.toLowerCase()}`}
-                                                required
+                                                
                                             />
                                             {errores[id] && <div style={{
                                                 color: "black", fontWeight: "bold",
