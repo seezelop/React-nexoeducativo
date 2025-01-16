@@ -132,11 +132,16 @@ class AltaPreceptor extends Component {
       telefono: this.state.telefono,
       activo: this.state.activo,
       rol: this.state.rol,
-      cursoId: this.state.cursoSeleccionado, // ID del curso seleccionado
     };
 
-    // Enviar al backend
-    fetch("http://localhost:8080/api/usuario/asignarPreceptor", {
+    const asignarPreceptor ={
+      curso: this.state.cursoSeleccionado, // ID del curso seleccionado
+      dni: this.state.dni
+    }
+
+    //console.log("datitos"+JSON.stringify(datos))
+
+    fetch("http://localhost:8080/api/usuario/altaUsuario", {
       method: "POST",
       credentials: "include",
       headers: {
@@ -146,14 +151,38 @@ class AltaPreceptor extends Component {
     })
       .then((response) => {
         if (response.ok) {
-          alert("Preceptor asignado correctamente al curso.");
+          alert("Preceptor dado de alta correctamente.");
+          this.handleAsignarPreceptor(asignarPreceptor)//solo se asigna un curso si se dio de alta exitosamente
           window.location.reload();
         }
         return response.text();
       })
-      .then((data) => console.log("Asignación exitosa:", data))
-      .catch((error) => console.error("Error al asignar preceptor:", error));
+      //.then((data) => console.log("Asignación exitosa:", data))
+      .catch((error) => console.error("Error al dar de alta preceptor:", error));
   };
+
+  handleAsignarPreceptor = (asignarPreceptor) =>{ 
+    console.log("datitos: "+JSON.stringify(asignarPreceptor))
+    // endpoint para asignar el curso a un preceptor, luego extraer el id del curso
+    fetch("http://localhost:8080/api/usuario/asignarPreceptor", {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(asignarPreceptor),
+    })
+    .then((response) => {
+      if (response.ok) {
+        alert("Preceptor dado de alta correctamente.");
+        window.location.reload();
+      }
+      return response.text();
+    })
+    .then((data) => console.log("Asignación exitosa:", data))
+    .catch((error) => console.error("Error al asignar el preceptor:", error));
+  }
+  
 
   render() {
     const { errores, cursosDisponibles, cursoSeleccionado } = this.state;
@@ -202,7 +231,7 @@ class AltaPreceptor extends Component {
                   <option value="">Seleccione un curso</option>
                   {cursosDisponibles.map((curso) => (
                     <option key={curso.idCurso} value={curso.idCurso}>
-                      {`${curso.numeroCurso}° ${curso.division}`}
+                      {`${curso.numero}° ${curso.division}`}
                     </option>
                   ))}
                 </select>
