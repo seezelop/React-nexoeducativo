@@ -38,6 +38,7 @@ import GestionarAsistenciaProfesor from './componentes/pages/GestionarAsistencia
 import RealizarPago from './componentes/pages/RealizarPago';
 import EstablecerPrecioCuota from './componentes/pages/EstablecerPrecioCuota';
 import HistorialPagos from './componentes/pages/HistorialPagos';
+import ABMtarea from './componentes/ABM/ABMtarea';
 
 
 function App() {
@@ -110,6 +111,9 @@ function App() {
               {/* Rutas para PRECEPTOR  */}
               <Route path="/GestionarAsistenciaAlumno" element={<GestionarAsistenciaAlumno />} />
               <Route path="/GestionarAsistenciaProfesor" element={<GestionarAsistenciaProfesor />} />
+
+              {/* Rutas para Profesor  */}
+              <Route path="/ABMtarea" element={<ABMtarea />} />
 
               {/* Ruta para realizar pagos  */}
               <Route path="/EstablecerPrecioCuota" element={<EstablecerPrecioCuota/>} />
