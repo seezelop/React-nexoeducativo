@@ -41,6 +41,8 @@ import HistorialPagos from './componentes/pages/HistorialPagos';
 import ABMtarea from './componentes/ABM/ABMtarea';
 import ABMNota from './componentes/ABM/ABMNota';
 import ABMComunicaciones from './componentes/ABM/ABMComunicaciones';
+import ABMEvento from './componentes/ABM/ABMEvento';
+import ABMMaterial from './componentes/ABM/ABMMaterial';
 
 
 function App() {
@@ -118,6 +120,8 @@ function App() {
               <Route path="/ABMtarea" element={<ABMtarea />} />
               <Route path="/ABMNota" element={<ABMNota />} />
               <Route path="/ABMComunicaciones" element={<ABMComunicaciones />} />
+              <Route path="/ABMEvento" element={<ABMEvento />} />
+              <Route path="/ABMMaterial" element={<ABMMaterial />} />
 
               {/* Ruta para realizar pagos  */}
               <Route path="/EstablecerPrecioCuota" element={<EstablecerPrecioCuota/>} />
