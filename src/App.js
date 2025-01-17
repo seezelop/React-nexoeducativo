@@ -39,8 +39,8 @@ import RealizarPago from './componentes/pages/RealizarPago';
 import EstablecerPrecioCuota from './componentes/pages/EstablecerPrecioCuota';
 import HistorialPagos from './componentes/pages/HistorialPagos';
 import ABMtarea from './componentes/ABM/ABMtarea';
-import ABNNota from './componentes/ABM/ABMNota';
 import ABMNota from './componentes/ABM/ABMNota';
+import ABMComunicaciones from './componentes/ABM/ABMComunicaciones';
 
 
 function App() {
@@ -117,6 +117,7 @@ function App() {
               {/* Rutas para Profesor  */}
               <Route path="/ABMtarea" element={<ABMtarea />} />
               <Route path="/ABMNota" element={<ABMNota />} />
+              <Route path="/ABMComunicaciones" element={<ABMComunicaciones />} />
 
               {/* Ruta para realizar pagos  */}
               <Route path="/EstablecerPrecioCuota" element={<EstablecerPrecioCuota/>} />
