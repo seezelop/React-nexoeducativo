@@ -21,13 +21,15 @@ class BajaAlumno extends Component {
     // Cargar lista de alumnos
     cargarAlumnos = async () => {
         try {
-            const response = await axios.get(`http://localhost:8080/api/usuario/getUsuarios/${this.state.rol}`, {
+            const response = await axios.get(`http://localhost:8080/api/usuario/verAlumnos`, {
                 withCredentials: true
             });
 
+            //console.log("info alumnos api: "+JSON.stringify(response.data))
+
             const alumnos = response.data.map(alumno => ({
-                idUsuario: alumno.idUsuario,
-                nombre: `${alumno.nombre} ${alumno.apellido} ${alumno.dni}`
+                idUsuario: alumno.id_usuario,
+                nombre: `${alumno.nombre} ${alumno.apellido}`
             }));
 
             this.setState({ alumnos });
