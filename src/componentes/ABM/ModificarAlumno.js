@@ -6,17 +6,18 @@ class ModificarAlumno extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            alumnos: [],
-            alumnoSeleccionado: 'Seleccione un alumno',
-            idAlumno: null,
+            profesores: [],
+            profesorSeleccionado: 'Seleccione un alumno',
+            id_usuario: null,
             nombre: '',
             apellido: '',
             dni: '',
             mail: '',
             telefono: '',
-            activo: false,
+            activo: 0,
             errores: {}, // Almacena los errores de validación
             rol: 'alumno',
+            valoresOriginales:  {}, // Nuevo estado para almacenar los valores originales
         };
     }
 
@@ -73,79 +74,108 @@ class ModificarAlumno extends Component {
         }));
     };
 
-    // Cargar la lista de alumnos
-    cargarAlumnos = async () => {
+    // Cargar la lista de profesores
+    cargarProfesores = async () => {
         try {
-            const response = await axios.get(`http://localhost:8080/api/usuario/getUsuarios/${this.state.rol}`, {
+            const response = await axios.get(`http://localhost:8080/api/usuario/verAlumnos`, {
                 withCredentials: true,
             });
 
-            console.log("INFO API" + response.data);
-
-            const alumnos = response.data.map((alumno) => ({
-                idAlumno: alumno.idAlumno,
-                nombre: `${alumno.nombre} ${alumno.apellido} ${alumno.dni}`,
+            //console.log("respuesta api: "+JSON.stringify(response.data))
+            const profesores = response.data.map((profesor) => ({
+                id_usuario: profesor.id_usuario,
+                nombre: `${profesor.nombre} ${profesor.apellido}`,
             }));
 
-            this.setState({ alumnos });
+            this.setState({ profesores });
         } catch (error) {
             console.error('Error al cargar los alumnos:', error);
         }
     };
 
-    // Manejar selección de alumno en el Dropdown
+    // Manejar selección de profesor en el Dropdown
     handleDropdownChange = async (value) => {
-        this.setState({
-            alumnoSeleccionado: value.nombre,
-            idAlumno: value.idAlumno,
-        });
-
         try {
-            const response = await axios.get(`http://localhost:8080/api/usuario/getUsuario/${value.idAlumno}`, {
-                withCredentials: true,
-            });
-
-            console.log("id que ingresa al endpoint:"+value.idAlumno)
-
-            const { nombre, apellido, dni, mail, telefono, activo } = response.data;
-            this.setState({
-                nombre: nombre || '',
-                apellido: apellido || '',
-                dni: dni || '',
-                mail: mail || '',
-                telefono: telefono || '',
-                activo: activo || false,
-            });
+            const parsedValue = JSON.parse(value);
+            this.setState(
+                {
+                    profesorSeleccionado: parsedValue.nombre,
+                    id_usuario: parsedValue.id_usuario, // Corregido: asegurar que se use idProfesor
+                },
+                async () => {
+                    console.log("Estado actualizado:", {
+                        profesorSeleccionado: this.state.profesorSeleccionado,
+                        id_usuario: this.state.id_usuario, // Ahora sí tendrá el valor actualizado
+                    });
+    
+                    try {
+                        const response = await axios.get(
+                            `http://localhost:8080/api/usuario/getUsuario/${this.state.id_usuario}`,
+                            { withCredentials: true }
+                        );
+    
+                        console.log("Datos obtenidos del alumno:", response.data);
+    
+                        const { nombre, apellido, dni, mail, telefono, activo } = response.data;
+    
+                        this.setState({
+                            nombre: nombre || '',
+                            apellido: apellido || '',
+                            dni: dni || '',
+                            mail: mail || '',
+                            telefono: telefono || '',
+                            activo: activo || false,
+                            valoresOriginales: { nombre, apellido, dni, mail, telefono, activo }, 
+                        });
+                    } catch (error) {
+                        console.error("Error al cargar los datos del alumnos:", error);
+                    }
+                }
+            );
         } catch (error) {
-            console.error('Error al cargar los datos del alumno:', error);
+            console.error("Error al procesar el alumno seleccionado:", error);
         }
     };
+    
 
     // Manejar envío del formulario
     handleSubmit = async (event) => {
         event.preventDefault();
 
-        const { idAlumno, nombre, apellido, dni, mail, telefono, activo } = this.state;
+        const { id_usuario,valoresOriginales, nombre, apellido, dni, mail, telefono, activo } = this.state;
 
+        if (!id_usuario) {
+            alert('Por favor selecciona un alumno antes de guardar los cambios.');
+            return;
+        }
+        // Construir un objeto con solo los campos modificados
+        const datosModificados = {};
+        if (nombre !== valoresOriginales.nombre) datosModificados.nombre = nombre;
+        if (apellido !== valoresOriginales.apellido) datosModificados.apellido = apellido;
+        if (dni !== valoresOriginales.dni) datosModificados.dni = dni;
+        if (mail !== valoresOriginales.mail) datosModificados.mail = mail;
+        if (telefono !== valoresOriginales.telefono) datosModificados.telefono = telefono;
+        if (activo !== valoresOriginales.activo) datosModificados.activo = activo;
         try {
             const response = await axios.patch(
-                `http://localhost:8080/api/usuario/modificarUsuario/${idAlumno}`,
-                { nombre, apellido, dni, mail, telefono, activo },
+                `http://localhost:8080/api/usuario/modificarUsuario/${id_usuario}`,
+                datosModificados,
                 { withCredentials: true }
             );
 
             if (response.status === 200) {
-                alert('Alumno modificado exitosamente!');
-                this.cargarAlumnos();
+                alert('alumno modificado exitosamente!');
+                this.cargarProfesores();
                 this.setState({
-                    alumnoSeleccionado: 'Seleccione un alumno',
-                    idAlumno: null,
+                    profesorSeleccionado: 'Seleccione un alumno',
+                    id_usuario: null,
                     nombre: '',
                     apellido: '',
                     dni: '',
                     mail: '',
                     telefono: '',
-                    activo: false,
+                    activo: 0,
+                    valoresOriginales:{}
                 });
                 window.location.reload(); // Refresca la página
             } else {
@@ -157,11 +187,12 @@ class ModificarAlumno extends Component {
     };
 
     componentDidMount() {
-        this.cargarAlumnos();
+        this.cargarProfesores();
+        
     }
 
     render() {
-        const { alumnos, alumnoSeleccionado, nombre, apellido, dni, mail, telefono, activo, errores } = this.state;
+        const { profesores, profesorSeleccionado, nombre, apellido, dni, mail, telefono, activo, errores } = this.state;
 
         return (
             <section className="d-flex flex-column">
@@ -172,22 +203,25 @@ class ModificarAlumno extends Component {
                                 <label htmlFor="dropdown-basic-button" className="form-label">Alumno</label>
                                 <DropdownButton
                                     id="dropdown-basic-button"
-                                    title={alumnoSeleccionado}
+                                    title={profesorSeleccionado}
                                     onSelect={this.handleDropdownChange}
                                     size="sm"
                                 >
-                                    {alumnos.map((alumno) => (
+                                    {profesores.map((profesor) => (
                                         <Dropdown.Item
-                                            key={alumno.idAlumno}
-                                            eventKey={alumno} // Pasa el objeto alumno directamente
+                                            key={profesor.id_usuario}
+                                            eventKey={JSON.stringify({
+                                                id_usuario: profesor.id_usuario,
+                                                nombre: profesor.nombre,
+                                            })}
                                         >
-                                            {alumno.nombre}
+                                            {profesor.nombre}
                                         </Dropdown.Item>
                                     ))}
                                 </DropdownButton>
                             </div>
 
-                            {alumnoSeleccionado !== 'Seleccione un alumno' && (
+                            {profesorSeleccionado !== 'Seleccione un alumno' && (
                                 <>
                                     {[{ id: "nombre", label: "Nombre", type: "text" },
                                     { id: "apellido", label: "Apellido", type: "text" },
@@ -203,7 +237,7 @@ class ModificarAlumno extends Component {
                                                 onChange={this.handleInputChange}
                                                 className={errores[id] ? "is-invalid" : ""}
                                                 placeholder={`Ingresa ${label.toLowerCase()}`}
-                                                required
+                                                
                                             />
                                             {errores[id] && <div style={{
                                                 color: "black", fontWeight: "bold",
