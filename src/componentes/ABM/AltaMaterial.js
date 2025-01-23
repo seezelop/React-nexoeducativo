@@ -10,7 +10,7 @@ function AltaMaterial() {
   const [materiaSeleccionada, setMateriaSeleccionada] = useState('');
 
   useEffect(() => {
-    axios.get('http://localhost:8080/api/materias/verMaterias')
+    axios.get('http://localhost:8080/api/usuario/verMaterias')
       .then(response => setMaterias(response.data))
       .catch(error => console.error('Error al cargar materias:', error));
   }, []);
@@ -24,7 +24,7 @@ function AltaMaterial() {
     formData.append('materiaId', materiaSeleccionada);
 
     try {
-      await axios.post('http://localhost:8080/api/materiales/alta', formData);
+      await axios.post('http://localhost:8080/api/usuario/altaMaterial', formData);
       setRespuesta('Material cargado correctamente.');
       setTitulo('');
       setDescripcion('');

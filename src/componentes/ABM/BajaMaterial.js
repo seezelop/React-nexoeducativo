@@ -16,7 +16,7 @@ function BajaMaterial() {
     e.preventDefault();
 
     try {
-      await axios.delete(`http://localhost:8080/api/materiales/baja/${materialSeleccionado}`);
+      await axios.delete(`http://localhost:8080/api/usuario/bajaMaterial/${materialSeleccionado}`);
       setRespuesta('Material eliminado correctamente.');
       setMaterialSeleccionado('');
     } catch (error) {
