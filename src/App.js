@@ -43,6 +43,8 @@ import ABMNota from './componentes/ABM/ABMNota';
 import ABMComunicaciones from './componentes/ABM/ABMComunicaciones';
 import ABMEvento from './componentes/ABM/ABMEvento';
 import ABMMaterial from './componentes/ABM/ABMMaterial';
+import InformacionCurso from './componentes/pages/InformacionCurso';
+import InformacionCursoAlumno from './componentes/pages/InformacionCursoAlumno';
 
 
 function App() {
@@ -122,6 +124,13 @@ function App() {
               <Route path="/ABMComunicaciones" element={<ABMComunicaciones />} />
               <Route path="/ABMEvento" element={<ABMEvento />} />
               <Route path="/ABMMaterial" element={<ABMMaterial />} />
+              
+              {/* Rutas para Padre  */}
+              <Route path="/InformacionCurso" element={<InformacionCurso />} />
+
+
+              {/* Rutas para Alumno  */}
+              <Route path="/InformacionCursoAlumno" element={<InformacionCursoAlumno />} />
 
               {/* Ruta para realizar pagos  */}
               <Route path="/EstablecerPrecioCuota" element={<EstablecerPrecioCuota/>} />
