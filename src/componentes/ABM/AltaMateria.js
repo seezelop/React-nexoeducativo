@@ -6,78 +6,33 @@ class AltaMateria extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      nombre: '',
-      cursos: [],
-      profesores: [],
-      cursoSeleccionado: '',
-      profesorSeleccionado: '',
+      nombre: ''
     };
   }
 
-  componentDidMount() {
-    this.cargarCursos();
-    this.cargarProfesores();
-  }
-
-  // Cargar cursos desde el endpoint
-  cargarCursos = async () => {
-    try {
-      const response = await axios.get('http://localhost:8080/api/usuario/verCursoAdministrativo', {
-        withCredentials: true,
-      });
-      this.setState({ cursos: response.data });
-    } catch (error) {
-      console.error('Error al cargar los cursos:', error);
-      alert('Error al cargar los cursos.');
-    }
-  };
-
-  // Cargar profesores desde el endpoint
-  cargarProfesores = async () => {
-    try {
-      const response = await axios.get('http://localhost:8080/api/usuario/verProfesAdministrativo', {
-        withCredentials: true,
-      });
-      this.setState({ profesores: response.data });
-    } catch (error) {
-      console.error('Error al cargar los profesores:', error);
-      alert('Error al cargar los profesores.');
-    }
-  };
-
-  // Manejar cambios en los campos del formulario
+  // Manejar cambios en el input del nombre
   handleInputChange = (event) => {
-    const { id, value } = event.target;
-    this.setState({ [id]: value });
+    this.setState({ nombre: event.target.value });
   };
 
   // Manejar envío del formulario
   handleSubmit = async (event) => {
     event.preventDefault();
-
-    const { nombre, cursoSeleccionado, profesorSeleccionado } = this.state;
+    const { nombre } = this.state;
 
     try {
       const response = await axios.post(
         'http://localhost:8080/api/usuario/saveMateria',
-        {
-          nombre,
-          cursoId: cursoSeleccionado,
-          profesorId: profesorSeleccionado,
-        },
+        { nombre }, // Enviar solo el nombre
         {
           headers: { 'Content-Type': 'application/json' },
-          withCredentials: true,
+          withCredentials: true
         }
       );
 
       if (response.status === 201) {
         alert('Materia agregada exitosamente!');
-        this.setState({
-          nombre: '',
-          cursoSeleccionado: '',
-          profesorSeleccionado: '',
-        });
+        this.setState({ nombre: '' }); // Resetear el campo de entrada
       } else {
         alert('Error al agregar la materia.');
       }
@@ -88,10 +43,10 @@ class AltaMateria extends Component {
   };
 
   render() {
-    const { nombre, cursos, profesores, cursoSeleccionado, profesorSeleccionado } = this.state;
+    const { nombre } = this.state;
 
     return (
-      <form onSubmit={this.handleSubmit}>
+      <form onSubmit={this.handleSubmit} className="col-md-6 mx-auto">
         <div className="mb-3">
           <label htmlFor="nombre" className="form-label">Nombre de la Materia:</label>
           <Form.Control
@@ -103,41 +58,7 @@ class AltaMateria extends Component {
           />
         </div>
 
-        <div className="mb-3">
-          <label htmlFor="cursoSeleccionado" className="form-label">Seleccionar Curso:</label>
-          <Form.Select
-            id="cursoSeleccionado"
-            value={cursoSeleccionado}
-            onChange={this.handleInputChange}
-            required
-          >
-            <option value="">Seleccione un curso</option>
-            {cursos.map((curso) => (
-              <option key={curso.id} value={curso.id}>
-                {curso.nombre}
-              </option>
-            ))}
-          </Form.Select>
-        </div>
-
-        <div className="mb-3">
-          <label htmlFor="profesorSeleccionado" className="form-label">Seleccionar Profesor:</label>
-          <Form.Select
-            id="profesorSeleccionado"
-            value={profesorSeleccionado}
-            onChange={this.handleInputChange}
-            required
-          >
-            <option value="">Seleccione un profesor</option>
-            {profesores.map((profesor) => (
-              <option key={profesor.id} value={profesor.id}>
-                {profesor.nombre} {profesor.apellido}
-              </option>
-            ))}
-          </Form.Select>
-        </div>
-
-        <Button type="submit" className="btn btn-primary">Agregar Materia</Button>
+        <Button type="submit" className="btn btn-primary w-100">Agregar Materia</Button>
       </form>
     );
   }
