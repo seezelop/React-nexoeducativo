@@ -7,11 +7,19 @@ class SeleccionarCurso extends Component {
         super(props);
         this.state = {
             cursos: [],
+            alumnos: [],
+            materias: [],
             cursoSeleccionado: 'Seleccione un curso',
             id_curso: null,
             numero: '',
             division: '',
-            activo: false,
+            nombreP:'',
+             apellidoP:'',
+             nombre: '',
+             apellido:'',
+             nombreM:'',
+             nombreProfesor:'',
+             apellidoProfesor: '',
         };
     }
 
@@ -36,6 +44,40 @@ class SeleccionarCurso extends Component {
         }
     };
 
+    obtenerInfo = async(id_curso)=>{
+        try {
+            const response = await axios.get(`http://localhost:8080/api/usuario/selectCurso/${id_curso}`, {
+                withCredentials: true,
+            });
+
+            //obtener alumnos
+            const alumnos = response.data.map((alumno) => ({
+                nombre: alumno.nombre,
+                apellido: alumno.apellido,
+            }));
+
+            this.setState({ alumnos });
+
+            const { numero, division, nombreP, apellidoP, nombre, apellido, nombreM, nombreProfesor, apellidoProfesor} = response.data;
+            this.setState({
+                numero: numero || '',
+                division: division || '',
+                nombreP: nombreP || '',
+                apellidoP: apellidoP || '',
+                nombre: nombre || '',
+                apellido: apellido || '',
+                nombreM:nombreM || '',
+             nombreProfesor: nombreProfesor || '',
+             apellidoProfesor: apellidoProfesor || ''
+            });
+    }catch (error) {
+        console.error('Error al cargar la informacion:', error);
+    }
+    };
+
+    componentDidMount() {
+        this.cargarCursos();
+    }
     // Manejar selección de curso en el Dropdown
     handleDropdownChange = (value) => {
         const parsedValue = JSON.parse(value);
@@ -57,18 +99,15 @@ class SeleccionarCurso extends Component {
     // Manejar envío del formulario
     handleSubmit = (event) => {
         event.preventDefault();
-        const { id_curso, numero, division, activo } = this.state;
+        //const { id_curso, numero, division, activo } = this.state;
 
-        console.log('Datos del curso seleccionado:', { id_curso, numero, division, activo });
+        //console.log('Datos del curso seleccionado:', { id_curso, numero, division, activo });
         alert('Curso seleccionado con éxito!');
     };
 
-    componentDidMount() {
-        this.cargarCursos();
-    }
 
     render() {
-        const { cursos, cursoSeleccionado, numero, division, activo } = this.state;
+        const { cursos, cursoSeleccionado, numero, division, nombreP, apellidoP, nombreM, nombreProfesor, apellidoProfesor } = this.state;
 
         return (
             <section className="d-flex flex-column">
@@ -115,11 +154,20 @@ class SeleccionarCurso extends Component {
                                         />
                                     </div>
                                     <div className="mb-3">
-                                        <label htmlFor="activo" className="form-label">Activo:</label>
-                                        <Form.Check
-                                            id="activo"
-                                            type="checkbox"
-                                            checked={activo}
+                                        <label htmlFor="activo" className="form-label">Nombre Preceptor:</label>
+                                        <Form.Control
+                                            id="nombreP"
+                                            type="text"
+                                            value={nombreP}
+                                            readOnly
+                                        />
+                                    </div>
+                                    <div className="mb-3">
+                                        <label htmlFor="activo" className="form-label">Apellido Preceptor:</label>
+                                        <Form.Control
+                                            id="apellidoP"
+                                            type="text"
+                                            value={apellidoP}
                                             readOnly
                                         />
                                     </div>
