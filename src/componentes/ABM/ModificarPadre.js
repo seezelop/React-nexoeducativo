@@ -17,7 +17,7 @@ class ModificarPadre extends Component {
             activo: 0,
             errores: {}, // Almacena los errores de validación
             rol: 'padre',
-            valoresOriginales:  {}, // Nuevo estado para almacenar los valores originales
+            valoresOriginales: {}, // Nuevo estado para almacenar los valores originales
         };
     }
 
@@ -65,14 +65,26 @@ class ModificarPadre extends Component {
 
     // Manejar cambios en los inputs y aplicar validaciones
     handleInputChange = (event) => {
-        const { id, value } = event.target;
-        const error = this.validarCampo(id, value);
+        const { id, type, checked } = event.target;
 
-        this.setState((prevState) => ({
-            [id]: value,
-            errores: { ...prevState.errores, [id]: error },
-        }));
+        // Determinar el valor adecuado según el tipo de input
+        const valor = type === 'checkbox' ? (checked ? 1 : 0) : event.target.value;
+
+        console.log(`Campo ${id} cambiado a:`, valor, `Tipo: ${type}`);
+
+        // Validar el campo
+        const error = this.validarCampo(id, valor);
+
+        // Actualizar el estado
+        this.setState({
+            [id]: valor,
+            errores: { ...this.state.errores, [id]: error }
+        }, () => {
+            // Callback para verificar que el estado se actualizó correctamente
+            console.log(`Estado actualizado: ${id} =`, this.state[id]);
+        });
     };
+
 
     // Cargar la lista de profesores
     cargarProfesores = async () => {
@@ -107,25 +119,25 @@ class ModificarPadre extends Component {
                         profesorSeleccionado: this.state.profesorSeleccionado,
                         idUsuario: this.state.idUsuario, // Ahora sí tendrá el valor actualizado
                     });
-    
+
                     try {
                         const response = await axios.get(
                             `http://localhost:8080/api/usuario/getUsuario/${this.state.idUsuario}`,
                             { withCredentials: true }
                         );
-    
+
                         console.log("Datos obtenidos del profesor:", response.data);
-    
+
                         const { nombre, apellido, dni, mail, telefono, activo } = response.data;
-    
+
                         this.setState({
                             nombre: nombre || '',
                             apellido: apellido || '',
                             dni: dni || '',
                             mail: mail || '',
                             telefono: telefono || '',
-                            activo: activo || false,
-                            valoresOriginales: { nombre, apellido, dni, mail, telefono, activo }, 
+                            activo: activo ? 1 : 0,
+                            valoresOriginales: { nombre, apellido, dni, mail, telefono, activo },
                         });
                     } catch (error) {
                         console.error("Error al cargar los datos del padre:", error);
@@ -136,18 +148,19 @@ class ModificarPadre extends Component {
             console.error("Error al procesar el padre seleccionado:", error);
         }
     };
-    
+
 
     // Manejar envío del formulario
     handleSubmit = async (event) => {
         event.preventDefault();
 
-        const { idUsuario,valoresOriginales, nombre, apellido, dni, mail, telefono, activo } = this.state;
+        const { idUsuario, valoresOriginales, nombre, apellido, dni, mail, telefono, activo } = this.state;
 
         if (!idUsuario) {
             alert('Por favor selecciona un padre antes de guardar los cambios.');
             return;
         }
+
         // Construir un objeto con solo los campos modificados
         const datosModificados = {};
         if (nombre !== valoresOriginales.nombre) datosModificados.nombre = nombre;
@@ -155,7 +168,12 @@ class ModificarPadre extends Component {
         if (dni !== valoresOriginales.dni) datosModificados.dni = dni;
         if (mail !== valoresOriginales.mail) datosModificados.mail = mail;
         if (telefono !== valoresOriginales.telefono) datosModificados.telefono = telefono;
-        if (activo !== valoresOriginales.activo) datosModificados.activo = activo;
+        if (Number(activo) !== Number(valoresOriginales.activo)) {
+            datosModificados.activo = parseInt(activo, 10); // Asegúrate de que sea un número
+        }
+
+        console.log('Datos a enviar:', datosModificados);
+
         try {
             const response = await axios.patch(
                 `http://localhost:8080/api/usuario/modificarUsuario/${idUsuario}`,
@@ -175,20 +193,21 @@ class ModificarPadre extends Component {
                     mail: '',
                     telefono: '',
                     activo: 0,
-                    valoresOriginales:{}
+                    valoresOriginales: {}
                 });
-                window.location.reload(); // Refresca la página
+                window.location.reload();
             } else {
                 alert('Error al modificar el padre');
             }
         } catch (error) {
             console.error('Error al modificar el padre:', error);
+            console.log('Estado actual activo:', this.state.activo);
         }
     };
 
     componentDidMount() {
         this.cargarProfesores();
-        
+
     }
 
     render() {
@@ -237,7 +256,7 @@ class ModificarPadre extends Component {
                                                 onChange={this.handleInputChange}
                                                 className={errores[id] ? "is-invalid" : ""}
                                                 placeholder={`Ingresa ${label.toLowerCase()}`}
-                                                
+
                                             />
                                             {errores[id] && <div style={{
                                                 color: "black", fontWeight: "bold",
@@ -251,7 +270,7 @@ class ModificarPadre extends Component {
                                         <Form.Check
                                             id="activo"
                                             type="checkbox"
-                                            checked={activo}
+                                            checked={Number(this.state.activo) === 1}
                                             onChange={this.handleInputChange}
                                         />
                                     </div>
