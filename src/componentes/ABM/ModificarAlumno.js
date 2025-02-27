@@ -65,13 +65,23 @@ class ModificarAlumno extends Component {
 
     // Manejar cambios en los inputs y aplicar validaciones
     handleInputChange = (event) => {
-        const { id, value } = event.target;
+        const { id, value, type, checked } = event.target;
+        const casteo= type === 'checkbox' ? (checked ? 1 : 0) : value;
+        
+        const error = this.validarCampo(id, casteo);
+
+        this.setState((prevState) => ({
+            [id]: casteo,
+            errores: { ...prevState.errores, [id]: error },
+        }));
+
+        /*const { id, value } = event.target;
         const error = this.validarCampo(id, value);
 
         this.setState((prevState) => ({
             [id]: value,
             errores: { ...prevState.errores, [id]: error },
-        }));
+        }));*/
     };
 
     // Cargar la lista de profesores
@@ -86,6 +96,10 @@ class ModificarAlumno extends Component {
                 id_usuario: profesor.id_usuario,
                 nombre: `${profesor.nombre} ${profesor.apellido}`,
             }));
+
+            if(response.status === 200){
+                console.log ('info ',response.data)
+            }
 
             this.setState({ profesores });
         } catch (error) {
@@ -124,7 +138,7 @@ class ModificarAlumno extends Component {
                             dni: dni || '',
                             mail: mail || '',
                             telefono: telefono || '',
-                            activo: activo || false,
+                            activo: activo ? 1:0,
                             valoresOriginales: { nombre, apellido, dni, mail, telefono, activo }, 
                         });
                     } catch (error) {
