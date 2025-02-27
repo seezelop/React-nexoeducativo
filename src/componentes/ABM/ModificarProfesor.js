@@ -65,11 +65,13 @@ class ModificarProfesor extends Component {
 
     // Manejar cambios en los inputs y aplicar validaciones
     handleInputChange = (event) => {
-        const { id, value } = event.target;
-        const error = this.validarCampo(id, value);
+        const { id, value, type, checked } = event.target;
+        const casteo= type === 'checkbox' ? (checked ? 1 : 0) : value;
+        
+        const error = this.validarCampo(id, casteo);
 
         this.setState((prevState) => ({
-            [id]: value,
+            [id]: casteo,
             errores: { ...prevState.errores, [id]: error },
         }));
     };
@@ -124,7 +126,7 @@ class ModificarProfesor extends Component {
                             dni: dni || '',
                             mail: mail || '',
                             telefono: telefono || '',
-                            activo: activo || false,
+                            activo: activo ? 1:0,
                             valoresOriginales: { nombre, apellido, dni, mail, telefono, activo }, 
                         });
                     } catch (error) {

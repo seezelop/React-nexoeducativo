@@ -6,88 +6,119 @@ class ModificarMateria extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      id_materia: '',
-      nombre: '',
+      cursos: [],
+      materias: [],
+      cursoSeleccionado: '',
+      materiaSeleccionada: '',
+      materiaEnviar:''
     };
   }
 
-  // Manejar cambios en los campos del formulario
-  handleInputChange = (event) => {
-    const { id, value } = event.target;
-    this.setState({ [id]: value });
-  };
-
-  // Manejar la selección del ID de la materia y cargar sus detalles
-  handleMateriaChange = async (event) => {
-    const { value } = event.target;
-    this.setState({ id_materia: value });
-
+  componentDidMount() {
+    this.cargarMaterias();
+  }
+  // Cargar materias según el curso seleccionado
+  cargarMaterias = async () => {
     try {
-      const response = await axios.get(
-        `http://localhost:8080/api/materia/${value}`,
-        { withCredentials: true }
-      );
-
-      if (response.status === 200) {
-        this.setState({ nombre: response.data.nombre });
-      }
+      const response = await axios.get(`http://localhost:8080/api/usuario/verMaterias`, {
+        withCredentials: true,
+      });
+      this.setState({ materias: response.data });
+      console.log ('cargar materias: '+response.data)
     } catch (error) {
-      console.error('Error al cargar los detalles de la materia:', error);
+      console.error('Error al cargar las materias:', error);
+      alert('Error al cargar las materias.');
     }
   };
 
-  // Manejar el envío del formulario
+
+  // Manejar cambio en el desplegable de materia
+  handleMateriaChange = (event) => {
+    this.setState(
+      { materiaSeleccionada: event.target.value,
+        materiaEnviar:'', //se reinicia
+       },
+    );
+  };
+
+  handleNombreChange = (event) => {
+    this.setState({ materiaEnviar: event.target.value });
+  };
+
+  // Manejar envío del formulario para eliminar la materia
   handleSubmit = async (event) => {
     event.preventDefault();
 
-    const { id_materia, nombre } = this.state;
+    const { materiaSeleccionada, materiaEnviar } = this.state;
+    const idMateria=materiaSeleccionada;
 
-    try {
-      const response = await axios.put(
-        `http://localhost:8080/api/materia/modificar/${id_materia}`,
-        { nombre },
-        { withCredentials: true }
+    if (!idMateria) {
+      alert('Por favor, selecciona una materia.');
+      return;
+    }
+
+    if (!materiaEnviar.trim()) {
+      alert('El nuevo nombre no puede estar vacío.');
+      return;
+    }
+
+    try {      
+      await axios.patch(
+        `http://localhost:8080/api/usuario/modificarMateria/${idMateria}`, 
+        { nombre: materiaEnviar }, // Solo el cuerpo JSON
+        { headers: { 'Content-Type': 'application/json' }, withCredentials: true } // Opciones de la petición
       );
+      
 
-      if (response.status === 200) {
-        alert('Materia modificada exitosamente!');
-        this.setState({ id_materia: '', nombre: '' });
-      } else {
-        alert('Error al modificar la materia.');
-      }
+      alert('Materia editada exitosamente.');
+      this.setState({
+        materiaSeleccionada: '',
+        materias: [],
+      });
     } catch (error) {
-      console.error('Error al modificar la materia:', error);
+      console.error('Error al editar la materia:', error);
+      alert('Error al editar la materia.');
     }
   };
 
   render() {
-    const { id_materia, nombre } = this.state;
+    const { materias, materiaSeleccionada, materiaEnviar } = this.state;
 
     return (
       <form onSubmit={this.handleSubmit}>
+        {/* Desplegable de Materias */}
         <div className="mb-3">
-          <label htmlFor="id_materia" className="form-label">ID Materia:</label>
-          <Form.Control
-            id="id_materia"
-            type="text"
-            value={id_materia}
+          <label htmlFor="materiaSeleccionada" className="form-label">Seleccionar Materia:</label>
+          <Form.Select
+            id="materiaSeleccionada"
+            value={materiaSeleccionada}
             onChange={this.handleMateriaChange}
             required
-          />
+          >
+            <option value="">Seleccione una materia</option>
+            {materias.map((materia) => (
+              <option key={materia.idMateria} value={materia.idMateria}>
+                {materia.nombre}
+              </option>
+            ))}
+          </Form.Select>
         </div>
-        {id_materia && (
+
+        {materiaSeleccionada && (
           <div className="mb-3">
-            <label htmlFor="nombre" className="form-label">Nombre:</label>
+            <label htmlFor="materiaEnviar" className="form-label">Nombre:</label>
             <Form.Control
-              id="nombre"
               type="text"
-              value={nombre}
-              onChange={this.handleInputChange}
+              id="nuevoNombreMateria"
+              value={materiaEnviar}
+              onChange={this.handleNombreChange}
+              placeholder="Ingrese el nuevo nombre"
               required
             />
           </div>
         )}
-        <Button type="submit" className="btn btn-primary">Guardar Cambios</Button>
+
+        <Button type="submit" className="btn btn-danger">Modificar Materia</Button>
       </form>
     );
   }
