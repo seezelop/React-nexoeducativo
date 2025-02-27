@@ -14,8 +14,9 @@ class ModificarAdministrativo extends Component {
             dni: '',
             mail: '',
             telefono: '',
-            activo: false,
+            activo: 0,
             errores: {}, // Almacena los errores de validación
+            valoresOriginales:  {},
         };
     }
 
@@ -63,13 +64,22 @@ class ModificarAdministrativo extends Component {
 
     // Manejar cambios en los inputs y aplicar validaciones
     handleInputChange = (event) => {
-        const { id, value } = event.target;
+        const { id, value, type, checked } = event.target;
+        const casteo= type === 'checkbox' ? (checked ? 1 : 0) : value;
+        
+        const error = this.validarCampo(id, casteo);
+
+        this.setState((prevState) => ({
+            [id]: casteo,
+            errores: { ...prevState.errores, [id]: error },
+        }));
+       /* const { id, value } = event.target;
         const error = this.validarCampo(id, value);
 
         this.setState((prevState) => ({
             [id]: value,
             errores: { ...prevState.errores, [id]: error },
-        }));
+        }));*/
     };
 
     // Cargar la lista de administrativos
@@ -104,7 +114,15 @@ class ModificarAdministrativo extends Component {
             });
 
             const { nombre, apellido, dni, mail, telefono, activo } = response.data;
-            this.setState({ nombre, apellido, dni, mail, telefono, activo });
+            this.setState({
+                nombre: nombre || '',
+                apellido: apellido || '',
+                dni: dni || '',
+                mail: mail || '',
+                telefono: telefono || '',
+                activo: activo ? 1:0,
+                valoresOriginales: { nombre, apellido, dni, mail, telefono, activo }, 
+            });
         } catch (error) {
             console.error('Error al cargar los datos del administrativo:', error);
         }
@@ -114,12 +132,20 @@ class ModificarAdministrativo extends Component {
     handleSubmit = async (event) => {
         event.preventDefault();
 
-        const { idAdministrativo, nombre, apellido, dni, mail, telefono, activo } = this.state;
+        const { idAdministrativo, valoresOriginales,nombre, apellido, dni, mail, telefono, activo } = this.state;
 
+        // Construir un objeto con solo los campos modificados
+        const datosModificados = {};
+        if (nombre !== valoresOriginales.nombre) datosModificados.nombre = nombre;
+        if (apellido !== valoresOriginales.apellido) datosModificados.apellido = apellido;
+        if (dni !== valoresOriginales.dni) datosModificados.dni = dni;
+        if (mail !== valoresOriginales.mail) datosModificados.mail = mail;
+        if (telefono !== valoresOriginales.telefono) datosModificados.telefono = telefono;
+        if (activo !== valoresOriginales.activo) datosModificados.activo = activo;
         try {
             const response = await axios.patch(
                 `http://localhost:8080/api/usuario/modificarUsuario/${idAdministrativo}`,
-                { nombre, apellido, dni, mail, telefono, activo },
+                datosModificados,
                 { withCredentials: true }
             );
 
@@ -127,15 +153,16 @@ class ModificarAdministrativo extends Component {
                 alert('Administrativo modificado exitosamente!');
                 this.cargarAdministrativos();
                 this.setState({
-                    administrativoSeleccionado: 'Seleccione un administrativo',
-                    idAdministrativo: null,
-                    nombre: '',
-                    apellido: '',
-                    dni: '',
-                    mail: '',
-                    telefono: '',
-                    activo: false,
+                    administrativoSeleccionado:'Seleccione un administrativo',
+                    nombre: nombre || '',
+                    apellido: apellido || '',
+                    dni: dni || '',
+                    mail: mail || '',
+                    telefono: telefono || '',
+                    activo: activo ? 1:0,
+                    valoresOriginales: { }, 
                 });
+                window.location.reload();
             } else {
                 alert('Error al modificar el administrativo');
             }
