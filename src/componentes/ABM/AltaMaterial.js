@@ -1,95 +1,190 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import { Form, Button, Row, Col } from 'react-bootstrap';
+import axios from "axios";
 
 function AltaMaterial() {
-  const [titulo, setTitulo] = useState('');
-  const [descripcion, setDescripcion] = useState('');
-  const [archivo, setArchivo] = useState(null);
-  const [respuesta, setRespuesta] = useState('');
+  const [cursos, setCursos] = useState([]);
+  const [cursoSeleccionado, setCursoSeleccionado] = useState("");
   const [materias, setMaterias] = useState([]);
-  const [materiaSeleccionada, setMateriaSeleccionada] = useState('');
+  const [materiaSeleccionada, setMateriaSeleccionada] = useState("");
+  //const [titulo, setTitulo] = useState("");
+  const [descripcion, setDescripcion] = useState("");
+  const [urlArchivo, setUrlArchivo] = useState(null);
 
+  // Cargar los cursos del profesor al montar el componente
   useEffect(() => {
-    axios.get('http://localhost:8080/api/usuario/verMaterias')
-      .then(response => setMaterias(response.data))
-      .catch(error => console.error('Error al cargar materias:', error));
+    //console.log("Componente AltaTarea montado, cargando cursos...");
+    cargarCursos();
   }, []);
 
-  const manejarEnvio = async (e) => {
-    e.preventDefault();
-    const formData = new FormData();
-    formData.append('titulo', titulo);
-    formData.append('descripcion', descripcion);
-    formData.append('archivo', archivo);
-    formData.append('materiaId', materiaSeleccionada);
-
+  const cargarCursos = async () => {
     try {
-      await axios.post('http://localhost:8080/api/usuario/altaMaterial', formData);
-      setRespuesta('Material cargado correctamente.');
-      setTitulo('');
-      setDescripcion('');
-      setArchivo(null);
-      setMateriaSeleccionada('');
+      //console.log("Haciendo petición a la API para cargar cursos...");
+      const response = await axios.get("http://localhost:8080/api/usuario/verCursoProfesor", {
+        withCredentials: true,
+      });
+     // console.log("Respuesta de cursos recibida:", response.data);
+      setCursos(response.data);
     } catch (error) {
-      setRespuesta('Error al cargar el material.');
+      console.error("Error al cargar los cursos:", error);
     }
   };
 
+  const cargarMaterias = async (cursoId) => {
+    try {
+     // console.log(`Cargando materias para el curso ID: ${cursoId}...`);
+      const response = await axios.get(`http://localhost:8080/api/usuario/selecMateriaProfesor/${cursoId}`, {
+        withCredentials: true,
+      });
+     // console.log("Respuesta de materias recibida:", response.data);
+      setMaterias(response.data);
+    } catch (error) {
+      console.error("Error al cargar las materias:", error);
+      setMaterias([]);
+    }
+  };
+
+  const handleCursoChange = (e) => {
+    const cursoId = e.target.value;
+   // console.log(`Curso seleccionado cambiado a: ${cursoId}`);
+    setCursoSeleccionado(cursoId);
+    setMateriaSeleccionada(""); // Limpiar la materia seleccionada al cambiar el curso
+    
+    if (cursoId) {
+      cargarMaterias(cursoId);
+      console.log('curso seleccionado: '+cursoId)
+    } else {
+      setMaterias([]);
+    }
+  };
+
+  const handleFileChange = (e) => {
+    setUrlArchivo(e.target.files[0]);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!materiaSeleccionada) {
+      alert("Por favor selecciona una materia.");
+      return;
+    }
+
+    const formData = new FormData();
+    const material = {
+      //titulo: titulo, 
+      descripcion: descripcion,
+      //fechaEntrega: fechaEntrega,
+      idMateria: materiaSeleccionada,
+      idCurso: cursoSeleccionado
+    };
+    
+    formData.append("material", new Blob([JSON.stringify(material)], { type: "application/json" }));
+    
+    if (urlArchivo) {
+      formData.append("urlArchivo", urlArchivo);
+    }
+
+    try {
+      await axios.post(
+        `http://localhost:8080/api/usuario/altaMaterial`,
+        formData,
+        {
+          withCredentials: true,
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+
+      alert(`Material creado correctamente.`);
+      //setTitulo("");
+      setDescripcion("");
+      setUrlArchivo(null);
+      setMateriaSeleccionada("");
+      setCursoSeleccionado("")
+    } catch (error) {
+      console.error("Error al crear el material:", error);
+      alert(`Error al crear el material: ${error.response?.data?.message || error.message}`);
+    }
+  };
+
+  // Estilos personalizados para asegurar que el texto sea visible
+  const selectStyle = {
+    color: "black", // Forzar color negro para el texto
+    backgroundColor: "white" // Asegurar fondo blanco para contraste
+  };
+
+  const optionStyle = {
+    color: "black" // Asegurar que las opciones tengan texto negro
+  };
+
   return (
-    <form onSubmit={manejarEnvio}>
-      <div className="mb-3">
-        <label className="form-label">Título</label>
-        <input
-          type="text"
-          className="form-control"
-          value={titulo}
-          onChange={(e) => setTitulo(e.target.value)}
-          required
-        />
-      </div>
+    <form onSubmit={handleSubmit}>
+  {/* Desplegable de Cursos */}
+  <div className="mb-3">
+    <label htmlFor="cursoSeleccionado" className="form-label">Seleccionar Curso:</label>
+    <select
+      id="cursoSeleccionado"
+      className="form-control"
+      value={cursoSeleccionado}
+      onChange={handleCursoChange}
+      style={selectStyle}
+      required
+    >
+      <option value="" style={optionStyle}>Seleccione un curso</option>
+      {cursos.map((curso) => (
+        <option key={curso.idCurso} value={curso.idCurso}>
+          {curso.numero + " " + curso.division}
+        </option>
+      ))}
+    </select>
+  </div>
 
-      <div className="mb-3">
-        <label className="form-label">Descripción</label>
-        <textarea
-          className="form-control"
-          value={descripcion}
-          onChange={(e) => setDescripcion(e.target.value)}
-          rows="3"
-          required
-        />
-      </div>
+  {/* Desplegable de Materias */}
+  <div className="mb-3">
+    <label htmlFor="materiaSeleccionada" className="form-label">Seleccionar Materia:</label>
+    <select
+      id="materiaSeleccionada"
+       className="form-control"
+      value={materiaSeleccionada}
+      onChange={(e) => setMateriaSeleccionada(e.target.value)}
+      required
+      style={selectStyle} 
+      disabled={!cursoSeleccionado}
+    >
+      <option value="">Seleccione una materia</option>
+      {materias.map((materia) => (
+        <option key={materia.idMateria} value={materia.idMateria}>
+          {materia.nombre}
+        </option>
+      ))}
+    </select>
+  </div>
 
-      <div className="mb-3">
-        <label className="form-label">Materia</label>
-        <select
-          className="form-select"
-          value={materiaSeleccionada}
-          onChange={(e) => setMateriaSeleccionada(e.target.value)}
-          required
-        >
-          <option value="">Seleccione una materia</option>
-          {materias.map((materia) => (
-            <option key={materia.idMateria} value={materia.idMateria}>
-              {materia.nombre}
-            </option>
-          ))}
-        </select>
-      </div>
+  {/* Descripción */}
+  <div className="mb-3">
+    <label htmlFor="descripcion" className="form-label">Descripción</label>
+    <Form.Control
+      as="textarea"
+      id="descripcion"
+      rows="3"
+      value={descripcion}
+      onChange={(e) => setDescripcion(e.target.value)}
+      required
+    />
+  </div>
 
-      <div className="mb-3">
-        <label className="form-label">Archivo</label>
-        <input
-          type="file"
-          className="form-control"
-          onChange={(e) => setArchivo(e.target.files[0])}
-          required
-        />
-      </div>
+  {/* Subir Archivo */}
+  <div className="mb-3">
+    <label htmlFor="urlArchivo" className="form-label">Subir Archivo</label>
+    <Form.Control
+      type="file"
+      id="urlArchivo"
+      onChange={handleFileChange}
+    />
+  </div>
 
-      <button type="submit" className="btn btn-primary">Subir Material</button>
-
-      {respuesta && <div className="alert alert-info mt-3">{respuesta}</div>}
-    </form>
+  <Button type="submit" variant="success">Crear Material</Button>
+</form>
   );
 }
 
