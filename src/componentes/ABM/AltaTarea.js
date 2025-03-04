@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Form, Button, Row, Col } from 'react-bootstrap';
 import axios from "axios";
 
 function AltaTarea() {
@@ -115,82 +116,72 @@ function AltaTarea() {
 
   return (
     <form onSubmit={handleSubmit}>
-      {/* Selección de Curso */}
-      <div className="mb-3">
-        <label htmlFor="curso" className="form-label">Selecciona un Curso</label>
-        <select
-          id="curso"
-          className="form-control"
-          value={cursoSeleccionado}
-          onChange={handleCursoChange}
-          required
-          style={selectStyle}
-        >
-          <option value="" style={optionStyle}>Seleccione...</option>
-          {cursos.map((curso) => (
-            <option 
-              key={curso.idCurso} 
-              value={curso.idCurso}
-              style={optionStyle} 
-            >
-              {curso.numero+ ""+curso.division}
-            </option>
-          ))}
-        </select>
-      </div>
+  {/* Desplegable de Cursos */}
+  <div className="mb-3">
+    <label htmlFor="cursoSeleccionado" className="form-label">Seleccionar Curso:</label>
+    <select
+      id="cursoSeleccionado"
+      className="form-control"
+      value={cursoSeleccionado}
+      onChange={handleCursoChange}
+      style={selectStyle}
+      required
+    >
+      <option value="" style={optionStyle}>Seleccione un curso</option>
+      {cursos.map((curso) => (
+        <option key={curso.idCurso} value={curso.idCurso}>
+          {curso.numero + " " + curso.division}
+        </option>
+      ))}
+    </select>
+  </div>
 
-      {/* Selección de Materia */}
-      <div className="mb-3">
-        <label htmlFor="materia" className="form-label">Selecciona una Materia</label>
-        <select
-          id="materia"
-          className="form-control"
-          value={materiaSeleccionada}
-          onChange={(e) => setMateriaSeleccionada(e.target.value)}
-          required
-          style={selectStyle} 
-        >
-          <option value="" style={optionStyle}>Seleccione...</option>
-          {materias.map((materia) => (
-            <option 
-              key={materia.idMateria} 
-              value={materia.idMateria}
-              style={optionStyle} 
-            >
-              {materia.nombre}
-            </option>
-          ))}
-        </select>
-      </div>
+  {/* Desplegable de Materias */}
+  <div className="mb-3">
+    <label htmlFor="materiaSeleccionada" className="form-label">Seleccionar Materia:</label>
+    <select
+      id="materiaSeleccionada"
+       className="form-control"
+      value={materiaSeleccionada}
+      onChange={(e) => setMateriaSeleccionada(e.target.value)}
+      required
+      style={selectStyle} 
+      disabled={!cursoSeleccionado}
+    >
+      <option value="">Seleccione una materia</option>
+      {materias.map((materia) => (
+        <option key={materia.idMateria} value={materia.idMateria}>
+          {materia.nombre}
+        </option>
+      ))}
+    </select>
+  </div>
 
-      {/* Campos de la Tarea */}
-      <div className="mb-3">
-        <label htmlFor="descripcion" className="form-label">Descripción</label>
-        <textarea
-          id="descripcion"
-          className="form-control"
-          rows="3"
-          value={descripcion}
-          onChange={(e) => setDescripcion(e.target.value)}
-          required
-          style={{color: "black"}} // Asegurar texto negro
-        />
-      </div>
+  {/* Descripción */}
+  <div className="mb-3">
+    <label htmlFor="descripcion" className="form-label">Descripción</label>
+    <Form.Control
+      as="textarea"
+      id="descripcion"
+      rows="3"
+      value={descripcion}
+      onChange={(e) => setDescripcion(e.target.value)}
+      required
+    />
+  </div>
 
-      <div className="mb-3">
-        <label htmlFor="archivo" className="form-label">Subir Archivo (opcional)</label>
-        <input
-          type="file"
-          id="archivo"
-          className="form-control"
-          onChange={handleFileChange}
-        />
-      </div>
+  {/* Subir Archivo */}
+  <div className="mb-3">
+    <label htmlFor="archivo" className="form-label">Subir Archivo (opcional)</label>
+    <Form.Control
+      type="file"
+      id="archivo"
+      onChange={handleFileChange}
+    />
+  </div>
 
-      <button type="submit" className="btn btn-success">
-        Crear Tarea
-      </button>
-    </form>
+  <Button type="submit" variant="success">Crear Tarea</Button>
+</form>
   );
 }
 
