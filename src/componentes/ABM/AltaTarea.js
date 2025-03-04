@@ -6,23 +6,23 @@ function AltaTarea() {
   const [cursoSeleccionado, setCursoSeleccionado] = useState("");
   const [materias, setMaterias] = useState([]);
   const [materiaSeleccionada, setMateriaSeleccionada] = useState("");
-  const [titulo, setTitulo] = useState("");
+  //const [titulo, setTitulo] = useState("");
   const [descripcion, setDescripcion] = useState("");
   const [archivo, setArchivo] = useState(null);
 
   // Cargar los cursos del profesor al montar el componente
   useEffect(() => {
-    console.log("Componente AltaTarea montado, cargando cursos...");
+    //console.log("Componente AltaTarea montado, cargando cursos...");
     cargarCursos();
   }, []);
 
   const cargarCursos = async () => {
     try {
-      console.log("Haciendo petición a la API para cargar cursos...");
+      //console.log("Haciendo petición a la API para cargar cursos...");
       const response = await axios.get("http://localhost:8080/api/usuario/verCursoProfesor", {
         withCredentials: true,
       });
-      console.log("Respuesta de cursos recibida:", response.data);
+     // console.log("Respuesta de cursos recibida:", response.data);
       setCursos(response.data);
     } catch (error) {
       console.error("Error al cargar los cursos:", error);
@@ -31,11 +31,11 @@ function AltaTarea() {
 
   const cargarMaterias = async (cursoId) => {
     try {
-      console.log(`Cargando materias para el curso ID: ${cursoId}...`);
+     // console.log(`Cargando materias para el curso ID: ${cursoId}...`);
       const response = await axios.get(`http://localhost:8080/api/usuario/selecMateriaProfesor/${cursoId}`, {
         withCredentials: true,
       });
-      console.log("Respuesta de materias recibida:", response.data);
+     // console.log("Respuesta de materias recibida:", response.data);
       setMaterias(response.data);
     } catch (error) {
       console.error("Error al cargar las materias:", error);
@@ -45,7 +45,7 @@ function AltaTarea() {
 
   const handleCursoChange = (e) => {
     const cursoId = e.target.value;
-    console.log(`Curso seleccionado cambiado a: ${cursoId}`);
+   // console.log(`Curso seleccionado cambiado a: ${cursoId}`);
     setCursoSeleccionado(cursoId);
     setMateriaSeleccionada(""); // Limpiar la materia seleccionada al cambiar el curso
     
@@ -69,11 +69,15 @@ function AltaTarea() {
     }
 
     const formData = new FormData();
-    formData.append("tarea", JSON.stringify({ 
-      titulo, 
-      descripcion,
-      idMateria: materiaSeleccionada // Incluir la materia seleccionada
-    }));
+    const tarea = {
+      //titulo: titulo, 
+      descripcion: descripcion,
+      //fechaEntrega: fechaEntrega,
+      idMateria: materiaSeleccionada
+    };
+    
+    formData.append("tarea", new Blob([JSON.stringify(tarea)], { type: "application/json" }));
+    
     if (archivo) {
       formData.append("file", archivo);
     }
@@ -88,8 +92,8 @@ function AltaTarea() {
         }
       );
 
-      alert(`Tarea "${titulo}" creada correctamente.`);
-      setTitulo("");
+      alert(`Tarea creada correctamente.`);
+      //setTitulo("");
       setDescripcion("");
       setArchivo(null);
       setMateriaSeleccionada("");
@@ -120,14 +124,14 @@ function AltaTarea() {
           value={cursoSeleccionado}
           onChange={handleCursoChange}
           required
-          style={selectStyle} // Aplicar estilo personalizado
+          style={selectStyle}
         >
           <option value="" style={optionStyle}>Seleccione...</option>
           {cursos.map((curso) => (
             <option 
               key={curso.idCurso} 
               value={curso.idCurso}
-              style={optionStyle} // Aplicar estilo personalizado a cada opción
+              style={optionStyle} 
             >
               {curso.numero+ ""+curso.division}
             </option>
@@ -144,14 +148,14 @@ function AltaTarea() {
           value={materiaSeleccionada}
           onChange={(e) => setMateriaSeleccionada(e.target.value)}
           required
-          style={selectStyle} // Aplicar estilo personalizado
+          style={selectStyle} 
         >
           <option value="" style={optionStyle}>Seleccione...</option>
           {materias.map((materia) => (
             <option 
               key={materia.idMateria} 
               value={materia.idMateria}
-              style={optionStyle} // Aplicar estilo personalizado a cada opción
+              style={optionStyle} 
             >
               {materia.nombre}
             </option>
@@ -160,19 +164,6 @@ function AltaTarea() {
       </div>
 
       {/* Campos de la Tarea */}
-      <div className="mb-3">
-        <label htmlFor="titulo" className="form-label">Título de la Tarea</label>
-        <input
-          type="text"
-          id="titulo"
-          className="form-control"
-          value={titulo}
-          onChange={(e) => setTitulo(e.target.value)}
-          required
-          style={{color: "black"}} // Asegurar texto negro
-        />
-      </div>
-
       <div className="mb-3">
         <label htmlFor="descripcion" className="form-label">Descripción</label>
         <textarea
