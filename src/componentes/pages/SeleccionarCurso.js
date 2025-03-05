@@ -1,3 +1,6 @@
+//Tengo anotado que se debe completar info en este codigo pero no me queda claro a que info se refiere. 
+
+
 import React, { Component } from 'react';
 import { Dropdown, DropdownButton, Form, Button } from 'react-bootstrap';
 import axios from 'axios';
