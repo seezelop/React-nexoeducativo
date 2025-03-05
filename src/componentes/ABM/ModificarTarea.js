@@ -5,12 +5,11 @@ import axios from "axios";
 function ModificarTarea() {
   const [cursos, setCursos] = useState([]);
   const [cursoSeleccionado, setCursoSeleccionado] = useState("");
+  const [materias, setMaterias] = useState([]);
+  const [materiaSeleccionada, setMateriaSeleccionada] = useState("");
   const [tareas, setTareas] = useState([]);
-   const [materias, setMaterias] = useState([]);
-    const [materiaSeleccionada, setMateriaSeleccionada] = useState("");
   const [idTarea, setIdTarea] = useState("");
   const [descripcion, setDescripcion] = useState("");
-  const [mensaje, setMensaje] = useState("");
   const [calificacion, setCalificacion] = useState("");
   const [archivo, setArchivo] = useState(null);
 
@@ -31,12 +30,13 @@ function ModificarTarea() {
   };
 
   const cargarMaterias = async (cursoId) => {
+    if (!cursoId) return;
+    
     try {
-     // console.log(`Cargando materias para el curso ID: ${cursoId}...`);
-      const response = await axios.get(`http://localhost:8080/api/usuario/selecMateriaProfesor/${cursoId}`, {
-        withCredentials: true,
-      });
-     // console.log("Respuesta de materias recibida:", response.data);
+      const response = await axios.get(
+        `http://localhost:8080/api/usuario/selecMateriaProfesor/${cursoId}`,
+        { withCredentials: true }
+      );
       setMaterias(response.data);
     } catch (error) {
       console.error("Error al cargar las materias:", error);
@@ -44,23 +44,15 @@ function ModificarTarea() {
     }
   };
 
-  const cargarTareas = async () => {
-    if (!cursoSeleccionado || !materiaSeleccionada) {
-      setMensaje("Por favor selecciona tanto un curso como una materia.");
-      setTareas([]); // Asegurarte de que las tareas estén vacías
-      return;
-    }
+  const cargarTareas = async (materiaId) => {
+    if (!materiaId) return;
 
     try {
+      //console.log("Cargando tareas para materia:", materiaId);
       const response = await axios.get(
-        `http://localhost:8080/api/usuario/obtenerTareas?cursoIdCurso=${cursoSeleccionado}&idMateria=${materiaSeleccionada}`,
+        `http://localhost:8080/api/usuario/obtenerTareas?cursoIdCurso=${cursoSeleccionado}&idMateria=${materiaId}`,
         { withCredentials: true }
       );
-      if (response.data.length === 0) {
-        console.log("No hay tareas disponibles para la materia seleccionada. Curso seleecionado y materia:"+cursoSeleccionado+" "+materiaSeleccionada);
-      } else {
-        setMensaje(""); // Limpiar el mensaje
-      }
       setTareas(response.data);
     } catch (error) {
       console.error("Error al cargar las tareas:", error);
@@ -68,16 +60,27 @@ function ModificarTarea() {
     }
   };
 
-
   const handleCursoChange = (e) => {
     const cursoId = e.target.value;
     setCursoSeleccionado(cursoId);
-    setTareas([]); // Limpiar tareas al cambiar el curso
+    setMateriaSeleccionada("");
+    setTareas([]);
+
     if (cursoId) {
       cargarMaterias(cursoId);
+    } else {
+      setMaterias([]);
     }
+  };
 
-    cargarTareas();
+  const handleMateriaChange = (e) => {
+    const materiaId = e.target.value;
+    setMateriaSeleccionada(materiaId);
+    setTareas([]);
+
+    if (materiaId) {
+      cargarTareas(materiaId);
+    }
   };
 
   const handleFileChange = (e) => {
@@ -122,29 +125,15 @@ function ModificarTarea() {
         }
       );
 
-      alert(`Tarea modificada correctamente.`);
+      alert("Tarea modificada correctamente.");
       setDescripcion("");
       setArchivo(null);
       setIdTarea("");
       setCalificacion("");
     } catch (error) {
       console.error("Error al modificar la tarea:", error);
-      alert(
-        `Error al modificar la tarea: ${
-          error.response?.data?.message || error.message
-        }`
-      );
+      alert(`Error al modificar la tarea: ${error.response?.data?.message || error.message}`);
     }
-  };
-
-   // Estilos personalizados para asegurar que el texto sea visible
-   const selectStyle = {
-    color: "black", // Forzar color negro para el texto
-    backgroundColor: "white" // Asegurar fondo blanco para contraste
-  };
-
-  const optionStyle = {
-    color: "black" // Asegurar que las opciones tengan texto negro
   };
 
   return (
@@ -156,8 +145,8 @@ function ModificarTarea() {
           className="form-control"
           value={cursoSeleccionado}
           onChange={handleCursoChange}
-          style={selectStyle}
           required
+          style={{ color: "black" }}
         >
           <option value="">Seleccione un curso</option>
           {cursos.map((curso) => (
@@ -168,27 +157,27 @@ function ModificarTarea() {
         </select>
       </div>
 
-      {/* Desplegable de Materias */}
-  <div className="mb-3">
-    <label htmlFor="materiaSeleccionada" className="form-label">Seleccionar Materia:</label>
-    <select
-      id="materiaSeleccionada"
-       className="form-control"
-      value={materiaSeleccionada}
-      onChange={(e) => setMateriaSeleccionada(e.target.value)}
-      required
-      style={selectStyle} 
-      disabled={!cursoSeleccionado}
-    >
-      <option value="">Seleccione una materia</option>
-      {materias.map((materia) => (
-        <option key={materia.idMateria} value={materia.idMateria}>
-          {materia.nombre}
-        </option>
-      ))}
-    </select>
-  </div>
-  <div className="mb-3">
+      <div className="mb-3">
+        <label htmlFor="materiaSeleccionada">Seleccionar Materia:</label>
+        <select
+          id="materiaSeleccionada"
+          className="form-control"
+          value={materiaSeleccionada}
+          onChange={handleMateriaChange}
+          required
+          style={{ color: "black" }}
+          disabled={!cursoSeleccionado}
+        >
+          <option value="">Seleccione una materia</option>
+          {materias.map((materia) => (
+            <option key={materia.idMateria} value={materia.idMateria}>
+              {materia.nombre}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="mb-3">
         <label htmlFor="idTarea">Seleccionar Tarea:</label>
         <select
           id="idTarea"
@@ -196,7 +185,7 @@ function ModificarTarea() {
           value={idTarea}
           onChange={(e) => setIdTarea(e.target.value)}
           required
-          style={selectStyle}
+          style={{ color: "black" }}
           disabled={!materiaSeleccionada}
         >
           <option value="">Seleccione una tarea</option>
@@ -220,11 +209,10 @@ function ModificarTarea() {
       </div>
 
       <div className="mb-3">
-        <label htmlFor="calificacion">Calificacion</label>
+        <label htmlFor="calificacion">Calificación</label>
         <Form.Control
-          as="text"
+          type="text"
           id="calificacion"
-          rows="3"
           value={calificacion}
           onChange={(e) => setCalificacion(e.target.value)}
         />
@@ -243,4 +231,3 @@ function ModificarTarea() {
 }
 
 export default ModificarTarea;
-
