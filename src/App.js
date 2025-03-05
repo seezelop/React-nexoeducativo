@@ -45,6 +45,7 @@ import ABMEvento from './componentes/ABM/ABMEvento';
 import ABMMaterial from './componentes/ABM/ABMMaterial';
 import InformacionCurso from './componentes/pages/InformacionCurso';
 import InformacionCursoAlumno from './componentes/pages/InformacionCursoAlumno';
+import RenovarMembresia from './componentes/pages/RenovarMembresia';
 
 
 function App() {
@@ -105,6 +106,8 @@ function App() {
             <Route path="/ABMadministrativo" element={<ABMadministrativo />} />
             <Route path="/SeleccionarCurso" element={<SeleccionarCurso />} />
             <Route path="/SeleccionarProfesor" element={<SeleccionarProfesor />} />
+            
+            <Route path="/RenovarMembresia" element={<RenovarMembresia />} />
             
              {/* Rutas para ADMINISTRATIVO  */}
              <Route path="/ABMmaterias" element={<ABMmaterias />} />
