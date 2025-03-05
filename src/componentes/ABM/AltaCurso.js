@@ -63,18 +63,17 @@ const AltaCurso = () => {
 
   const handleMateriaChange = (index, field, value) => {
     const updatedMaterias = [...formData.m];
-    updatedMaterias[index][field] = value;
+    updatedMaterias[index][field] = field.includes("id") ? Number(value) || null : value;
     setFormData((prev) => ({
       ...prev,
       m: updatedMaterias,
     }));
-
-    console.log('infooo'+formData);
-
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    console.log("Datos a enviar:", formData); // Verificación antes de enviar
 
     if (!formData.r.numero || !formData.r.division || formData.m.length === 0) {
       alert('Por favor, complete todos los campos.');
@@ -105,8 +104,6 @@ const AltaCurso = () => {
     } catch (error) {
       console.error('Error al registrar el curso:', error);
       alert('Hubo un error al registrar el curso.');
-      console.log('INFO A ENVAR: ',formData);
-
     } finally {
       setLoading(false);
     }
@@ -122,10 +119,9 @@ const AltaCurso = () => {
               <Form.Label>Materia</Form.Label>
               <Form.Control
                 as="select"
-                 className="form-select text-dark bg-white"
+                className="form-select text-dark bg-white"
                 value={materia.idMateria || ""}
                 onChange={(e) => handleMateriaChange(i, "idMateria", Number(e.target.value))}
-
                 required
               >
                 <option value="">Seleccione una materia</option>
@@ -142,9 +138,9 @@ const AltaCurso = () => {
               <Form.Label>Profesor</Form.Label>
               <Form.Control
                 as="select"
-                value={materia.idProfesor}
-                 className="form-select text-dark bg-white"
-                onChange={(e) => handleMateriaChange(i, 'idProfesor', e.target.value)}
+                className="form-select text-dark bg-white"
+                value={materia.idProfesor || ""}
+                onChange={(e) => handleMateriaChange(i, "idProfesor", Number(e.target.value))}
                 required
               >
                 <option value="">Seleccione un profesor</option>
@@ -163,9 +159,9 @@ const AltaCurso = () => {
               <Form.Label>Día</Form.Label>
               <Form.Control
                 as="select"
-                value={materia.nombre}
-                 className="form-select text-dark bg-white"
-                onChange={(e) => handleMateriaChange(i, 'dia', e.target.value)}
+                className="form-select text-dark bg-white"
+                value={materia.dia || ""}
+                onChange={(e) => handleMateriaChange(i, "dia", e.target.value)}
                 required
               >
                 <option value="">Seleccione un día</option>
@@ -182,8 +178,8 @@ const AltaCurso = () => {
               <Form.Label>Hora Inicio</Form.Label>
               <Form.Control
                 type="time"
-                value={materia.horaInicio}
-                onChange={(e) => handleMateriaChange(i, 'horaInicio', e.target.value)}
+                value={materia.horaInicio || ""}
+                onChange={(e) => handleMateriaChange(i, "horaInicio", e.target.value)}
                 required
               />
             </Form.Group>
@@ -193,8 +189,8 @@ const AltaCurso = () => {
               <Form.Label>Hora Fin</Form.Label>
               <Form.Control
                 type="time"
-                value={materia.horaFin}
-                onChange={(e) => handleMateriaChange(i, 'horaFin', e.target.value)}
+                value={materia.horaFin || ""}
+                onChange={(e) => handleMateriaChange(i, "horaFin", e.target.value)}
                 required
               />
             </Form.Group>
@@ -242,20 +238,6 @@ const AltaCurso = () => {
       </Form.Group>
 
       {cantidadMaterias > 0 && renderMateriasFields()}
-
-      <Form.Group className="mb-3">
-        <Form.Check
-          type="checkbox"
-          label="Curso Activo"
-          checked={formData.r.activo === 1}
-          onChange={() =>
-            setFormData((prev) => ({
-              ...prev,
-              r: { ...prev.r, activo: prev.r.activo === 1 ? 0 : 1 },
-            }))
-          }
-        />
-      </Form.Group>
 
       <Button variant="primary" type="submit" disabled={loading}>
         {loading ? 'Registrando...' : 'Registrar Curso'}
