@@ -37,7 +37,7 @@ const RenovarMembresia = () => {
       });
       if (response.status === 200) {
         alert("Membresía renovada exitosamente.");
-        navigate('/');  // Redirige a la página de inicio después de renovar
+        navigate('/JefeColegio');  // Redirige a la página de jefe colegio después de renovar membresia
       } else {
         alert("Hubo un problema al renovar la membresía.");
       }

@@ -11,7 +11,7 @@ function ModificarEvento() {
     e.preventDefault();
 
     try {
-      await axios.put(`http://localhost:8080/api/eventos/modificar/${eventoId}`, {
+      await axios.put(`http://localhost:8080/api/usuario/modificarEvento/${eventoId}`, {
         titulo: nuevoTitulo,
         descripcion: nuevaDescripcion
       });
