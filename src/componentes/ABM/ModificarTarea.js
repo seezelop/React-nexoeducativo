@@ -209,16 +209,6 @@ function ModificarTarea() {
       </div>
 
       <div className="mb-3">
-        <label htmlFor="calificacion">Calificación</label>
-        <Form.Control
-          type="text"
-          id="calificacion"
-          value={calificacion}
-          onChange={(e) => setCalificacion(e.target.value)}
-        />
-      </div>
-
-      <div className="mb-3">
         <label htmlFor="archivo">Subir Archivo (opcional)</label>
         <Form.Control type="file" id="archivo" onChange={handleFileChange} />
       </div>
