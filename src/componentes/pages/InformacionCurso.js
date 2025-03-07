@@ -23,24 +23,27 @@ function InformacionCurso() {
     obtenerHijos();
   }, []);
 
-  // Obtener la información del curso del hijo seleccionado
-  const obtenerInfoCurso = async () => {
+  // Obtener la información del curso del hijo seleccionado automáticamente
+  useEffect(() => {
     if (!hijoSeleccionado) {
-      alert('Por favor, seleccione un hijo.');
+      setInfoCurso(null);
       return;
     }
 
-    setLoading(true);
-    try {
-      const response = await axios.get(`http://localhost:8080/api/usuario/verInfoHijo/${hijoSeleccionado}`, { withCredentials: true });
-      setInfoCurso(response.data);
-    } catch (error) {
-      console.error('Error al obtener la información del curso:', error);
-      alert('Hubo un error al obtener la información del curso.');
-    } finally {
-      setLoading(false);
-    }
-  };
+    const obtenerInfoCurso = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.get(`http://localhost:8080/api/usuario/verInfoHijo/${hijoSeleccionado}`, { withCredentials: true });
+        setInfoCurso(response.data);
+      } catch (error) {
+        console.error('Error al obtener la información del curso:', error);
+        alert('Hubo un error al obtener la información del curso.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    obtenerInfoCurso();
+  }, [hijoSeleccionado]);
 
   return (
     <section className="d-flex flex-column min-vh-100">
@@ -58,30 +61,46 @@ function InformacionCurso() {
           >
             <option value="">Seleccione un hijo</option>
             {hijos.map((hijo) => (
-              <option key={hijo.id} value={hijo.id}>
+              <option key={hijo.idUsuario} value={hijo.idUsuario}>
                 {hijo.nombre} {hijo.apellido}
               </option>
             ))}
           </select>
         </div>
 
-        <button className="btn btn-primary mb-4" onClick={obtenerInfoCurso} disabled={loading}>
-          {loading ? 'Cargando...' : 'Ver Información del Curso'}
-        </button>
+        {loading && <p>Cargando información...</p>}
 
-        {infoCurso && (
+        {infoCurso && infoCurso.length > 0 && (
           <div className="border p-3 rounded">
-            <h3>Información del Curso</h3>
-            <p><strong>Curso:</strong> {infoCurso.curso}</p>
-            <p><strong>División:</strong> {infoCurso.division}</p>
-            <p><strong>Materias:</strong></p>
-            <ul>
-              {infoCurso.materias.map((materia, index) => (
-                <li key={index}>
-                  {materia.nombre} - {materia.profesor} ({materia.dia}, {materia.horaInicio} - {materia.horaFin})
-                </li>
-              ))}
-            </ul>
+            <h3>Notas</h3>
+            {infoCurso[0].notas.length > 0 ? (
+              <ul>
+                {infoCurso[0].notas.map((nota, index) => (
+                  <li key={index}>
+                    <strong>Materia:</strong> {nota.nombre} <br />
+                    <strong>Tarea:</strong> {nota.descripcion} <br />
+                    <strong>Nota:</strong> {nota.nota} <br />
+                    <strong>Profesor:</strong> {nota.nombreP} {nota.apellidoP}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>No hay notas registradas.</p>
+            )}
+
+            <h3>Eventos</h3>
+            {infoCurso[0].eventos.length > 0 ? (
+              <ul>
+                {infoCurso[0].eventos.map((evento, index) => (
+                  <li key={index}>
+                    <strong>Descripción:</strong> {evento.descripcion} <br />
+                    <strong>Fecha:</strong> {evento.fecha}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p>No hay eventos registrados.</p>
+            )}
           </div>
         )}
 
