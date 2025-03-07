@@ -205,9 +205,6 @@ function ModificarEvento() {
           }}
           placeholder="Deje en blanco para mantener la fecha actual"
         />
-        <small className="form-text text-muted">
-          El formato debe ser YYYY-MM-DDTHH:MM (Ejemplo: 2025-03-22T14:30)
-        </small>
       </div>
 
       <button type="submit" className="btn btn-primary">Modificar Evento</button>
