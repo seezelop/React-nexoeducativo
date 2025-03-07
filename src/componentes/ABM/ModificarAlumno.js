@@ -2,8 +2,7 @@ import React, { Component } from 'react';
 import { Dropdown, DropdownButton, Button, Form } from 'react-bootstrap';
 import axios from 'axios';
 
-<<<<<<< Updated upstream
-class ModificarAlumno extends Component {
+/*class ModificarAlumno extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -19,8 +18,8 @@ class ModificarAlumno extends Component {
             errores: {}, // Almacena los errores de validación
             rol: 'alumno',
             valoresOriginales:  {}, // Nuevo estado para almacenar los valores originales
-        };
-=======
+        };*/
+
 const ModificarAlumno = () => {
   const [formData, setFormData] = useState({
     id_usuario: '',
@@ -62,7 +61,6 @@ const ModificarAlumno = () => {
       }
     } catch (error) {
       console.error('Error al modificar el alumno:', error);
->>>>>>> Stashed changes
     }
 
     // Validaciones por campo
@@ -325,6 +323,7 @@ const ModificarAlumno = () => {
             </section>
         );
     }
+}
 }
 
 export default ModificarAlumno;
