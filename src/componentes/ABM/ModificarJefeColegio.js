@@ -99,7 +99,7 @@ class ModificarJefeColegio extends Component {
 
         try {
             const response = await axios.get(
-                `http://localhost:8080/api/usuario/getUsuario/${parsedValue.idJefeColegio}`,
+                `http://localhost:8080/api/usuario/getUsuariosSuperAdmin/${parsedValue.idJefeColegio}`,
                 { withCredentials: true }
             );
 

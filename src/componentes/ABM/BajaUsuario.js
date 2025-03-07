@@ -23,7 +23,7 @@ class BajaUsuario extends Component {
      //esto es para rellenar el dropdown con los jefe colegios
      cargarUsuarios = async () => {
         try {
-            const response = await axios.get(`http://localhost:8080/api/usuario/getUsuarios/${this.state.rol}`, {
+            const response = await axios.get(`http://localhost:8080/api/usuario/getUsuariosSuperAdmin/${this.state.rol}`, {
                 withCredentials: true
               });
             //pasar lista de string a objetos
