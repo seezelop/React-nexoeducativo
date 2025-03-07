@@ -1,24 +1,6 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dropdown, DropdownButton, Button, Form } from 'react-bootstrap';
 import axios from 'axios';
-
-/*class ModificarAlumno extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            profesores: [],
-            profesorSeleccionado: 'Seleccione un alumno',
-            id_usuario: null,
-            nombre: '',
-            apellido: '',
-            dni: '',
-            mail: '',
-            telefono: '',
-            activo: 0,
-            errores: {}, // Almacena los errores de validación
-            rol: 'alumno',
-            valoresOriginales:  {}, // Nuevo estado para almacenar los valores originales
-        };*/
 
 const ModificarAlumno = () => {
   const [formData, setFormData] = useState({
@@ -27,303 +9,193 @@ const ModificarAlumno = () => {
     apellido: '',
     dni: '',
     mail: '',
-    clave: '',
     telefono: '',
     activo: false,
-    pago_cuota: false,
-    Rol_id_rol: ''
   });
 
+  const [alumnos, setAlumnos] = useState([]);
+  const [errores, setErrores] = useState({});
+  const [valoresOriginales, setValoresOriginales] = useState({});
+  const [profesorSeleccionado, setProfesorSeleccionado] = useState("Seleccione un alumno");
+
+  useEffect(() => {
+    cargarAlumnos();
+  }, []);
+
+  const cargarAlumnos = async () => {
+    try {
+      const response = await axios.get(`http://localhost:8080/api/usuario/verAlumnos`, {
+        withCredentials: true,
+      });
+
+      const alumnosData = response.data.map(alumno => ({
+        id_usuario: alumno.id_usuario,
+        nombre: `${alumno.nombre} ${alumno.apellido}`,
+      }));
+
+      setAlumnos(alumnosData);
+    } catch (error) {
+      console.error("Error al cargar los alumnos:", error);
+    }
+  };
+
+  const validarCampo = (id, value) => {
+    let error = "";
+    switch (id) {
+      case "nombre":
+        if (!/^[a-zA-Z]{3,30}$/.test(value)) {
+          error = "El nombre debe tener entre 3 y 30 letras.";
+        }
+        break;
+      case "apellido":
+        if (!/^[a-zA-Z]{4,30}$/.test(value)) {
+          error = "El apellido debe tener entre 4 y 30 letras.";
+        }
+        break;
+      case "dni":
+        if (!/^\d{6,8}$/.test(value)) {
+          error = "El DNI debe tener entre 6 y 8 dígitos.";
+        }
+        break;
+      case "mail":
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+          error = "Formato de email inválido.";
+        }
+        break;
+      case "telefono":
+        if (!/^\d{7,9}$/.test(value)) {
+          error = "El teléfono debe tener entre 7 y 9 dígitos.";
+        }
+        break;
+      default:
+        break;
+    }
+    return error;
+  };
+
   const handleInputChange = (e) => {
-    const { id, value } = e.target;
+    const { id, value, type, checked } = e.target;
+    const newValue = type === "checkbox" ? checked : value;
+    const error = validarCampo(id, newValue);
+
     setFormData({
       ...formData,
-      [id]: value
+      [id]: newValue,
+    });
+
+    setErrores({
+      ...errores,
+      [id]: error,
     });
   };
 
-  const handleCheckboxChange = (e) => {
-    const { id, checked } = e.target;
-    setFormData({
-      ...formData,
-      [id]: checked
-    });
+  const handleDropdownChange = async (value) => {
+    try {
+      const parsedValue = JSON.parse(value);
+      setProfesorSeleccionado(parsedValue.nombre);
+      setFormData({ ...formData, id_usuario: parsedValue.id_usuario });
+
+      const response = await axios.get(`http://localhost:8080/api/usuario/getUsuario/${parsedValue.id_usuario}`, {
+        withCredentials: true,
+      });
+
+      const { nombre, apellido, dni, mail, telefono, activo } = response.data;
+      setFormData({
+        id_usuario: parsedValue.id_usuario,
+        nombre: nombre || "",
+        apellido: apellido || "",
+        dni: dni || "",
+        mail: mail || "",
+        telefono: telefono || "",
+        activo: activo,
+      });
+
+      setValoresOriginales({ nombre, apellido, dni, mail, telefono, activo });
+    } catch (error) {
+      console.error("Error al cargar los datos del alumno:", error);
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!formData.id_usuario) {
+      alert("Por favor selecciona un alumno antes de guardar los cambios.");
+      return;
+    }
+
+    const datosModificados = {};
+    Object.keys(formData).forEach((key) => {
+      if (formData[key] !== valoresOriginales[key]) {
+        datosModificados[key] = formData[key];
+      }
+    });
+
+    if (Object.keys(datosModificados).length === 0) {
+      alert("No hay cambios para actualizar.");
+      return;
+    }
+
     try {
-      const response = await axios.patch(`http://localhost:8080/api/alumno/modificar/${formData.id_usuario}`, formData, { withCredentials: true });
+      const response = await axios.patch(
+        `http://localhost:8080/api/usuario/modificarUsuario/${formData.id_usuario}`,
+        datosModificados,
+        { withCredentials: true }
+      );
+
       if (response.status === 200) {
-        alert('Alumno modificado exitosamente!');
+        alert("Alumno modificado exitosamente!");
+        cargarAlumnos();
+        setProfesorSeleccionado("Seleccione un alumno");
+        setFormData({
+          id_usuario: "",
+          nombre: "",
+          apellido: "",
+          dni: "",
+          mail: "",
+          telefono: "",
+          activo: false,
+        });
+        setValoresOriginales({});
       } else {
-        alert('Error al modificar el alumno');
+        alert("Error al modificar el alumno.");
       }
     } catch (error) {
-      console.error('Error al modificar el alumno:', error);
+      console.error("Error al modificar el alumno:", error);
     }
+  };
 
-    // Validaciones por campo
-    validarCampo = (id, value) => {
-        let error = '';
+  return (
+    <div>
+      <h2>Modificar Alumno</h2>
+      <DropdownButton title={profesorSeleccionado}>
+        {alumnos.map((alumno) => (
+          <Dropdown.Item
+            key={alumno.id_usuario}
+            onClick={() => handleDropdownChange(JSON.stringify(alumno))}
+          >
+            {alumno.nombre}
+          </Dropdown.Item>
+        ))}
+      </DropdownButton>
 
-        switch (id) {
-            case 'nombre':
-                if (!/^[a-zA-Z]{3,30}$/.test(value)) {
-                    error = 'El nombre debe tener entre 3 y 30 letras.';
-                }
-                break;
+      <Form onSubmit={handleSubmit}>
+        <Form.Group>
+          <Form.Label>Nombre</Form.Label>
+          <Form.Control id="nombre" value={formData.nombre} onChange={handleInputChange} />
+          <span className="text-danger">{errores.nombre}</span>
+        </Form.Group>
 
-            case 'apellido':
-                if (!/^[a-zA-Z]{4,30}$/.test(value)) {
-                    error = 'El apellido debe tener entre 4 y 30 letras.';
-                }
-                break;
+        <Form.Group>
+          <Form.Label>Apellido</Form.Label>
+          <Form.Control id="apellido" value={formData.apellido} onChange={handleInputChange} />
+          <span className="text-danger">{errores.apellido}</span>
+        </Form.Group>
 
-            case 'dni':
-                if (!/^\d{6,8}$/.test(value)) {
-                    error = 'El DNI debe tener entre 6 y 8 dígitos.';
-                }
-                break;
-
-            case 'mail':
-                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-                    error = 'Formato de email inválido.';
-                }
-                break;
-
-            case 'telefono':
-                if (!/^\d{7,9}$/.test(value)) {
-                    error = 'El teléfono debe tener entre 7 y 9 dígitos.';
-                }
-                break;
-
-            default:
-                break;
-        }
-
-        return error;
-    };
-
-    // Manejar cambios en los inputs y aplicar validaciones
-    handleInputChange = (event) => {
-        const { id, value, type, checked } = event.target;
-        const casteo= type === 'checkbox' ? (checked ? 1 : 0) : value;
-        
-        const error = this.validarCampo(id, casteo);
-
-        this.setState((prevState) => ({
-            [id]: casteo,
-            errores: { ...prevState.errores, [id]: error },
-        }));
-
-        /*const { id, value } = event.target;
-        const error = this.validarCampo(id, value);
-
-        this.setState((prevState) => ({
-            [id]: value,
-            errores: { ...prevState.errores, [id]: error },
-        }));*/
-    };
-
-    // Cargar la lista de profesores
-    cargarProfesores = async () => {
-        try {
-            const response = await axios.get(`http://localhost:8080/api/usuario/verAlumnos`, {
-                withCredentials: true,
-            });
-
-            //console.log("respuesta api: "+JSON.stringify(response.data))
-            const profesores = response.data.map((profesor) => ({
-                id_usuario: profesor.id_usuario,
-                nombre: `${profesor.nombre} ${profesor.apellido}`,
-            }));
-
-            if(response.status === 200){
-                console.log ('info ',response.data)
-            }
-
-            this.setState({ profesores });
-        } catch (error) {
-            console.error('Error al cargar los alumnos:', error);
-        }
-    };
-
-    // Manejar selección de profesor en el Dropdown
-    handleDropdownChange = async (value) => {
-        try {
-            const parsedValue = JSON.parse(value);
-            this.setState(
-                {
-                    profesorSeleccionado: parsedValue.nombre,
-                    id_usuario: parsedValue.id_usuario, // Corregido: asegurar que se use idProfesor
-                },
-                async () => {
-                    console.log("Estado actualizado:", {
-                        profesorSeleccionado: this.state.profesorSeleccionado,
-                        id_usuario: this.state.id_usuario, // Ahora sí tendrá el valor actualizado
-                    });
-    
-                    try {
-                        const response = await axios.get(
-                            `http://localhost:8080/api/usuario/getUsuario/${this.state.id_usuario}`,
-                            { withCredentials: true }
-                        );
-    
-                        console.log("Datos obtenidos del alumno:", response.data);
-    
-                        const { nombre, apellido, dni, mail, telefono, activo } = response.data;
-    
-                        this.setState({
-                            nombre: nombre || '',
-                            apellido: apellido || '',
-                            dni: dni || '',
-                            mail: mail || '',
-                            telefono: telefono || '',
-                            activo: activo ? 1:0,
-                            valoresOriginales: { nombre, apellido, dni, mail, telefono, activo }, 
-                        });
-                    } catch (error) {
-                        console.error("Error al cargar los datos del alumnos:", error);
-                    }
-                }
-            );
-        } catch (error) {
-            console.error("Error al procesar el alumno seleccionado:", error);
-        }
-    };
-    
-
-    // Manejar envío del formulario
-    handleSubmit = async (event) => {
-        event.preventDefault();
-
-        const { id_usuario,valoresOriginales, nombre, apellido, dni, mail, telefono, activo } = this.state;
-
-        if (!id_usuario) {
-            alert('Por favor selecciona un alumno antes de guardar los cambios.');
-            return;
-        }
-        // Construir un objeto con solo los campos modificados
-        const datosModificados = {};
-        if (nombre !== valoresOriginales.nombre) datosModificados.nombre = nombre;
-        if (apellido !== valoresOriginales.apellido) datosModificados.apellido = apellido;
-        if (dni !== valoresOriginales.dni) datosModificados.dni = dni;
-        if (mail !== valoresOriginales.mail) datosModificados.mail = mail;
-        if (telefono !== valoresOriginales.telefono) datosModificados.telefono = telefono;
-        if (activo !== valoresOriginales.activo) datosModificados.activo = activo;
-        try {
-            const response = await axios.patch(
-                `http://localhost:8080/api/usuario/modificarUsuario/${id_usuario}`,
-                datosModificados,
-                { withCredentials: true }
-            );
-
-            if (response.status === 200) {
-                alert('alumno modificado exitosamente!');
-                this.cargarProfesores();
-                this.setState({
-                    profesorSeleccionado: 'Seleccione un alumno',
-                    id_usuario: null,
-                    nombre: '',
-                    apellido: '',
-                    dni: '',
-                    mail: '',
-                    telefono: '',
-                    activo: 0,
-                    valoresOriginales:{}
-                });
-                window.location.reload(); // Refresca la página
-            } else {
-                alert('Error al modificar el alumno');
-            }
-        } catch (error) {
-            console.error('Error al modificar el alumno:', error);
-        }
-    };
-
-    componentDidMount() {
-        this.cargarProfesores();
-        
-    }
-
-    render() {
-        const { profesores, profesorSeleccionado, nombre, apellido, dni, mail, telefono, activo, errores } = this.state;
-
-        return (
-            <section className="d-flex flex-column">
-                <section className="container d-flex justify-content-center align-items-center flex-grow-1">
-                    <section className="col-lg-12">
-                        <form onSubmit={this.handleSubmit}>
-                            <div className="pb-5">
-                                <label htmlFor="dropdown-basic-button" className="form-label">Alumno</label>
-                                <DropdownButton
-                                    id="dropdown-basic-button"
-                                    title={profesorSeleccionado}
-                                    onSelect={this.handleDropdownChange}
-                                    size="sm"
-                                >
-                                    {profesores.map((profesor) => (
-                                        <Dropdown.Item
-                                            key={profesor.id_usuario}
-                                            eventKey={JSON.stringify({
-                                                id_usuario: profesor.id_usuario,
-                                                nombre: profesor.nombre,
-                                            })}
-                                        >
-                                            {profesor.nombre}
-                                        </Dropdown.Item>
-                                    ))}
-                                </DropdownButton>
-                            </div>
-
-                            {profesorSeleccionado !== 'Seleccione un alumno' && (
-                                <>
-                                    {[{ id: "nombre", label: "Nombre", type: "text" },
-                                    { id: "apellido", label: "Apellido", type: "text" },
-                                    { id: "dni", label: "DNI", type: "number" },
-                                    { id: "mail", label: "Email", type: "email" },
-                                    { id: "telefono", label: "Teléfono", type: "number" }].map(({ id, label, type }) => (
-                                        <div className="mb-3" key={id}>
-                                            <label htmlFor={id} className="form-label">{label}</label>
-                                            <Form.Control
-                                                id={id}
-                                                type={type}
-                                                value={this.state[id]}
-                                                onChange={this.handleInputChange}
-                                                className={errores[id] ? "is-invalid" : ""}
-                                                placeholder={`Ingresa ${label.toLowerCase()}`}
-                                                
-                                            />
-                                            {errores[id] && <div style={{
-                                                color: "black", fontWeight: "bold",
-                                                fontSize: "0.9rem", marginTop: "0.3rem"
-                                            }}>{errores[id]}</div>}
-                                        </div>
-                                    ))}
-
-                                    <div className="mb-3">
-                                        <label htmlFor="activo" className="form-label">Activo:</label>
-                                        <Form.Check
-                                            id="activo"
-                                            type="checkbox"
-                                            checked={activo}
-                                            onChange={this.handleInputChange}
-                                        />
-                                    </div>
-
-                                    <div className="d-grid gap-2 mb-4">
-                                        <Button type="submit" className="btn btn-primary">Guardar Cambios</Button>
-                                    </div>
-                                </>
-                            )}
-                        </form>
-                    </section>
-                </section>
-            </section>
-        );
-    }
-}
-}
+        <Button type="submit">Modificar</Button>
+      </Form>
+    </div>
+  );
+};
 
 export default ModificarAlumno;

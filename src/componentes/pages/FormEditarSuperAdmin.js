@@ -1,6 +1,17 @@
 import React, { Component } from 'react';
 
 class FormEditarSuperAdmin extends Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            nombre: '',
+            apellido: '',
+            dni: '',
+            mail: '',
+            telefono: '',
+            errores: {}, // Almacena los errores de validación
+        };
+    }
     render() {
         return (
             <section className="d-flex flex-column">
@@ -10,31 +21,63 @@ class FormEditarSuperAdmin extends Component {
                         <div className="card shadow-sm"> {/* Aplicar el estilo de tarjeta */}
                             <div className="card-body">
                                 <form>
-                                    <div className="row">
+                                    <div className="column">
                                         {/* Campo para el Nombre */}
-                                        <div className="col-md-6 mb-3">
+                                        <div className="mb-3">
                                             <label htmlFor="nombre" className="form-label">Nombre:</label>
                                             <input
                                                 type="text"
                                                 className="form-control"
                                                 id="nombre"
                                                 placeholder="Ingresa tu nombre"
-                                                required
+                                                //required
                                             />
                                         </div>
-
-                                        {/* Campo para el Apellido */}
-                                        <div className="col-md-6 mb-3">
+                                    </div>
+                                    {/* Campo para el Apellido */}
+                                    <div className="mb-3">
                                             <label htmlFor="apellido" className="form-label">Apellido:</label>
                                             <input
                                                 type="text"
                                                 className="form-control"
                                                 id="apellido"
                                                 placeholder="Ingresa tu apellido"
-                                                required
+                                                //required
                                             />
                                         </div>
-                                    </div>
+
+                                        <div className="mb-3">
+                                            <label htmlFor="dni" className="form-label">Dni:</label>
+                                            <input
+                                                type="number"
+                                                className="form-control"
+                                                id="dni"
+                                                placeholder="Ingresa tu dni"
+                                               // required
+                                            />
+                                        </div>
+
+                                        <div className="mb-3">
+                                            <label htmlFor="clave" className="form-label">Clave:</label>
+                                            <input
+                                                type="password"
+                                                className="form-control"
+                                                id="clave"
+                                                placeholder="Ingresa tu clave"
+                                               // required
+                                            />
+                                        </div>
+
+                                        <div className="mb-3">
+                                            <label htmlFor="telefono" className="form-label">Telefono:</label>
+                                            <input
+                                                type="number"
+                                                className="form-control"
+                                                id="telefono"
+                                                placeholder="Ingresa tu telefono"
+                                               // required
+                                            />
+                                        </div>
 
                                     {/* Campo para el Email */}
                                     <div className="mb-3">
@@ -44,7 +87,7 @@ class FormEditarSuperAdmin extends Component {
                                             className="form-control"
                                             id="email"
                                             placeholder="Ingresa tu email"
-                                            required
+                                            //required
                                         />
                                     </div>
 
