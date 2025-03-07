@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Dropdown, DropdownButton, Button, Form } from 'react-bootstrap';
 import axios from 'axios';
 
+<<<<<<< Updated upstream
 class ModificarAlumno extends Component {
     constructor(props) {
         super(props);
@@ -19,6 +20,49 @@ class ModificarAlumno extends Component {
             rol: 'alumno',
             valoresOriginales:  {}, // Nuevo estado para almacenar los valores originales
         };
+=======
+const ModificarAlumno = () => {
+  const [formData, setFormData] = useState({
+    id_usuario: '',
+    nombre: '',
+    apellido: '',
+    dni: '',
+    mail: '',
+    clave: '',
+    telefono: '',
+    activo: false,
+    pago_cuota: false,
+    Rol_id_rol: ''
+  });
+
+  const handleInputChange = (e) => {
+    const { id, value } = e.target;
+    setFormData({
+      ...formData,
+      [id]: value
+    });
+  };
+
+  const handleCheckboxChange = (e) => {
+    const { id, checked } = e.target;
+    setFormData({
+      ...formData,
+      [id]: checked
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await axios.patch(`http://localhost:8080/api/alumno/modificar/${formData.id_usuario}`, formData, { withCredentials: true });
+      if (response.status === 200) {
+        alert('Alumno modificado exitosamente!');
+      } else {
+        alert('Error al modificar el alumno');
+      }
+    } catch (error) {
+      console.error('Error al modificar el alumno:', error);
+>>>>>>> Stashed changes
     }
 
     // Validaciones por campo
