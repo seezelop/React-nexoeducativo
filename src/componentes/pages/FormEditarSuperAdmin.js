@@ -12,6 +12,7 @@ class FormEditarSuperAdmin extends Component {
             clave: '',
             telefono: '',
             errores: {}, // Almacena los errores de validación
+            activo:1
         };
     }
 
@@ -78,7 +79,7 @@ class FormEditarSuperAdmin extends Component {
     manejarEnvio = async (event) => {
         event.preventDefault();
     
-        const { nombre, apellido, dni, mail, clave, telefono } = this.state;
+        const { nombre, apellido, dni, mail, clave, telefono, activo } = this.state;
         
         // Create object without empty fields
         const usuarioModificado = {};
@@ -88,6 +89,7 @@ class FormEditarSuperAdmin extends Component {
         if (dni) usuarioModificado.dni = dni;
         if (mail) usuarioModificado.mail = mail;
         if (telefono) usuarioModificado.telefono = telefono;
+        if (activo !== undefined) usuarioModificado.activo = activo;
         
         // Only include password if it was entered
         if (clave && clave.trim() !== '') {
