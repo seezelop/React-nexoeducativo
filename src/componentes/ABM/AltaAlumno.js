@@ -11,6 +11,7 @@ class AltaAlumno extends Component {
       mail: "",
       clave: "",
       telefono: "",
+      jornada: "",
       activo: 1,
       idCurso: "",
       idPadre: "",
@@ -79,6 +80,11 @@ class AltaAlumno extends Component {
       case "apellido":
         if (!/^[a-zA-Z]{4,30}$/.test(value)) {
           return "El apellido debe tener entre 4 y 30 letras.";
+        }
+        break;
+        case "jornada":
+        if (!/^[a-zA-Z]{6,8}$/.test(value)) {
+          return "La jornada debe tener entre 6 y 8 letras.";
         }
         break;
       case "dni":
@@ -160,6 +166,7 @@ class AltaAlumno extends Component {
           { id: "apellido", label: "Apellido", type: "text" },
           { id: "dni", label: "DNI", type: "number" },
           { id: "mail", label: "Email", type: "email" },
+          { id: "jornada", label: "Jornada", type: "text" },
           { id: "clave", label: "Clave", type: "password" },
           { id: "telefono", label: "Teléfono", type: "number" },
         ].map(({ id, label, type }) => (

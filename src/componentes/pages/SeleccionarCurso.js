@@ -1,8 +1,5 @@
-//Tengo anotado que se debe completar info en este codigo pero no me queda claro a que info se refiere. 
-
-
 import React, { Component } from 'react';
-import { Dropdown, DropdownButton, Form, Button } from 'react-bootstrap';
+import { Dropdown, DropdownButton, Form, Button, ListGroup } from 'react-bootstrap';
 import axios from 'axios';
 
 class SeleccionarCurso extends Component {
@@ -13,16 +10,11 @@ class SeleccionarCurso extends Component {
             alumnos: [],
             materias: [],
             cursoSeleccionado: 'Seleccione un curso',
-            id_curso: null,
+            idCurso: null,
             numero: '',
             division: '',
-            nombreP:'',
-             apellidoP:'',
-             nombre: '',
-             apellido:'',
-             nombreM:'',
-             nombreProfesor:'',
-             apellidoProfesor: '',
+            nombreP: '',
+            apellidoP: '',
         };
     }
 
@@ -34,8 +26,8 @@ class SeleccionarCurso extends Component {
             });
 
             const cursos = response.data.map((curso) => ({
-                id_curso: curso.id_curso,
-                nombre: `Curso ${curso.numero} - División ${curso.division}`,
+                idCurso: curso.idCurso,
+                nombre: `${curso.numero} ${curso.division}`,
                 numero: curso.numero,
                 division: curso.division,
                 activo: curso.activo,
@@ -47,76 +39,73 @@ class SeleccionarCurso extends Component {
         }
     };
 
-    obtenerInfo = async(id_curso)=>{
+    // Obtener información adicional del curso
+    obtenerInfo = async (idCurso) => {
         try {
-            const response = await axios.get(`http://localhost:8080/api/usuario/selectCurso/${id_curso}`, {
+            const response = await axios.get(`http://localhost:8080/api/usuario/selectCurso/${idCurso}`, {
                 withCredentials: true,
             });
 
-            //obtener alumnos
-            const alumnos = response.data.map((alumno) => ({
-                nombre: alumno.nombre,
-                apellido: alumno.apellido,
-            }));
+            // Acceder al primer elemento del array (asumiendo que solo hay un curso)
+            const curso = response.data[0];
 
-            this.setState({ alumnos });
+            // Obtener alumnos y materias
+            const alumnos = curso.alumnos;
+            const materias = curso.materias;
 
-            const { numero, division, nombreP, apellidoP, nombre, apellido, nombreM, nombreProfesor, apellidoProfesor} = response.data;
+            // Actualizar el estado con la información del curso
             this.setState({
-                numero: numero || '',
-                division: division || '',
-                nombreP: nombreP || '',
-                apellidoP: apellidoP || '',
-                nombre: nombre || '',
-                apellido: apellido || '',
-                nombreM:nombreM || '',
-             nombreProfesor: nombreProfesor || '',
-             apellidoProfesor: apellidoProfesor || ''
+                alumnos,
+                materias,
+                numero: curso.numero || '',
+                division: curso.division || '',
+                nombreP: curso.nombreP || '',
+                apellidoP: curso.apellidoP || '',
             });
-    }catch (error) {
-        console.error('Error al cargar la informacion:', error);
-    }
+
+            console.info('INFO CURSO:', curso);
+        } catch (error) {
+            console.error('Error al cargar la información:', error.response?.data || error.message);
+        }
     };
 
     componentDidMount() {
         this.cargarCursos();
     }
+
     // Manejar selección de curso en el Dropdown
     handleDropdownChange = (value) => {
         const parsedValue = JSON.parse(value);
+        console.log('ID del curso seleccionado:', parsedValue.idCurso); // Verifica el valor de idCurso
+
         this.setState({
             cursoSeleccionado: parsedValue.nombre,
-            id_curso: parsedValue.id_curso,
+            idCurso: parsedValue.idCurso,
             numero: parsedValue.numero,
             division: parsedValue.division,
-            activo: parsedValue.activo,
         });
+
+        // Llamar a obtenerInfo para cargar la información adicional del curso
+        this.obtenerInfo(parsedValue.idCurso);
     };
-
-    // Manejar cambios en los campos del formulario
-    handleInputChange = (event) => {
-        const { id, value, type, checked } = event.target;
-        this.setState({ [id]: type === 'checkbox' ? checked : value });
-    };
-
-    // Manejar envío del formulario
-    handleSubmit = (event) => {
-        event.preventDefault();
-        //const { id_curso, numero, division, activo } = this.state;
-
-        //console.log('Datos del curso seleccionado:', { id_curso, numero, division, activo });
-        alert('Curso seleccionado con éxito!');
-    };
-
 
     render() {
-        const { cursos, cursoSeleccionado, numero, division, nombreP, apellidoP, nombreM, nombreProfesor, apellidoProfesor } = this.state;
+        const {
+            cursos,
+            cursoSeleccionado,
+            numero,
+            division,
+            nombreP,
+            apellidoP,
+            alumnos,
+            materias,
+        } = this.state;
 
         return (
             <section className="d-flex flex-column">
                 <section className="container d-flex justify-content-center align-items-center flex-grow-1">
                     <section className="col-lg-12">
-                        <form onSubmit={this.handleSubmit}>
+                        <form>
                             <div className="pb-5">
                                 <label htmlFor="dropdown-basic-button" className="form-label">Curso</label>
                                 <DropdownButton
@@ -127,7 +116,7 @@ class SeleccionarCurso extends Component {
                                 >
                                     {cursos.map((curso) => (
                                         <Dropdown.Item
-                                            key={curso.id_curso}
+                                            key={curso.idCurso}
                                             eventKey={JSON.stringify(curso)}
                                         >
                                             {curso.nombre}
@@ -138,6 +127,7 @@ class SeleccionarCurso extends Component {
 
                             {cursoSeleccionado !== 'Seleccione un curso' && (
                                 <>
+                                    {/* Información básica del curso */}
                                     <div className="mb-3">
                                         <label htmlFor="numero" className="form-label">Número:</label>
                                         <Form.Control
@@ -157,7 +147,7 @@ class SeleccionarCurso extends Component {
                                         />
                                     </div>
                                     <div className="mb-3">
-                                        <label htmlFor="activo" className="form-label">Nombre Preceptor:</label>
+                                        <label htmlFor="nombreP" className="form-label">Nombre Preceptor:</label>
                                         <Form.Control
                                             id="nombreP"
                                             type="text"
@@ -166,7 +156,7 @@ class SeleccionarCurso extends Component {
                                         />
                                     </div>
                                     <div className="mb-3">
-                                        <label htmlFor="activo" className="form-label">Apellido Preceptor:</label>
+                                        <label htmlFor="apellidoP" className="form-label">Apellido Preceptor:</label>
                                         <Form.Control
                                             id="apellidoP"
                                             type="text"
@@ -174,8 +164,29 @@ class SeleccionarCurso extends Component {
                                             readOnly
                                         />
                                     </div>
-                                    <div className="d-grid gap-2 mb-4">
-                                        <Button type="submit" className="btn btn-primary">Confirmar Curso</Button>
+
+                                    {/* Lista de alumnos */}
+                                    <div className="mb-3">
+                                        <label className="form-label">Alumnos:</label>
+                                        <ListGroup>
+                                            {alumnos.map((alumno, index) => (
+                                                <ListGroup.Item key={index}>
+                                                    {alumno.nombre} {alumno.apellido}
+                                                </ListGroup.Item>
+                                            ))}
+                                        </ListGroup>
+                                    </div>
+
+                                    {/* Lista de materias */}
+                                    <div className="mb-3">
+                                        <label className="form-label">Materias:</label>
+                                        <ListGroup>
+                                            {materias.map((materia, index) => (
+                                                <ListGroup.Item key={index}>
+                                                    <strong>{materia.nombre}</strong> - Profesor: {materia.nombreProfesor} {materia.apellidoProfesor}
+                                                </ListGroup.Item>
+                                            ))}
+                                        </ListGroup>
                                     </div>
                                 </>
                             )}
