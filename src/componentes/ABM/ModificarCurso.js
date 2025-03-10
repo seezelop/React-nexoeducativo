@@ -9,14 +9,40 @@ const ModificarCurso = () => {
     numero: '',
     division: '',
     activo: 1,
+    materias: [],
   });
 
   const [loading, setLoading] = useState(false);
 
+  const obtenerInfo = async (idCurso) => {
+    try {
+        const response = await axios.get(`http://localhost:8080/api/usuario/selectCurso/${idCurso}`, {
+            withCredentials: true,
+        });
+
+        // Acceder al primer elemento del array (asumiendo que solo hay un curso)
+        const curso = response.data[0];
+
+        const materias = curso.materias;
+
+        // Actualizar el estado con la información del curso
+        this.setState({
+            //alumnos,
+            materias,
+           
+        });
+
+        console.info('INFO CURSO:', curso);
+    } catch (error) {
+        console.error('Error al cargar la información:', error.response?.data || error.message);
+    }
+};
+
+
   useEffect(() => {
     const fetchCursos = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/api/usuario/verCursos', {
+        const response = await axios.get('http://localhost:8080/api/usuario/verCursoAdministrativo', {
           withCredentials: true,
         });
         setCursos(response.data);
