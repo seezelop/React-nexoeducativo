@@ -202,72 +202,74 @@ class ModificarAlumno extends Component {
 
     // Manejar envío del formulario
     handleSubmit = async (event) => {
-        event.preventDefault();
+    event.preventDefault();
 
-        const { id_usuario, valoresOriginales, nombre, apellido, dni, mail, telefono, activo, jornada, cursoSeleccionado, padreSeleccionado } = this.state;
+    const { id_usuario, nombre, apellido, dni, mail, telefono, activo, jornada, cursoSeleccionado, padreSeleccionado, valoresOriginales } = this.state;
 
-        if (!id_usuario) {
-            alert('Por favor selecciona un alumno antes de guardar los cambios.');
-            return;
+    if (!id_usuario) {
+        alert('Por favor selecciona un alumno antes de guardar los cambios.');
+        return;
+    }
+
+    // Crear un objeto con solo los valores modificados y no vacíos
+    const datosModificados = {};
+
+    // Comparar cada campo con el valor original y agregarlo si cambió y no está vacío
+    if (nombre !== valoresOriginales.nombre && nombre !== '') datosModificados.nombre = nombre;
+    if (apellido !== valoresOriginales.apellido && apellido !== '') datosModificados.apellido = apellido;
+    if (dni !== valoresOriginales.dni && dni !== '') datosModificados.dni = dni;
+    if (mail !== valoresOriginales.mail && mail !== '') datosModificados.mail = mail;
+    if (telefono !== valoresOriginales.telefono && telefono !== '') datosModificados.telefono = telefono;
+    if (jornada !== valoresOriginales.jornada && jornada !== '') datosModificados.jornada = jornada;
+
+    // Agregar curso y padre si fueron seleccionados y no están vacíos
+    if (cursoSeleccionado) datosModificados.curso = cursoSeleccionado;
+    if (padreSeleccionado) datosModificados.padre = padreSeleccionado;
+
+    // Siempre incluir el campo "activo", aunque no haya cambiado
+    datosModificados.activo = activo;
+
+    // Si no hay cambios además del campo activo, no enviamos la petición
+    if (Object.keys(datosModificados).length === 0 && datosModificados.hasOwnProperty('activo') || Object.keys(datosModificados).length === 0 && datosModificados.hasOwnProperty('activo')) {
+        alert('No hay cambios para guardar.');
+        return;
+    }
+
+    console.log('Datos a enviar:', datosModificados);
+
+    try {
+        const response = await axios.patch(
+            `http://localhost:8080/api/usuario/modificarAlumno/${id_usuario}`,
+            datosModificados,
+            { withCredentials: true }
+        );
+
+        if (response.status === 200) {
+            alert('Alumno modificado exitosamente!');
+            this.cargarProfesores();
+            this.setState({
+                profesorSeleccionado: 'Seleccione un alumno',
+                id_usuario: null,
+                nombre: '',
+                apellido: '',
+                dni: '',
+                mail: '',
+                telefono: '',
+                activo: 0,
+                jornada: '',
+                cursoSeleccionado: '',
+                padreSeleccionado: '',
+                valoresOriginales: {}
+            });
+            window.location.reload();
+        } else {
+            alert('Error al modificar el alumno');
         }
+    } catch (error) {
+        console.error('Error al modificar el alumno:', error);
+    }
+};
 
-        // Construir un objeto con solo los campos modificados y no vacíos
-        const datosModificados = {};
-        if (nombre !== valoresOriginales.nombre && nombre.trim() !== '') datosModificados.nombre = nombre;
-        if (apellido !== valoresOriginales.apellido && apellido.trim() !== '') datosModificados.apellido = apellido;
-        if (dni !== valoresOriginales.dni && dni.trim() !== '') datosModificados.dni = dni;
-        if (mail !== valoresOriginales.mail && mail.trim() !== '') datosModificados.mail = mail;
-        if (telefono !== valoresOriginales.telefono && telefono.trim() !== '') datosModificados.telefono = telefono;
-        if (activo !== valoresOriginales.activo) datosModificados.activo = activo;
-        if (jornada !== valoresOriginales.jornada && jornada.trim() !== '') datosModificados.jornada = jornada;
-
-        // Incluir curso y padre solo si han sido seleccionados
-        if (cursoSeleccionado && cursoSeleccionado !== valoresOriginales.cursoSeleccionado) {
-            datosModificados.curso = cursoSeleccionado;
-        }
-        if (padreSeleccionado && padreSeleccionado !== valoresOriginales.padreSeleccionado) {
-            datosModificados.padre = padreSeleccionado;
-        }
-
-        // Verificar si hay datos modificados antes de enviar la solicitud
-        if (Object.keys(datosModificados).length === 0) {
-            alert('No se han realizado cambios para guardar.');
-            return;
-        }
-
-        console.log('datos a enviar '+datosModificados.activo)
-        try {
-            const response = await axios.patch(
-                `http://localhost:8080/api/usuario/modificarAlumno/${id_usuario}`,
-                datosModificados,
-                { withCredentials: true }
-            );
-
-            if (response.status === 200) {
-                alert('Alumno modificado exitosamente!');
-                this.cargarProfesores();
-                this.setState({
-                    profesorSeleccionado: 'Seleccione un alumno',
-                    id_usuario: null,
-                    nombre: '',
-                    apellido: '',
-                    dni: '',
-                    mail: '',
-                    telefono: '',
-                    activo: 0,
-                    jornada: '',
-                    cursoSeleccionado: '',
-                    padreSeleccionado: '',
-                    valoresOriginales: {}
-                });
-                window.location.reload();
-            } else {
-                alert('Error al modificar el alumno');
-            }
-        } catch (error) {
-            console.error('Error al modificar el alumno:', error);
-        }
-    };
 
     componentDidMount() {
         this.cargarProfesores();
