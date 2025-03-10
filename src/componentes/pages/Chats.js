@@ -30,8 +30,8 @@ const Chats = () => {
       <h2>Selecciona un Usuario para Chatear</h2>
       <ul>
         {usuarios.map((usuario) => (
-          <li key={usuario.mail}>
-            {usuario.nombre} - {usuario.rol}
+          <li key={usuario.getMail}>
+            {usuario.nombre} - {usuario.apellido} - {usuario.mail}
             <button onClick={() => iniciarChat(usuario)}>Chatear</button>
           </li>
         ))}
