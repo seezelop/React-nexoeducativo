@@ -46,6 +46,8 @@ import ABMMaterial from './componentes/ABM/ABMMaterial';
 import InformacionCurso from './componentes/pages/InformacionCurso';
 import InformacionCursoAlumno from './componentes/pages/InformacionCursoAlumno';
 import RenovarMembresia from './componentes/pages/RenovarMembresia';
+import Chats from "./componentes/pages/Chats";
+import ChatIndividual from "./componentes/pages/ChatIndividual"; 
 
 
 function App() {
@@ -139,6 +141,11 @@ function App() {
               <Route path="/EstablecerPrecioCuota" element={<EstablecerPrecioCuota/>} />
               <Route path="/RealizarPago" element={<RealizarPago />} />
               <Route path="/HistorialPagos" element={<HistorialPagos />} />
+
+
+             {/* Rutas para chats  */}
+              <Route path="/admin/chats" element={<Chats />} />
+              <Route path="/admin/chat/:mail" element={<ChatIndividual />} />
 
             
           </Routes>
