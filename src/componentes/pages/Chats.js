@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 const Chats = () => {
   const [usuarios, setUsuarios] = useState([]);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -12,8 +13,14 @@ const Chats = () => {
         const response = await axios.get("http://localhost:8080/chatIndividual", {
           withCredentials: true,
         });
-        setUsuarios(response.data);
+
+        if (Array.isArray(response.data)) {
+          setUsuarios(response.data);
+        } else {
+          setError("Datos de usuarios no válidos");
+        }
       } catch (error) {
+        setError("Error al obtener usuarios");
         console.error("Error al obtener usuarios:", error);
       }
     };
@@ -25,17 +32,25 @@ const Chats = () => {
     navigate(`/admin/chat/${usuario.mail}`);
   };
 
+  if (error) {
+    return <div className="error">{error}</div>;
+  }
+
   return (
     <div>
       <h2>Selecciona un Usuario para Chatear</h2>
-      <ul>
-        {usuarios.map((usuario) => (
-          <li key={usuario.getMail}>
-            {usuario.nombre} - {usuario.apellido} - {usuario.mail}
-            <button onClick={() => iniciarChat(usuario)}>Chatear</button>
-          </li>
-        ))}
-      </ul>
+      {usuarios.length === 0 ? (
+        <p>No hay usuarios disponibles.</p>
+      ) : (
+        <ul>
+          {usuarios.map((usuario) => (
+            <li key={usuario.mail}>
+              {usuario.nombre} - {usuario.apellido} - {usuario.mail}
+              <button onClick={() => iniciarChat(usuario)}>Chatear</button>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };
