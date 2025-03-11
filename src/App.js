@@ -48,6 +48,7 @@ import InformacionCursoAlumno from './componentes/pages/InformacionCursoAlumno';
 import RenovarMembresia from './componentes/pages/RenovarMembresia';
 import Chats from "./componentes/pages/Chats";
 import ChatIndividual from "./componentes/pages/ChatIndividual"; 
+import GestionesPago from "./componentes/pages/GestionesPago";
 
 
 function App() {
@@ -118,6 +119,7 @@ function App() {
              <Route path="/ABMalumno" element={<ABMalumno />} />
              <Route path="/ABMcurso" element={<ABMcurso />} />
              <Route path="/ABMpreceptor" element={<ABMpreceptor />} />
+             <Route path="/gestiones-pago" element={<GestionesPago />} />
 
               {/* Rutas para PRECEPTOR  */}
               <Route path="/GestionarAsistenciaAlumno" element={<GestionarAsistenciaAlumno />} />
