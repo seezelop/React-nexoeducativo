@@ -7,7 +7,8 @@ const GestionarAsistenciaAlumnos = () => {
   const [cursoSeleccionado, setCursoSeleccionado] = useState('');
   const [alumnos, setAlumnos] = useState([]);
   const [asistencia, setAsistencia] = useState([]);
-  // const [fecha, setFecha] = useState(new Date().toISOString().split('T')[0]);
+  const [fechasAsistencias, setFechasAsistencias] = useState([]);
+  const [fechaSeleccionada, setFechaSeleccionada] = useState('');
   const [loading, setLoading] = useState(false);
   const [mensaje, setMensaje] = useState({ text: '', type: '' });
 
@@ -45,9 +46,9 @@ const GestionarAsistenciaAlumnos = () => {
       // Inicializar el estado de asistencia para cada alumno
       const asistenciaInicial = alumnosData.map(alumno => ({
         idUsuario: alumno.id_usuario,
-        asistio: 0,         // ausente por defecto
-        mediaFalta: 0,    
-        retiroAntes: 0     
+        asistio: 0, // Ausente por defecto
+        mediaFalta: 0,
+        retiroAntes: 0,
       }));
 
       setAsistencia(asistenciaInicial);
@@ -59,7 +60,55 @@ const GestionarAsistenciaAlumnos = () => {
     }
   };
 
-  // Manejar el cambio de curso seleccionado
+  // Obtener fechas de asistencias
+  const fetchFechasAsistencias = async (cursoId) => {
+    if (!cursoId) return;
+
+    try {
+      const response = await axios.get(
+        `http://localhost:8080/api/usuario/obtenerAsistencias/${cursoId}`,
+        { withCredentials: true }
+      );
+      setFechasAsistencias(response.data);
+    } catch (error) {
+      console.error('Error al obtener fechas de asistencias:', error);
+      setMensaje({ text: 'Hubo un error al cargar las fechas de asistencias.', type: 'danger' });
+    }
+  };
+
+  // Obtener asistencias por fecha
+  const fetchAsistenciasPorFecha = async (cursoId, fecha) => {
+    if (!cursoId || !fecha) return;
+
+    setLoading(true);
+    try {
+      const response = await axios.get(
+        `http://localhost:8080/api/usuario/obtenerAsistenciasPorFecha/${cursoId}?fecha=${fecha}`,
+        { withCredentials: true }
+      );
+
+      // Actualizar el estado de asistencia con los datos obtenidos
+      const asistenciasData = response.data;
+      const asistenciaActualizada = alumnos.map(alumno => {
+        const asistenciaAlumno = asistenciasData.find(a => a.idUsuario === alumno.id_usuario);
+        return {
+          idUsuario: alumno.id_usuario,
+          asistio: asistenciaAlumno ? asistenciaAlumno.asistio : 0,
+          mediaFalta: asistenciaAlumno ? asistenciaAlumno.mediaFalta : 0,
+          retiroAntes: asistenciaAlumno ? asistenciaAlumno.retiroAntes : 0,
+        };
+      });
+
+      setAsistencia(asistenciaActualizada);
+      setLoading(false);
+    } catch (error) {
+      console.error('Error al obtener asistencias por fecha:', error);
+      setMensaje({ text: 'Hubo un error al cargar las asistencias.', type: 'danger' });
+      setLoading(false);
+    }
+  };
+
+  // Manejar el cambio de curso seleccionado (Tomar Asistencia)
   const handleCursoChange = (e) => {
     const cursoId = e.target.value;
     setCursoSeleccionado(cursoId);
@@ -71,35 +120,49 @@ const GestionarAsistenciaAlumnos = () => {
     }
   };
 
+  // Manejar el cambio de curso seleccionado (Modificar Asistencia)
+  const handleCursoChange2 = async (e) => {
+    const cursoId = e.target.value;
+    setCursoSeleccionado(cursoId);
+
+    if (cursoId) {
+      await fetchAlumnos(cursoId);
+      await fetchFechasAsistencias(cursoId);
+
+      if (fechaSeleccionada) {
+        await fetchAsistenciasPorFecha(cursoId, fechaSeleccionada);
+      }
+    } else {
+      setAlumnos([]);
+      setAsistencia([]);
+      setFechasAsistencias([]);
+    }
+  };
+
   // Manejar cambios en la asistencia de un alumno
   const handleAsistenciaChange = (index, field, value) => {
     const updatedAsistencia = [...asistencia];
 
-    // Si se selecciona "Presente"
     if (field === 'asistio') {
       updatedAsistencia[index] = {
         ...updatedAsistencia[index],
         asistio: value,
         mediaFalta: value === 1 ? 0 : updatedAsistencia[index].mediaFalta,
-        retiroAntes: value === 1 ? 0 : updatedAsistencia[index].retiroAntes
+        retiroAntes: value === 1 ? 0 : updatedAsistencia[index].retiroAntes,
       };
-    }
-    // Si se selecciona "Media Falta"
-    else if (field === 'mediaFalta') {
+    } else if (field === 'mediaFalta') {
       updatedAsistencia[index] = {
         ...updatedAsistencia[index],
         mediaFalta: value,
         asistio: value === 1 ? 0 : updatedAsistencia[index].asistio,
-        retiroAntes: value === 1 ? 0 : updatedAsistencia[index].retiroAntes
+        retiroAntes: value === 1 ? 0 : updatedAsistencia[index].retiroAntes,
       };
-    }
-    // Si se selecciona "Retiro Antes"
-    else if (field === 'retiroAntes') {
+    } else if (field === 'retiroAntes') {
       updatedAsistencia[index] = {
         ...updatedAsistencia[index],
         retiroAntes: value,
         asistio: value === 1 ? 0 : updatedAsistencia[index].asistio,
-        mediaFalta: value === 1 ? 0 : updatedAsistencia[index].mediaFalta
+        mediaFalta: value === 1 ? 0 : updatedAsistencia[index].mediaFalta,
       };
     }
 
@@ -113,14 +176,14 @@ const GestionarAsistenciaAlumnos = () => {
         ...updatedAsistencia[index],
         asistio: 0,
         mediaFalta: 0,
-        retiroAntes: 0
+        retiroAntes: 0,
       };
     }
 
     setAsistencia(updatedAsistencia);
   };
 
-  // Enviar la asistencia al backend
+  // Enviar la asistencia al backend (Tomar Asistencia)
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -137,11 +200,11 @@ const GestionarAsistenciaAlumnos = () => {
     setLoading(true);
     try {
       const dataToSend = {
-        //fecha: fecha,
-        alumnosCurso: asistencia
+        alumnosCurso: asistencia,
       };
 
-      console.log('LO QUE SE VA A ENVIAR: '+JSON.stringify(dataToSend))
+      console.log('LO QUE SE VA A ENVIAR:', JSON.stringify(dataToSend, null, 2));
+
       const response = await axios.post(
         `http://localhost:8080/api/usuario/tomarAsistencia/${cursoSeleccionado}`,
         dataToSend,
@@ -150,13 +213,46 @@ const GestionarAsistenciaAlumnos = () => {
 
       if (response.status === 201) {
         setMensaje({ text: 'Asistencia registrada correctamente.', type: 'success' });
-        // Reiniciar formulario o redirigir según necesidad
       }
     } catch (error) {
       console.error('Error al registrar asistencia:', error);
       setMensaje({
         text: `Error al registrar la asistencia: ${error.response?.data || error.message}`,
-        type: 'danger'
+        type: 'danger',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Editar la asistencia (Modificar Asistencia)
+  const handleEditarAsistencia = async () => {
+    if (!cursoSeleccionado || !fechaSeleccionada) {
+      setMensaje({ text: 'Debe seleccionar un curso y una fecha.', type: 'warning' });
+      return;
+    }
+
+    if (asistencia.length === 0) {
+      setMensaje({ text: 'No hay alumnos para editar asistencia.', type: 'warning' });
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await axios.patch(
+        `http://localhost:8080/api/usuario/editarAsistencia/${cursoSeleccionado}?fecha=${fechaSeleccionada}`,
+        asistencia,
+        { withCredentials: true }
+      );
+
+      if (response.status === 200) {
+        setMensaje({ text: 'Asistencia editada correctamente.', type: 'success' });
+      }
+    } catch (error) {
+      console.error('Error al editar asistencia:', error);
+      setMensaje({
+        text: `Error al editar la asistencia: ${error.response?.data || error.message}`,
+        type: 'danger',
       });
     } finally {
       setLoading(false);
@@ -270,8 +366,116 @@ const GestionarAsistenciaAlumnos = () => {
           </Form>
         </Card.Body>
       </Card>
+
+      <h2>Modificar Asistencia</h2>
+      <Card className="mb-4">
+        <Card.Body>
+          <Row>
+            <Col md={6}>
+              <Form.Group className="mb-3">
+                <Form.Label>Seleccionar Curso</Form.Label>
+                <Form.Control
+                  as="select"
+                  value={cursoSeleccionado}
+                  onChange={handleCursoChange2}
+                  required
+                  className="form-select"
+                >
+                  <option value="">Seleccione un curso</option>
+                  {cursos.map((curso) => (
+                    <option key={curso.idCurso} value={curso.idCurso}>
+                      {curso.numero + curso.division}
+                    </option>
+                  ))}
+                </Form.Control>
+              </Form.Group>
+            </Col>
+            <Col md={6}>
+              <Form.Group className="mb-3">
+                <Form.Label>Seleccionar Fecha</Form.Label>
+                <Form.Control
+                  as="select"
+                  value={fechaSeleccionada}
+                  onChange={(e) => setFechaSeleccionada(e.target.value)}
+                  required
+                  className="form-select"
+                >
+                  <option value="">Seleccione una fecha</option>
+                  {fechasAsistencias.map((fecha, index) => (
+                    <option key={index} value={fecha}>
+                      {fecha}
+                    </option>
+                  ))}
+                </Form.Control>
+              </Form.Group>
+            </Col>
+          </Row>
+
+          {alumnos.length > 0 && (
+            <>
+              <h4 className="mt-4">Lista de Alumnos</h4>
+              <Table striped bordered hover responsive>
+                <thead>
+                  <tr>
+                    <th>Alumno</th>
+                    <th>Presente</th>
+                    <th>Media Falta</th>
+                    <th>Retiro Anticipado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {alumnos.map((alumno, index) => (
+                    <tr key={alumno.id_usuario}>
+                      <td>{alumno.nombre} {alumno.apellido}</td>
+                      <td>
+                        <Form.Check
+                          type="checkbox"
+                          checked={asistencia[index]?.asistio === 1}
+                          onChange={(e) =>
+                            handleAsistenciaChange(index, 'asistio', e.target.checked ? 1 : 0)
+                          }
+                          disabled={asistencia[index]?.mediaFalta === 1 || asistencia[index]?.retiroAntes === 1}
+                        />
+                      </td>
+                      <td>
+                        <Form.Check
+                          type="checkbox"
+                          checked={asistencia[index]?.mediaFalta === 1}
+                          onChange={(e) =>
+                            handleAsistenciaChange(index, 'mediaFalta', e.target.checked ? 1 : 0)
+                          }
+                          disabled={asistencia[index]?.asistio === 1 || asistencia[index]?.retiroAntes === 1}
+                        />
+                      </td>
+                      <td>
+                        <Form.Check
+                          type="checkbox"
+                          checked={asistencia[index]?.retiroAntes === 1}
+                          onChange={(e) =>
+                            handleAsistenciaChange(index, 'retiroAntes', e.target.checked ? 1 : 0)
+                          }
+                          disabled={asistencia[index]?.asistio === 1 || asistencia[index]?.mediaFalta === 1}
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+
+              <Button
+                variant="warning"
+                onClick={handleEditarAsistencia}
+                disabled={loading || !fechaSeleccionada}
+                className="mt-3"
+              >
+                {loading ? 'Editando...' : 'Editar Asistencia'}
+              </Button>
+            </>
+          )}
+        </Card.Body>
+      </Card>
     </div>
-  );
+ );
 };
 
 export default GestionarAsistenciaAlumnos;
