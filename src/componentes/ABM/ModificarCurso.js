@@ -44,9 +44,11 @@ const ModificarCurso = () => {
 
       // Guardamos una copia de las materias originales para comparar después
       const materiasData = response.data;
+      console.log('Materias obtenidas:', materiasData);
       setMaterias(materiasData);
       setMateriasOriginales(JSON.parse(JSON.stringify(materiasData))); // Copia profunda
       setEditingIndices({}); // Reiniciar el estado de edición
+
     } catch (error) {
       console.error('Error al cargar las materias:', error.response?.data || error.message);
     }
@@ -273,97 +275,108 @@ const ModificarCurso = () => {
         <div className="mt-4">
           <h4>Materias del Curso</h4>
           <Table striped>
-            <thead>
-              <tr>
-                <th>Día</th>
-                <th>Hora Inicio</th>
-                <th>Hora Fin</th>
-                <th>Materia</th>
-                <th>Profesor</th>
-                <th>Acción</th>
-              </tr>
-            </thead>
-            <tbody>
-              {materias.map((materia, index) => (
-                <tr key={index}>
-                  <td>
-                    {editingIndices[index] ? (
-                      <Form.Control
-                        type="text"
-                        value={materia.dia}
-                        onChange={(e) => handleMateriaChange(index, 'dia', e.target.value)}
-                      />
-                    ) : (
-                      materia.dia
-                    )}
-                  </td>
-                  <td>
-                    {editingIndices[index] ? (
-                      <Form.Control
-                        type="text"
-                        value={materia.horaInicio}
-                        onChange={(e) => handleMateriaChange(index, 'horaInicio', e.target.value)}
-                      />
-                    ) : (
-                      materia.horaInicio
-                    )}
-                  </td>
-                  <td>
-                    {editingIndices[index] ? (
-                      <Form.Control
-                        type="text"
-                        value={materia.horaFin}
-                        onChange={(e) => handleMateriaChange(index, 'horaFin', e.target.value)}
-                      />
-                    ) : (
-                      materia.horaFin
-                    )}
-                  </td>
-                  <td>
-                    {editingIndices[index] ? (
-                      <Form.Control
-                        type="text"
-                        value={materia.nombre}
-                        onChange={(e) => handleMateriaChange(index, 'nombre', e.target.value)}
-                      />
-                    ) : (
-                      materia.nombre
-                    )}
-                  </td>
-                  <td>
-                    {editingIndices[index] ? (
-                      <>
-                        <Form.Control
-                          type="text"
-                          placeholder="Nombre"
-                          value={materia.nombreProfesor}
-                          onChange={(e) => handleMateriaChange(index, 'nombreProfesor', e.target.value)}
-                          className="mb-1"
-                        />
-                        <Form.Control
-                          type="text"
-                          placeholder="Apellido"
-                          value={materia.apellidoProfesor}
-                          onChange={(e) => handleMateriaChange(index, 'apellidoProfesor', e.target.value)}
-                        />
-                      </>
-                    ) : (
-                      `${materia.nombreProfesor} ${materia.apellidoProfesor}`
-                    )}
-                  </td>
-                  <td>
-                    <Button
-                      variant={editingIndices[index] ? "success" : "primary"}
-                      size="sm"
-                      onClick={() => toggleEditing(index)}
-                    >
-                      {editingIndices[index] ? "Guardar" : "Editar"}
-                    </Button>
-                  </td>
-                </tr>
+  <thead>
+    <tr>
+      <th>Día</th>
+      <th>Hora Inicio</th>
+      <th>Hora Fin</th>
+      <th>Materia</th>
+      <th>Profesor</th>
+      <th>Acción</th>
+    </tr>
+  </thead>
+  <tbody>
+    {materias.map((materia, index) => (
+      <tr key={index}>
+        <td>
+          {editingIndices[index] ? (
+            <Form.Control
+              type="text"
+              value={materia.dia}
+              onChange={(e) => handleMateriaChange(index, 'dia', e.target.value)}
+            />
+          ) : (
+            materia.dia
+          )}
+        </td>
+        <td>
+          {editingIndices[index] ? (
+            <Form.Control
+              type="text"
+              value={materia.horaInicio}
+              onChange={(e) => handleMateriaChange(index, 'horaInicio', e.target.value)}
+            />
+          ) : (
+            materia.horaInicio
+          )}
+        </td>
+        <td>
+          {editingIndices[index] ? (
+            <Form.Control
+              type="text"
+              value={materia.horaFin}
+              onChange={(e) => handleMateriaChange(index, 'horaFin', e.target.value)}
+            />
+          ) : (
+            materia.horaFin
+          )}
+        </td>
+        <td>
+          {editingIndices[index] ? (
+            <Form.Control
+              as="select"
+              value={materia.nombre}
+              onChange={(e) => handleMateriaChange(index, 'nombre', e.target.value)}
+            >
+              <option value={materia.nombre}>{materia.nombre}</option>
+              {/* Aquí puedes agregar otras materias si las tienes disponibles */}
+              {materiasOriginales.map((materiaOriginal, idx) => (
+                materiaOriginal.nombre !== materia.nombre && (
+                  <option key={idx} value={materiaOriginal.nombre}>
+                    {materiaOriginal.nombre}
+                  </option>
+                )
               ))}
-            </tbody>
-          </Table>
+            </Form.Control>
+          ) : (
+            materia.nombre
+          )}
+        </td>
+        <td>
+          {editingIndices[index] ? (
+            <>
+              <Form.Control
+                type="text"
+                placeholder="Nombre"
+                value={materia.nombreProfesor}
+                onChange={(e) => handleMateriaChange(index, 'nombreProfesor', e.target.value)}
+                className="mb-1"
+              />
+              <Form.Control
+                type="text"
+                placeholder="Apellido"
+                value={materia.apellidoProfesor}
+                onChange={(e) => handleMateriaChange(index, 'apellidoProfesor', e.target.value)}
+              />
+            </>
+          ) : (
+            `${materia.nombreProfesor} ${materia.apellidoProfesor}`
+          )}
+        </td>
+        <td>
+          <Button
+            variant={editingIndices[index] ? "success" : "primary"}
+            size="sm"
+            onClick={() => toggleEditing(index)}
+          >
+            {editingIndices[index] ? "Guardar" : "Editar"}
+          </Button>
+        </td>
+      </tr>
+    ))}
+  </tbody>
+</Table>
+
         </div>
       )}
 
