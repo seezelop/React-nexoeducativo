@@ -6,7 +6,7 @@ function InformacionCurso() {
   const [hijos, setHijos] = useState([]); // Lista de hijos del padre
   const [hijoSeleccionado, setHijoSeleccionado] = useState(''); // Hijo seleccionado
   const [infoCurso, setInfoCurso] = useState(null); // Información del curso del hijo
-  const [loading, setLoading] = useState(false); // Estado de carga
+  const [loading, setLoading] = useState(false); // Estado de cargaaaaaaaa 
   const navigate = useNavigate();
 
   // Obtener la lista de hijos al cargar el componente
