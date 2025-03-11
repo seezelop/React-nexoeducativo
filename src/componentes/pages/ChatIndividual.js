@@ -1,51 +1,37 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Client } from "@stomp/stompjs";
-import SockJS from "sockjs-client";
+import WebSocketService from "../context/WebSocketService";
 
 const ChatIndividual = () => {
   const { mail } = useParams();
   const [mensajes, setMensajes] = useState([]);
   const [mensaje, setMensaje] = useState("");
-  const [stompClient, setStompClient] = useState(null);
 
   useEffect(() => {
-    const socket = new SockJS("http://localhost:8080/ms");
-    const client = new Client({
-      webSocketFactory: () => socket,
-      reconnectDelay: 5000,
-      onConnect: () => {
-        console.log("Conectado al WebSocket");
-        client.subscribe(`/usuario/${mail}/privado`, (message) => {
-          setMensajes((prevMensajes) => [...prevMensajes, JSON.parse(message.body)]);
-        });
-      },
+    // Conectar al WebSocket
+    WebSocketService.connect((nuevoMensaje) => {
+      setMensajes((prevMensajes) => [...prevMensajes, nuevoMensaje]);
     });
 
-    client.activate();
-    setStompClient(client);
-
     return () => {
-      client.deactivate();
+      WebSocketService.client.deactivate();
     };
-  }, [mail]);
+  }, []);
 
   const enviarMensaje = () => {
-    if (stompClient && mensaje.trim() !== "") {
-      const nuevoMensaje = {
-        comunicador: "tu_email@ejemplo.com", // Aquí debes poner el email del usuario autenticado
-        destinatario: mail,
-        contenido: mensaje,
-      };
-
-      stompClient.publish({
-        destination: "/enviar/mensajePrivado",
-        body: JSON.stringify(nuevoMensaje),
-      });
-
-      setMensajes([...mensajes, nuevoMensaje]);
-      setMensaje("");
+    if (!WebSocketService.client.connected) {
+      console.error("El cliente STOMP no está conectado");
+      return;
     }
+
+    if (mensaje.trim() === "") {
+      console.error("El mensaje no puede estar vacío");
+      return;
+    }
+
+    WebSocketService.sendMessage(mail, mensaje);
+    setMensajes([...mensajes, { comunicador: "lorencita2@gmail.com", contenido: mensaje }]);
+    setMensaje("");
   };
 
   return (
