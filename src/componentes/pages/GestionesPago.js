@@ -21,9 +21,10 @@ const GestionesPago = () => {
 
     try {
       const response = await fetch(endpoint, {
-        method: "POST" ,
+        method: "POST", 
+        credentials: 'include',
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ infoPago }),
+        body: JSON.stringify({ infoPago }, ),
       });
 
       if (response.ok) {
