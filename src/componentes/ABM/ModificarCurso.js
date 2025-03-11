@@ -200,6 +200,7 @@ const ModificarCurso = () => {
         });
         setCursos(cursosActualizados.data);
         obtenerInfoMaterias(formData.idCurso);
+        //comentario
       } else {
         alert('Error al modificar el curso.');
       }
