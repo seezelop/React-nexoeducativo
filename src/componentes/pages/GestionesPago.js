@@ -11,8 +11,8 @@ const GestionesPago = () => {
   const handleSubmit = async (tipo) => {
     const endpoint =
       tipo === "subir"
-        ? "http://localhost:8080/api/usuario/SubirInfoPago"
-        : "http://localhost:8080/api/usuario/EdtarInfoPago";
+        ? "http://localhost:8080/api/usuario/subirInfoPago"
+        : "http://localhost:8080/api/usuario/editarInfoPago";
 
     if (infoPago.length < 10 || infoPago.length > 255) {
       setMensaje("El texto debe tener entre 10 y 255 caracteres.");
@@ -21,7 +21,7 @@ const GestionesPago = () => {
 
     try {
       const response = await fetch(endpoint, {
-        method: "POST",
+        method: "POST" ,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ infoPago }),
       });
