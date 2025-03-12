@@ -14,18 +14,20 @@ const ChatIndividual = () => {
     });
 
     return () => {
-      WebSocketService.client.deactivate();
+      if (WebSocketService.client.connected) {
+        WebSocketService.client.deactivate();
+      }
     };
   }, []);
 
   const enviarMensaje = () => {
     if (!WebSocketService.client.connected) {
-      console.error("El cliente STOMP no está conectado");
+      console.error("🔴 El cliente STOMP no está conectado");
       return;
     }
 
     if (mensaje.trim() === "") {
-      console.error("El mensaje no puede estar vacío");
+      console.error("⚠️ El mensaje no puede estar vacío");
       return;
     }
 
