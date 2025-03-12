@@ -8,10 +8,10 @@ class WebSocketService {
     this.client = new Client({
       webSocketFactory: () => new SockJS(SOCKET_URL),
       connectHeaders: {
-        user: "lorencita2@gmail.com", // Reemplaza con el correo del usuario autenticado
+        user: "lorencita2@gmail.com", // Asegúrate de obtener el usuario autenticado correctamente
       },
       debug: (str) => console.log(str),
-      reconnectDelay: 5000,
+      reconnectDelay: 5000, // Reintento automático cada 5 segundos
     });
   }
 
@@ -19,8 +19,9 @@ class WebSocketService {
     this.client.onConnect = () => {
       console.log("🟢 Conectado a WebSocket");
 
-      // Suscribirse a mensajes privados
-      this.client.subscribe("/usuario/privado", (message) => {
+      // 🔄 Suscribirse a mensajes privados
+      this.client.subscribe("/user/privado", (message) => {
+        console.log("📩 Mensaje recibido:", JSON.parse(message.body));
         onMessageReceived(JSON.parse(message.body));
       });
     };
@@ -35,7 +36,7 @@ class WebSocketService {
     }
 
     const nuevoMensaje = {
-      comunicador: "lorencita2@gmail.com", // Reemplaza con el correo del usuario autenticado
+      comunicador: "lorencita2@gmail.com", // Asegúrate de obtener el usuario autenticado correctamente
       destinatario,
       contenido,
     };
