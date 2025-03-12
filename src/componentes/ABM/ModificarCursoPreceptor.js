@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Form, Button, Row, Col, Table } from 'react-bootstrap';
 import axios from 'axios';
 
-const ModificarCurso = () => {
+const ModificarCursoPreceptor = () => {
   const [cursos, setCursos] = useState([]);
   const [materias, setMaterias] = useState([]);
   const [materiasOriginales, setMateriasOriginales] = useState([]);
@@ -24,7 +24,7 @@ const ModificarCurso = () => {
   useEffect(() => {
     const fetchCursos = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/api/usuario/verCursoAdministrativo', {
+        const response = await axios.get('http://localhost:8080/api/usuario/verCursoPreceptor', {
           withCredentials: true,
         });
         setCursos(response.data);
@@ -267,6 +267,7 @@ const ModificarCurso = () => {
         <Form.Check
           type="checkbox"
           label="Curso Activo"
+        
           onChange={handleCheckboxChange}
         />
       </Form.Group>
@@ -354,4 +355,4 @@ const ModificarCurso = () => {
   );
 };
 
-export default ModificarCurso;
+export default ModificarCursoPreceptor;

@@ -43,12 +43,14 @@ import ABMNota from './componentes/ABM/ABMNota';
 import ABMComunicaciones from './componentes/ABM/ABMComunicaciones';
 import ABMEvento from './componentes/ABM/ABMEvento';
 import ABMMaterial from './componentes/ABM/ABMMaterial';
+import ABMCursoPreceptor from './componentes/ABM/ABMCursoPreceptor'
 import InformacionCurso from './componentes/pages/InformacionCurso';
 import InformacionCursoAlumno from './componentes/pages/InformacionCursoAlumno';
 import RenovarMembresia from './componentes/pages/RenovarMembresia';
 import Chats from "./componentes/pages/Chats";
 import ChatIndividual from "./componentes/pages/ChatIndividual"; 
 import GestionesPago from "./componentes/pages/GestionesPago";
+import ModificarCursoPreceptor from './componentes/ABM/ModificarCursoPreceptor';
 
 
 function App() {
@@ -118,6 +120,7 @@ function App() {
              <Route path="/ABMpadre" element={<ABMpadre />} />
              <Route path="/ABMalumno" element={<ABMalumno />} />
              <Route path="/ABMcurso" element={<ABMcurso />} />
+             <Route path="/ABMcursoPreceptor" element={<ABMCursoPreceptor />} />
              <Route path="/ABMpreceptor" element={<ABMpreceptor />} />
              <Route path="/gestiones-pago" element={<GestionesPago />} />
 
@@ -143,6 +146,7 @@ function App() {
               <Route path="/EstablecerPrecioCuota" element={<EstablecerPrecioCuota/>} />
               <Route path="/RealizarPago" element={<RealizarPago />} />
               <Route path="/HistorialPagos" element={<HistorialPagos />} />
+              <Route path="/ModificarCursoPreceptor" element={<ModificarCursoPreceptor />} />
 
 
              {/* Rutas para chats  */}

@@ -10,7 +10,7 @@ const PreceptorNavigation = () => {
         </Link>
       </li>
       <li className="nav-item me-3">
-        <Link className="nav-link active" to="/ABMcurso">
+        <Link className="nav-link active" to="/ABMcursoPreceptor">
           ABM Curso
         </Link>
       </li>
