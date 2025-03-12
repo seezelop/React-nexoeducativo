@@ -1,97 +1,124 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Button, Table } from 'react-bootstrap';
+import { Table, Alert, Spinner, Container, Button, Form } from 'react-bootstrap';
 import axios from 'axios';
 
 const GestionarAsistenciaProfesor = () => {
   const [profesores, setProfesores] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [mensaje, setMensaje] = useState('');
   const [asistencia, setAsistencia] = useState({});
 
-  // Cargar la lista de profesores al cargar el componente
-  const cargarProfesores = async () => {
-    try {
-      const response = await axios.get('http://localhost:8080/api/profesores'); // Suponiendo que esta es la ruta que devuelve los profesores
-      setProfesores(response.data);
-    } catch (error) {
-      console.error('Error al cargar los profesores:', error);
-    }
-  };
+  useEffect(() => {
+    const obtenerProfesores = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.get('http://localhost:8080/api/usuario/verProfesAdministrativo', { withCredentials: true });
+        setProfesores(response.data);
+        const asistenciaInicial = response.data.reduce((acc, profe) => {
+          acc[profe.id_usuario] = { asistio: 0, mediaFalta: 0, retiroAntes: 0 };
+          return acc;
+        }, {});
+        setAsistencia(asistenciaInicial);
+      } catch (err) {
+        setError('Error al cargar los profesores: ' + (err.response?.data || err.message));
+      } finally {
+        setLoading(false);
+      }
+    };
+    obtenerProfesores();
+  }, []);
 
-  // Manejar el cambio de asistencia
-  const handleAsistenciaChange = (idProfesor, estado) => {
-    setAsistencia({
-      ...asistencia,
-      [idProfesor]: estado
+  const handleCheckboxChange = (id_usuario, campo) => {
+    setAsistencia((prev) => {
+      const nuevoEstado = { asistio: 0, mediaFalta: 0, retiroAntes: 0 };
+      nuevoEstado[campo] = prev[id_usuario][campo] === 1 ? 0 : 1;
+      return { ...prev, [id_usuario]: nuevoEstado };
     });
   };
 
-  // Enviar la asistencia al backend
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const enviarAsistencia = async () => {
+    setLoading(true);
     try {
-      const data = { profesores: Object.entries(asistencia).map(([id, estado]) => ({ id_profesor: id, estado })) };
-      const response = await axios.post('http://localhost:8080/api/asistencia-profesor', data, { withCredentials: true });
-      if (response.status === 200) {
-        alert('Asistencia registrada con éxito!');
-      } else {
-        alert('Error al registrar la asistencia');
-      }
-    } catch (error) {
-      console.error('Error al registrar la asistencia:', error);
+      const data = {
+        alumnosCurso: Object.keys(asistencia).map((id_usuario) => ({
+          idUsuario: parseInt(id_usuario),  
+          asistio: asistencia[id_usuario].asistio,
+          mediaFalta: asistencia[id_usuario].mediaFalta,
+          retiroAntes: asistencia[id_usuario].retiroAntes,
+        })),
+      };
+      
+
+      console.log('esto se va a enviar: '+JSON.stringify(data))
+      
+      await axios.post('http://localhost:8080/api/usuario/tomarAsistenciaProfesor', data, { withCredentials: true });
+
+      setMensaje('Asistencia registrada correctamente');
+    } catch (err) {
+      setMensaje('Error al registrar la asistencia: ' + (JSON.stringify(err.response?.data) || err.message));
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Cargar profesores al montar el componente
-  useEffect(() => {
-    cargarProfesores();
-  }, []);
-
   return (
-    <section className="d-flex flex-column min-vh-100">
-      <div className="container d-flex flex-column justify-content-center align-items-center flex-grow-1">
-        
-        <h3 className="mb-4 text-center">GESTIÓN DE ASISTENCIA PROFESORES</h3>
+    <Container className="mt-4">
+      <h1 className="text-center mb-4">Gestión de Asistencia de Profesores</h1>
+      {loading && <Spinner animation="border" />}
+      {error && <Alert variant="danger">{error}</Alert>}
+      {mensaje && <Alert variant={mensaje.includes('Error') ? 'danger' : 'success'}>{mensaje}</Alert>}
 
-        <Form onSubmit={handleSubmit} className="col-md-8 mb-5">
-          <div className="card shadow-sm p-3">
-            <h4 className="mb-4">Asistencia de profesores</h4>
+      {profesores.length > 0 ? (
+        <Table striped bordered hover>
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Asistió</th>
+              <th>Media Falta</th>
+              <th>Retiro Antes</th>
+            </tr>
+          </thead>
+          <tbody>
+            {profesores.map((profesor) => (
+              <tr key={profesor.id_usuario}>
+                <td>{profesor.nombreCompleto || `${profesor.nombre} ${profesor.apellido}`}</td>
+                <td>
+                  <Form.Check
+                    type="checkbox"
+                    checked={asistencia[profesor.id_usuario]?.asistio === 1}
+                    onChange={() => handleCheckboxChange(profesor.id_usuario, 'asistio')}
+                    disabled={asistencia[profesor.id_usuario]?.mediaFalta === 1 || asistencia[profesor.id_usuario]?.retiroAntes === 1}
+                  />
+                </td>
+                <td>
+                  <Form.Check
+                    type="checkbox"
+                    checked={asistencia[profesor.id_usuario]?.mediaFalta === 1}
+                    onChange={() => handleCheckboxChange(profesor.id_usuario, 'mediaFalta')}
+                    disabled={asistencia[profesor.id_usuario]?.asistio === 1 || asistencia[profesor.id_usuario]?.retiroAntes === 1}
+                  />
+                </td>
+                <td>
+                  <Form.Check
+                    type="checkbox"
+                    checked={asistencia[profesor.id_usuario]?.retiroAntes === 1}
+                    onChange={() => handleCheckboxChange(profesor.id_usuario, 'retiroAntes')}
+                    disabled={asistencia[profesor.id_usuario]?.asistio === 1 || asistencia[profesor.id_usuario]?.mediaFalta === 1}
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      ) : (
+        !loading && <Alert variant="warning">No hay profesores disponibles</Alert>
+      )}
 
-            <Table striped bordered hover>
-              <thead>
-                <tr>
-                  <th>Profesor</th>
-                  <th>Asistencia</th>
-                </tr>
-              </thead>
-              <tbody>
-                {profesores.map((profesor) => (
-                  <tr key={profesor.id_profesor}>
-                    <td>{profesor.nombre} {profesor.apellido}</td>
-                    <td>
-                      <Form.Check
-                        type="radio"
-                        label="Presente"
-                        checked={asistencia[profesor.id_profesor] === 'presente'}
-                        onChange={() => handleAsistenciaChange(profesor.id_profesor, 'presente')}
-                      />
-                      <Form.Check
-                        type="radio"
-                        label="Ausente"
-                        checked={asistencia[profesor.id_profesor] === 'ausente'}
-                        onChange={() => handleAsistenciaChange(profesor.id_profesor, 'ausente')}
-                      />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
-
-            <Button variant="primary" type="submit">
-              Registrar Asistencia
-            </Button>
-          </div>
-        </Form>
-      </div>
-    </section>
+      <Button className="mt-3" onClick={enviarAsistencia} disabled={loading || profesores.length === 0}>
+        {loading ? 'Procesando...' : 'Registrar Asistencia'}
+      </Button>
+    </Container>
   );
 };
 
