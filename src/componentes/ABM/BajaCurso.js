@@ -36,6 +36,45 @@ class BajaCurso extends Component {
 
   // Manejar envío del formulario para eliminar la materia
   handleSubmit = async (event) => {
+    event.preventDefault();
+  
+  const { cursoSeleccionado } = this.state;
+  
+  // Validar que se haya seleccionado un curso
+  if (!cursoSeleccionado) {
+    alert('Por favor, seleccione un curso para eliminar.');
+    return;
+  }
+  
+  // Confirmación antes de eliminar
+  const confirmar = window.confirm('¿Está seguro que desea eliminar este curso? Esta acción no se puede deshacer.');
+  
+  if (confirmar) {
+    try {
+      // Llamada a la API para eliminar el curso
+      await axios.delete(`http://localhost:8080/api/usuario/borrarCurso/${cursoSeleccionado}`, {
+        withCredentials: true,
+      });
+      
+      // Actualizar la lista de cursos después de eliminar
+      this.cargarCursos();
+      
+      // Resetear la selección
+      this.setState({ cursoSeleccionado: '' });
+      
+      // Notificar al usuario
+      alert('Curso eliminado con éxito.');
+    } catch (error) {
+      console.error('Error al eliminar el curso:', error);
+      
+      // Mostrar mensaje de error específico si está disponible
+      if (error.response && error.response.data) {
+        alert(`Error: ${error.response.data.mensaje || error.response.data}`);
+      } else {
+        alert('Error al eliminar el curso. Por favor, intente nuevamente.');
+      }
+    }
+  }
   }
 
   render() {
