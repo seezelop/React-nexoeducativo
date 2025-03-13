@@ -2,6 +2,7 @@ import React from 'react';
 import AltaCurso from './AltaCurso';
 import BajaCurso from './BajaCurso';
 import ModificarCursoPreceptor from './ModificarCursoPreceptor';
+import BajaCursoPreceptor from './BajaCursoPreceptor';
 
 function ABMCursoPreceptor() {
   return (
@@ -20,7 +21,7 @@ function ABMCursoPreceptor() {
         <section className="col-md-8 mb-5">
           <div className="card shadow-sm p-3">
             <h3 className="mb-4 text-center">BAJA CURSO</h3>
-            <BajaCurso />
+            <BajaCursoPreceptor />
           </div>
         </section>
 

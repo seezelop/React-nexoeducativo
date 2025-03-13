@@ -51,6 +51,7 @@ import Chats from "./componentes/pages/Chats";
 import ChatIndividual from "./componentes/pages/ChatIndividual"; 
 import GestionesPago from "./componentes/pages/GestionesPago";
 import ModificarCursoPreceptor from './componentes/ABM/ModificarCursoPreceptor';
+import BajaCursoPreceptor from './componentes/ABM/BajaCursoPreceptor';
 
 
 function App() {
@@ -127,6 +128,7 @@ function App() {
               {/* Rutas para PRECEPTOR  */}
               <Route path="/GestionarAsistenciaAlumno" element={<GestionarAsistenciaAlumno />} />
               <Route path="/GestionarAsistenciaProfesor" element={<GestionarAsistenciaProfesor />} />
+              <Route path="/bajaCursoPreceptor" element={<BajaCursoPreceptor />} />
 
               {/* Rutas para Profesor  */}
               <Route path="/ABMtarea" element={<ABMtarea />} />
