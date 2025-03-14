@@ -52,7 +52,8 @@ import ChatIndividual from "./componentes/pages/ChatIndividual";
 import GestionesPago from "./componentes/pages/GestionesPago";
 import ModificarCursoPreceptor from './componentes/ABM/ModificarCursoPreceptor';
 import BajaCursoPreceptor from './componentes/ABM/BajaCursoPreceptor';
-
+import CantInasistenciasAlumno from './componentes/pages/CantInasistenciasAlumno';
+import CantInasistencias from './componentes/pages/CantInasistencias';
 
 function App() {
   return (
@@ -94,6 +95,9 @@ function App() {
             <Route path="/header" element={<Header />} />
             <Route path="/ABMJefeColegio" element={<ABMJefeColegio />} />
             <Route path="/consultar-escuelas" element={<ConsultarEscuelas />} />
+            <Route path="/cantInasistenciasAlumno" element={<CantInasistenciasAlumno />} />
+            <Route path="/cantInasistencias" element={<CantInasistencias />} />
+            
 
 
 

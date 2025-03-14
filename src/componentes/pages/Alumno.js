@@ -8,6 +8,10 @@ function Alumno() {
     navigate('/InformacionCursoAlumno');
   };
 
+  const irAInasistencias = () => {
+    navigate('/cantInasistenciasAlumno');
+  };
+
   return (
     <section className="d-flex flex-column min-vh-100">
       <div className="container flex-grow-1">
@@ -19,7 +23,7 @@ function Alumno() {
           <button className="btn btn-secondary">Notificación Privada</button>
           <button className="btn btn-info" onClick={irAInformacionCurso}>Información del Curso</button>
           <button className="btn btn-warning">Enviar Mensaje Privado</button>
-          <button className="btn btn-danger">Cantidad de Faltas</button>
+          <button className="btn btn-danger"onClick={irAInasistencias}>Cantidad de Faltas</button>
         </div>
       </div>
     </section>
