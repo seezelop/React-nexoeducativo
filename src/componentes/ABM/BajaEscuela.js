@@ -97,6 +97,7 @@ class BajaEscuela extends Component {
                                         <Dropdown.Item
                                             key={escuela.id_escuela}
                                             eventKey={JSON.stringify({ id_escuela: escuela.id_escuela, nombre: escuela.nombre })}
+                                            className="text-dark"  // COLOR NEGRO PARA LOS TEXTOS DEL DESPLEGABLE
                                         >
                                             {escuela.nombre}
                                         </Dropdown.Item>
