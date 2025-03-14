@@ -9,12 +9,9 @@ const GestionesPago = () => {
     setInfoPago(e.target.value);
   };
 
-  // Maneja la solicitud HTTP
-  const handleSubmit = async (tipo) => {
-    const endpoint =
-      tipo === "subir"
-        ? "http://localhost:8080/api/usuario/subirInfoPago"
-        : "http://localhost:8080/api/usuario/editarInfoPago";
+  // Maneja la solicitud HTTP - simplificado solo para subir
+  const handleSubmit = async () => {
+    const endpoint = "http://localhost:8080/api/usuario/subirInfoPago";
 
     // Validación de longitud del texto
     if (infoPago.length < 10 || infoPago.length > 255) {
@@ -23,20 +20,15 @@ const GestionesPago = () => {
     }
 
     try {
-      // Determina el método HTTP según el tipo de operación
-      const method = tipo === "subir" ? "POST" : "PATCH";
-
       const response = await fetch(endpoint, {
-        method: method, // Usa POST o PATCH dinámicamente
+        method: "POST",
         credentials: "include", // Incluye cookies si es necesario
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ infoPago }),
+        body: JSON.stringify(infoPago), // Enviamos directamente el string
       });
 
       if (response.ok) {
-        setMensaje(
-          `Información de pago ${tipo === "subir" ? "subida" : "editada"} correctamente.`
-        );
+        setMensaje("Información de pago subida correctamente.");
       } else {
         const errorData = await response.json(); // Intenta obtener detalles del error
         setMensaje(errorData.message || "Hubo un error, inténtalo nuevamente.");
@@ -57,20 +49,12 @@ const GestionesPago = () => {
         rows="5"
       ></textarea>
       <div className="mt-3">
-        {/* Botón para subir información */}
+        {/* Solo botón para subir información */}
         <button
-          className="btn btn-success me-2"
-          onClick={() => handleSubmit("subir")}
+          className="btn btn-success"
+          onClick={handleSubmit}
         >
           Subir Información
-        </button>
-
-        {/* Botón para editar información */}
-        <button
-          className="btn btn-warning"
-          onClick={() => handleSubmit("editar")}
-        >
-          Editar Información
         </button>
       </div>
 
