@@ -31,7 +31,7 @@ function BajaEvento() {
   const cargarCursos = async () => {
     setCargando(true);
     setMensaje(null);
-    
+
     try {
       const response = await axios.get('http://localhost:8080/api/usuario/verCursoProfesor', {
         withCredentials: true
@@ -50,7 +50,7 @@ function BajaEvento() {
   const cargarEventos = async (idCurso) => {
     setCargando(true);
     setMensaje(null);
-    
+
     try {
       const response = await axios.get(`http://localhost:8080/api/usuario/verEventos/${idCurso}`, {
         withCredentials: true
@@ -76,35 +76,35 @@ function BajaEvento() {
     // Obtener información del evento seleccionado para la confirmación
     const eventoAEliminar = eventos.find(evento => evento.idEvento.toString() === eventoSeleccionado.toString());
     const nombreEvento = eventoAEliminar ? eventoAEliminar.nombre || `ID: ${eventoSeleccionado}` : `ID: ${eventoSeleccionado}`;
-    
+
     // Confirmación antes de eliminar
     const confirmar = window.confirm(`¿Está seguro que desea eliminar el evento? Esta acción no se puede deshacer.`);
-    
+
     if (confirmar) {
       setCargando(true);
       setMensaje(null);
-      
+
       try {
         await axios.delete(`http://localhost:8080/api/usuario/borrarEvento/${eventoSeleccionado}`, {
           withCredentials: true
         });
-        
+
         // Recargar eventos después de eliminar
         await cargarEventos(cursoSeleccionado);
-        
+
         setEventoSeleccionado('');
         setMensaje(`El evento ha sido eliminado con éxito.`);
         setTipoMensaje('success');
         setCargando(false);
       } catch (error) {
         console.error('Error al eliminar el evento:', error);
-        
+
         // Mostrar mensaje de error específico si está disponible
         let mensajeError = 'Error al eliminar el evento. Por favor, intente nuevamente.';
         if (error.response && error.response.data) {
           mensajeError = `Error: ${error.response.data.mensaje || JSON.stringify(error.response.data)}`;
         }
-        
+
         setMensaje(mensajeError);
         setTipoMensaje('danger');
         setCargando(false);
@@ -124,7 +124,7 @@ function BajaEvento() {
           {mensaje}
         </Alert>
       )}
-      
+
       <Form onSubmit={handleSubmit}>
         {/* Selector de Curso */}
         <Form.Group className="mb-3">
@@ -148,34 +148,34 @@ function BajaEvento() {
           <Form.Group className="mb-3">
             <Form.Label>Seleccionar Evento</Form.Label>
             {eventos.length > 0 ? (
-           <Card className="border-light bg-transparent">
-           <ListGroup variant="flush" className="bg-transparent">
-             {eventos.map((evento) => (
-               <ListGroup.Item 
-                 key={evento.idEvento}
-                 action
-                 active={eventoSeleccionado === evento.idEvento.toString()}
-                 onClick={() => setEventoSeleccionado(evento.idEvento.toString())}
-                 disabled={cargando}
-                 style={{
-                   backgroundColor: eventoSeleccionado === evento.idEvento.toString() ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
-                   color: 'white',
-                   border: 'none' // Elimina posibles bordes blancos
-                 }}
-                 className="border-0 text-white bg-transparent"
-               >
-                 <div className="d-flex justify-content-between align-items-center">
-                   <div>
-                     <strong>{evento.descripcion || 'Evento sin nombre'}</strong>                   </div>
-                   <div>
-                     <small>{evento.fecha}</small>
-                   </div>
-                 </div>
-               </ListGroup.Item>
-             ))}
-           </ListGroup>
-         </Card>
-         
+              <Card className="border-light bg-transparent">
+                <ListGroup variant="flush" className="bg-transparent">
+                  {eventos.map((evento) => (
+                    <ListGroup.Item
+                      key={evento.idEvento}
+                      action
+                      active={eventoSeleccionado === evento.idEvento.toString()}
+                      onClick={() => setEventoSeleccionado(evento.idEvento.toString())}
+                      disabled={cargando}
+                      style={{
+                        backgroundColor: eventoSeleccionado === evento.idEvento.toString() ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
+                        color: 'white',
+                        border: 'none' // Elimina posibles bordes blancos
+                      }}
+                      className="border-0 text-white bg-transparent"
+                    >
+                      <div className="d-flex justify-content-between align-items-center">
+                        <div>
+                          <strong>{evento.descripcion && evento.descripcion.trim() !== '' ? evento.descripcion : 'Evento sin nombre'}</strong>
+                        </div>
+                        <div>
+                          <small>{evento.fecha}</small>
+                        </div>
+                      </div>
+                    </ListGroup.Item>
+                  ))}
+                </ListGroup>
+              </Card>
             ) : (
               <Alert variant="info">
                 No hay eventos disponibles para este curso.
@@ -184,8 +184,9 @@ function BajaEvento() {
           </Form.Group>
         )}
 
+
         {/* Botón de eliminar */}
-        <Button 
+        <Button
           type="submit"
           variant="danger"
           disabled={cargando || !eventoSeleccionado}
