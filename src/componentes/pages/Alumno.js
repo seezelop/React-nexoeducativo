@@ -19,11 +19,7 @@ function Alumno() {
         <p className="mb-5">Consulta el progreso académico y la asistencia en esta sección.</p>
 
         <div className="d-flex flex-wrap justify-content-center gap-3">
-          <button className="btn btn-primary">Novedades</button>
-          <button className="btn btn-secondary">Notificación Privada</button>
-          <button className="btn btn-info" onClick={irAInformacionCurso}>Información del Curso</button>
-          <button className="btn btn-warning">Enviar Mensaje Privado</button>
-          <button className="btn btn-danger"onClick={irAInasistencias}>Cantidad de Faltas</button>
+          
         </div>
       </div>
     </section>
