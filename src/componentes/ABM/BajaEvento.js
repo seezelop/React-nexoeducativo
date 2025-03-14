@@ -166,9 +166,7 @@ function BajaEvento() {
                >
                  <div className="d-flex justify-content-between align-items-center">
                    <div>
-                     <strong>{evento.descripcion || 'Evento sin nombre'}</strong>
-                     {evento.descripcion && <div><small>{evento.descripcion}</small></div>}
-                   </div>
+                     <strong>{evento.descripcion || 'Evento sin nombre'}</strong>                   </div>
                    <div>
                      <small>{evento.fecha}</small>
                    </div>

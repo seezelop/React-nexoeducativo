@@ -9,7 +9,7 @@ function RealizarPago() {
   // Cargar los datos guardados por el administrativo
   useEffect(() => {
     const detalleGuardado = localStorage.getItem("detalleCuota");
-    const precioGuardado = localStorage.getItem("precioCuota");
+    const precioGuardado = localStorage.getItem("precioCuota"); //establecerpreciocuota.js
 
     if (detalleGuardado && precioGuardado) {
       setDetalle(detalleGuardado);

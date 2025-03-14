@@ -43,6 +43,7 @@ app.post('/crear-preferencia', async (req, res) => {
 // Rutas de éxito y fracaso del pago
 app.get('/pago-exitoso', (req, res) => {
   res.send('Pago realizado con éxito');
+  console.log('INFORMACION DE LA REQUEST RECIBIDA: '+JSON.stringify(req))
 });
 
 app.get('/pago-fallido', (req, res) => {
