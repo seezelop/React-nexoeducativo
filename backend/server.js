@@ -19,7 +19,7 @@ app.post('/crear-preferencia', async (req, res) => {
   const preference = {
     items: items, // Aquí se incluyen los productos para la preferencia
     back_urls: {
-      success: 'http://localhost:3000/pago-exitoso', // URL de éxito
+      success: 'http://localhost:3000/padre', // URL de éxito
       failure: 'http://localhost:3000/pago-fallido', // URL de fallo
     },
     auto_return: 'approved',
@@ -41,8 +41,9 @@ app.post('/crear-preferencia', async (req, res) => {
 });
 
 // Rutas de éxito y fracaso del pago
-app.get('/pago-exitoso', (req, res) => {
+app.get('/padre', (req, res) => {
   res.send('Pago realizado con éxito');
+  alert('listorti')
   console.log('INFORMACION DE LA REQUEST RECIBIDA: '+JSON.stringify(req))
 });
 
