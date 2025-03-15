@@ -4,14 +4,33 @@ import UserNavigation from "./UserNavigation";
 
 const AlumnoNavigation = () => {
   return (
-    <>
-      <UserNavigation /> {/* Renderiza la navegación de usuario */}
-      <li className="nav-item me-3">
-        <Link className="nav-link active" to="/Alumno">
-          Mi perfil
-        </Link>
-      </li>
-    </>
+   <>
+         <li className="nav-item me-3">
+           <Link className="nav-link active">
+             Novedades
+           </Link>
+         </li>
+         <li className="nav-item me-3">
+           <Link className="nav-link active">
+             Notificacion privada
+           </Link>
+         </li>
+         <li className="nav-item me-3">
+           <Link className="nav-link active" to="/InformacionCurso">
+             Informacion del curso
+           </Link>
+         </li>
+         <li className="nav-item me-3">
+           <Link className="nav-link active">
+             Enviar mensaje privado
+           </Link>
+         </li>
+         <li className="nav-item me-3">
+           <Link className="nav-link active" to="/cantInasistenciasAlumno">
+             Cantidad de faltas
+           </Link>
+         </li>
+       </>
   );
 };
 

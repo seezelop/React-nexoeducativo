@@ -6,10 +6,9 @@ function InformacionCurso() {
   const [hijos, setHijos] = useState([]); // Lista de hijos del padre
   const [hijoSeleccionado, setHijoSeleccionado] = useState(''); // Hijo seleccionado
   const [infoCurso, setInfoCurso] = useState(null); // Información del curso del hijo
-  const [loading, setLoading] = useState(false); // Estado de cargaaaaaaaa 
+  const [loading, setLoading] = useState(false); // Estado de carga
   const navigate = useNavigate();
 
-  // Obtener la lista de hijos al cargar el componente
   useEffect(() => {
     const obtenerHijos = async () => {
       try {
@@ -23,7 +22,6 @@ function InformacionCurso() {
     obtenerHijos();
   }, []);
 
-  // Obtener la información del curso del hijo seleccionado automáticamente
   useEffect(() => {
     if (!hijoSeleccionado) {
       setInfoCurso(null);
@@ -47,66 +45,97 @@ function InformacionCurso() {
 
   return (
     <section className="d-flex flex-column min-vh-100">
-      <div className="container flex-grow-1">
-        <h1 className="mb-4">Información del Curso</h1>
-        <p className="mb-5">Seleccione un hijo para ver la información de su curso.</p>
+      <div className="container d-flex flex-column justify-content-center align-items-center flex-grow-1">
+        
+        <section className="col-md-8 mb-5">
+          <div className="card shadow-sm p-3"> {/* Tarjeta con fondo claro */}
+            <h1 className="mb-4 text-center">Información del Curso</h1>
+            <p className="mb-4 text-center">Seleccione un hijo para ver la información de su curso.</p>
 
-        <div className="mb-4">
-          <label htmlFor="hijoSeleccionado" className="form-label">Seleccione un hijo:</label>
-          <select
-            id="hijoSeleccionado"
-            className="form-select"
-            value={hijoSeleccionado}
-            onChange={(e) => setHijoSeleccionado(e.target.value)}
-          >
-            <option value="">Seleccione un hijo</option>
-            {hijos.map((hijo) => (
-              <option key={hijo.idUsuario} value={hijo.idUsuario}>
-                {hijo.nombre} {hijo.apellido}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {loading && <p>Cargando información...</p>}
-
-        {infoCurso && infoCurso.length > 0 && (
-          <div className="border p-3 rounded">
-            <h3>Notas</h3>
-            {infoCurso[0].notas.length > 0 ? (
-              <ul>
-                {infoCurso[0].notas.map((nota, index) => (
-                  <li key={index}>
-                    <strong>Materia:</strong> {nota.nombre} <br />
-                    <strong>Tarea:</strong> {nota.descripcion} <br />
-                    <strong>Nota:</strong> {nota.nota} <br />
-                    <strong>Profesor:</strong> {nota.nombreP} {nota.apellidoP}
-                  </li>
+            <div className="mb-4">
+              <label htmlFor="hijoSeleccionado" className="form-label">Seleccione un hijo:</label>
+              <select
+                id="hijoSeleccionado"
+                className="form-select text-dark"
+                value={hijoSeleccionado}
+                onChange={(e) => setHijoSeleccionado(e.target.value)}
+              >
+                <option value="">Seleccione un hijo</option>
+                {hijos.map((hijo) => (
+                  <option key={hijo.idUsuario} value={hijo.idUsuario}>
+                    {hijo.nombre} {hijo.apellido}
+                  </option>
                 ))}
-              </ul>
-            ) : (
-              <p>No hay notas registradas.</p>
+              </select>
+            </div>
+
+            {loading && <p className="text-center">Cargando información...</p>}
+
+            {infoCurso && infoCurso.length > 0 && (
+              <div className="border p-3 rounded"> {/* Cuadro de información con bordes redondeados */}
+                <h3 className="text-center">Notas</h3>
+                {infoCurso[0].notas.length > 0 ? (
+                  <div className="table-responsive">
+                    <table className="table table-bordered">
+                      <thead className="table-dark">
+                        <tr>
+                          <th>Materia</th>
+                          <th>Tarea</th>
+                          <th>Nota</th>
+                          <th>Profesor</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {infoCurso[0].notas.map((nota, index) => (
+                          <tr key={index}>
+                            <td>{nota.nombre}</td>
+                            <td>{nota.descripcion}</td>
+                            <td>{nota.nota}</td>
+                            <td>{nota.nombreP} {nota.apellidoP}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <p className="text-center">No hay notas registradas.</p>
+                )}
+
+                <h3 className="text-center mt-4">Eventos</h3>
+                {infoCurso[0].eventos.length > 0 ? (
+                  <div className="table-responsive">
+                    <table className="table table-bordered">
+                      <thead className="table-dark">
+                        <tr>
+                          <th>Descripción</th>
+                          <th>Fecha</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {infoCurso[0].eventos.map((evento, index) => (
+                          <tr key={index}>
+                            <td>{evento.descripcion}</td>
+                            <td>{evento.fecha}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : (
+                  <p className="text-center">No hay eventos registrados.</p>
+                )}
+              </div>
             )}
 
-            <h3>Eventos</h3>
-            {infoCurso[0].eventos.length > 0 ? (
-              <ul>
-                {infoCurso[0].eventos.map((evento, index) => (
-                  <li key={index}>
-                    <strong>Descripción:</strong> {evento.descripcion} <br />
-                    <strong>Fecha:</strong> {evento.fecha}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <p>No hay eventos registrados.</p>
-            )}
+            <div className="d-grid gap-2 mt-4">
+              <button className="btn btn-primary" onClick={() => navigate(-1)}> {/* Botón estilizado */}
+                Volver
+              </button>
+            </div>
+
           </div>
-        )}
+        </section>
 
-        <button className="btn btn-secondary mt-4" onClick={() => navigate(-1)}>
-          Volver
-        </button>
       </div>
     </section>
   );

@@ -16,7 +16,10 @@ class ModificarEscuela extends Component {
     };
   }
 
-  // Cargar las escuelas disponibles
+  componentDidMount() {
+    this.cargarEscuelas();
+  }
+
   cargarEscuelas = async () => {
     try {
       const response = await axios.get('http://localhost:8080/api/usuario/getEscuelas', {
@@ -32,44 +35,29 @@ class ModificarEscuela extends Component {
     }
   };
 
-  // Al montar el componente, cargar las escuelas
-  componentDidMount() {
-    this.cargarEscuelas();
-  }
-
-  // Manejar cambios en el dropdown
   handleDropdownChange = (value) => {
     const parsedValue = JSON.parse(value);
     this.setState({
       escuelaSeleccionada: parsedValue.nombre,
       id_escuela: parsedValue.id_escuela,
-      nombre: '', // Campos inicializados vacíos
+      nombre: '',
       direccion: '',
       activo: false,
       plan_id_plan: null,
     });
   };
 
-  // Manejar cambios en los campos del formulario
   handleInputChange = (event) => {
     const { id, value, type, checked } = event.target;
     this.setState({ [id]: type === 'checkbox' ? checked : value });
   };
 
-  // Manejar envío del formulario
   handleSubmit = async (event) => {
     event.preventDefault();
     const { id_escuela, nombre, direccion, activo, plan_id_plan } = this.state;
 
     try {
-      // Transformar `activo` a 1 o 0 según su valor
-      const datos = {
-        nombre,
-        direccion,
-        activo: activo ? 1 : 0, // Transformar booleano a short
-        plan_id_plan,
-      };
-
+      const datos = { nombre, direccion, activo: activo ? 1 : 0, plan_id_plan };
       const response = await axios.patch(
         `http://localhost:8080/api/usuario/modificarEscuela/${id_escuela}`,
         datos,
@@ -78,7 +66,7 @@ class ModificarEscuela extends Component {
 
       if (response.status === 200) {
         alert('Escuela modificada exitosamente!');
-        this.cargarEscuelas(); // Actualizar lista de escuelas si es necesario
+        this.cargarEscuelas();
       }
     } catch (error) {
       console.error('Error al modificar la escuela:', error);
@@ -92,16 +80,14 @@ class ModificarEscuela extends Component {
     return (
       <section className="d-flex flex-column min-vh-100">
         <div className="container d-flex flex-column justify-content-center align-items-center flex-grow-1">
-
-          {/* Sección Modificación Escuela */}
+          
           <section className="col-md-8 mb-5">
-            <div className="card shadow-sm p-3">
-              <h3 className="mb-4 text-center">MODIFICACIÓN ESCUELA</h3>
+            <div className="card shadow-sm p-3"> 
+              <h3 className="mb-4 text-center">SELECCIONAR ESCUELA</h3>
 
               <Form onSubmit={this.handleSubmit}>
-                {/* Dropdown para seleccionar la escuela */}
                 <div className="mb-4">
-                  <label htmlFor="dropdown-basic-button" className="form-label">Seleccionar escuela:</label>
+                  <label htmlFor="dropdown-basic-button" className="form-label">Desplegable:</label>
                   <DropdownButton
                     id="dropdown-basic-button"
                     title={escuelaSeleccionada}
@@ -111,6 +97,7 @@ class ModificarEscuela extends Component {
                       <Dropdown.Item
                         key={escuela.id_escuela}
                         eventKey={JSON.stringify({ id_escuela: escuela.id_escuela, nombre: escuela.nombre })}
+                        className="text-dark"  // COLOR NEGRO PARA LOS TEXTOS DEL DESPLEGABLE
                       >
                         {escuela.nombre}
                       </Dropdown.Item>
@@ -118,7 +105,6 @@ class ModificarEscuela extends Component {
                   </DropdownButton>
                 </div>
 
-                {/* Formulario para modificar la escuela, visible solo si se seleccionó una escuela */}
                 {id_escuela && (
                   <>
                     <div className="mb-3">
@@ -178,7 +164,6 @@ class ModificarEscuela extends Component {
               </Form>
             </div>
           </section>
-
         </div>
       </section>
     );

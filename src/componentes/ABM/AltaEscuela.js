@@ -179,6 +179,7 @@ class AltaEscuela extends Component {
                                         <Dropdown.Item
                                             key={plan.idPlan}
                                             eventKey={JSON.stringify({ id: plan.idPlan, nombre: plan.descripcion })}
+                                            className="text-dark"  // COLOR NEGRO PARA LOS TEXTOS DEL DESPLEGABLE
                                         >
                                             {plan.descripcion}
                                         </Dropdown.Item>
@@ -198,6 +199,7 @@ class AltaEscuela extends Component {
                                         <Dropdown.Item
                                             key={jefe.id_usuario}
                                             eventKey={JSON.stringify({ id: jefe.id_usuario, nombre: jefe.nombre })}
+                                            className="text-dark"  // COLOR NEGRO PARA LOS TEXTOS DEL DESPLEGABLE
                                         >
                                             {jefe.nombre}
                                         </Dropdown.Item>
