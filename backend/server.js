@@ -42,10 +42,30 @@ app.post('/crear-preferencia', async (req, res) => {
 
 // Rutas de éxito y fracaso del pago
 app.get('/padre', (req, res) => {
-  res.send('Pago realizado con éxito');
-  alert('listorti')
-  console.log('INFORMACION DE LA REQUEST RECIBIDA: '+JSON.stringify(req))
-});
+  const importe = req.query.importe; // Debería ser un número
+  const usuarioId = req.query.usuarioId; // Debería ser el id del usuario
+
+  console.log(`Importe recibido: ${importe}`);
+  console.log(`Usuario ID recibido: ${usuarioId}`);
+
+  if (importe) {
+    // Llamar al backend para generar el comprobante de pago
+    axios.post('http://localhost:8080/api/usuario/generarComprobante', {
+      importe: importe,
+      idUsuario: usuarioId
+    })
+    .then(response => {
+      // Si el comprobante fue generado exitosamente
+      res.send(`Pago realizado con éxito. Comprobante generado: ${response.data}`);
+    })
+    .catch(error => {
+      console.error('Error al generar el comprobante:', error);
+      res.status(500).send('Hubo un error al generar el comprobante.');
+    });
+  } else {
+    res.send('No se ha proporcionado el importe.');
+  }
+})
 
 app.get('/pago-fallido', (req, res) => {
   res.send('Hubo un error con el pago');
