@@ -16,7 +16,7 @@ const AlumnoNavigation = () => {
            </Link>
          </li>
          <li className="nav-item me-3">
-           <Link className="nav-link active" to="/InformacionCurso">
+           <Link className="nav-link active" to="/InformacionCursoAlumno">
              Informacion del curso
            </Link>
          </li>
