@@ -47,24 +47,8 @@ app.get('/padre', (req, res) => {
 
   console.log(`Importe recibido: ${importe}`);
   console.log(`Usuario ID recibido: ${usuarioId}`);
+  console.log('infoo '+res)
 
-  if (importe) {
-    // Llamar al backend para generar el comprobante de pago
-    axios.post('http://localhost:8080/api/usuario/generarComprobante', {
-      importe: importe,
-      idUsuario: usuarioId
-    })
-    .then(response => {
-      // Si el comprobante fue generado exitosamente
-      res.send(`Pago realizado con éxito. Comprobante generado: ${response.data}`);
-    })
-    .catch(error => {
-      console.error('Error al generar el comprobante:', error);
-      res.status(500).send('Hubo un error al generar el comprobante.');
-    });
-  } else {
-    res.send('No se ha proporcionado el importe.');
-  }
 })
 
 app.get('/pago-fallido', (req, res) => {
