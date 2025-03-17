@@ -15,6 +15,7 @@ const Chats = () => {
         });
 
         if (Array.isArray(response.data)) {
+          //console.log('INFO DATAA: '+JSON.stringify(response.data))
           setUsuarios(response.data);
         } else {
           setError("Datos de usuarios no válidos");
