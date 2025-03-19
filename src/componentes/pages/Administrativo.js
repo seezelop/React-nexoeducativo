@@ -26,7 +26,7 @@ const Administrativo = () => {
           </button>
           {/* Botón para gestiones de pago */}
           <button className="btn btn-success" onClick={redirectToGestionesPago}>
-            Gestiones de Pago
+           Informacion de Pago
           </button>
         </div>
       </div>
