@@ -5,7 +5,7 @@ const JefeColegioNavigation = () => {
   const navigate = useNavigate();  // Hook para redirigir a otra página
 
   const redirigirARenovar = () => {
-    navigate('/renovar-membresia');  // Redirige a la ruta de renovación
+    navigate('/RenovarMembresia');  // Redirige a la ruta de renovación
   };
 
   return (

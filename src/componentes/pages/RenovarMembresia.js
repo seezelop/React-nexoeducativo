@@ -35,6 +35,7 @@ const RenovarMembresia = () => {
       const response = await axios.post("http://localhost:8080/api/usuario/renovarMembresia", { plan: selectedPlan }, {
         withCredentials: true,
       });
+      console.log('infoo: '+response.data)
       if (response.status === 200) {
         alert("Membresía renovada exitosamente.");
         navigate('/JefeColegio');  // Redirige a la página de jefe colegio después de renovar membresia
@@ -62,8 +63,8 @@ const RenovarMembresia = () => {
           >
             <option value="">Seleccione un plan</option>
             {planes.map((plan) => (
-              <option key={plan.id} value={plan.id}>
-                {plan.nombre} - {plan.descripcion}
+              <option key={plan.idPlan} value={plan.idPlan}>
+                {plan.descripcion}
               </option>
             ))}
           </Form.Select>
