@@ -25,6 +25,11 @@ const PadreNavigation = () => {
               Enviar Mensaje privado
             </Link>
           </li>
+          <li className="nav-item me-3">
+        <Link className="nav-link active" to="/padre">
+          Mi Perfil
+        </Link>
+      </li>
         </>
   );
 };

@@ -46,13 +46,15 @@ const Chats = () => {
         <ul>
           {usuarios.map((usuario) => (
             <li key={usuario.mail}>
-              {usuario.nombre} - {usuario.apellido} - {usuario.mail}
+              {usuario.nombre} {usuario.apellido} - {usuario.mail}
               <button onClick={() => iniciarChat(usuario)}>Chatear</button>
             </li>
           ))}
         </ul>
       )}
+      <h3> Editar mensajes enviados</h3>
     </div>
+    
   );
 };
 

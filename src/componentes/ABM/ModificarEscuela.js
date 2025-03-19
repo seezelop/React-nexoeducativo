@@ -78,7 +78,7 @@ class ModificarEscuela extends Component {
     const { escuelaSeleccionada, escuelas, nombre, direccion, activo, plan_id_plan, id_escuela } = this.state;
 
     return (
-      <section className="d-flex flex-column min-vh-100">
+      <section className="d-flex flex-column">
         <div className="container d-flex flex-column justify-content-center align-items-center flex-grow-1">
           
           <section className="col-md-8 mb-5">
@@ -87,7 +87,7 @@ class ModificarEscuela extends Component {
 
               <Form onSubmit={this.handleSubmit}>
                 <div className="mb-4">
-                  <label htmlFor="dropdown-basic-button" className="form-label">Desplegable:</label>
+                  <label htmlFor="dropdown-basic-button" className="form-label">Escuela:</label>
                   <DropdownButton
                     id="dropdown-basic-button"
                     title={escuelaSeleccionada}
