@@ -83,7 +83,7 @@ class ModificarEscuela extends Component {
           
           <section className="col-md-8 mb-5">
             <div className="card shadow-sm p-3"> 
-              <h3 className="mb-4 text-center">SELECCIONAR ESCUELA</h3>
+              <h3 className="mb-4 text-center">Seleccionar escuela</h3>
 
               <Form onSubmit={this.handleSubmit}>
                 <div className="mb-4">

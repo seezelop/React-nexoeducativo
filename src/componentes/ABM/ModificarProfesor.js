@@ -215,7 +215,9 @@ class ModificarProfesor extends Component {
                                             eventKey={JSON.stringify({
                                                 idUsuario: profesor.idUsuario,
                                                 nombre: profesor.nombre,
-                                            })}
+                                            }
+                                        )}
+                                        style={{ color: 'black' }} // Estilo para texto negro
                                         >
                                             {profesor.nombre}
                                         </Dropdown.Item>

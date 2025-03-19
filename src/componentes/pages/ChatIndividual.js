@@ -5,21 +5,20 @@ import { Container, Card, Form, Button, ListGroup } from "react-bootstrap";
 import { FaEdit, FaTrash, FaCheck, FaTimes } from "react-icons/fa";
 
 const ChatIndividual = () => {
-  const { mail } = useParams(); // Usuario seleccionado
+  const { mail } = useParams();
   const [mensajes, setMensajes] = useState([]);
   const [mensaje, setMensaje] = useState("");
   const [editandoId, setEditandoId] = useState(null);
   const [nuevoContenido, setNuevoContenido] = useState("");
-  const [userEmail, setUserEmail] = useState(""); // Correo del usuario logueado
+  const [userEmail, setUserEmail] = useState("");
 
-  // Obtener el correo del usuario logueado
   useEffect(() => {
     const obtenerUsuarioAutenticado = async () => {
       try {
         const response = await axios.get("http://localhost:8080/api/usuario/usuarioLogueado", {
           withCredentials: true,
         });
-        setUserEmail(response.data); // Suponiendo que el backend devuelve el correo del usuario
+        setUserEmail(response.data);
       } catch (error) {
         console.error("Error al obtener el usuario autenticado:", error);
       }
@@ -28,7 +27,6 @@ const ChatIndividual = () => {
     obtenerUsuarioAutenticado();
   }, []);
 
-  // Cargar mensajes
   useEffect(() => {
     const cargarMensajes = async () => {
       try {
@@ -36,11 +34,7 @@ const ChatIndividual = () => {
           `http://localhost:8080/obtenerMensajesEntreUsuarios/${mail}`,
           { withCredentials: true }
         );
-        if (response.status === 204) {
-          setMensajes([]); // Si no hay contenido, se deja vacío
-        } else {
-          setMensajes(response.data);
-        }
+        setMensajes(response.status === 204 ? [] : response.data);
       } catch (error) {
         console.error("Error al cargar los mensajes:", error);
       }
@@ -49,10 +43,8 @@ const ChatIndividual = () => {
     cargarMensajes();
   }, [mail]);
 
-  // Enviar mensaje
   const enviarMensaje = async () => {
-    if (!mensaje.trim()) return;
-    if (mensaje.length < 2 || mensaje.length > 255) {
+    if (!mensaje.trim() || mensaje.length < 2 || mensaje.length > 255) {
       alert("El mensaje debe tener entre 2 y 255 caracteres.");
       return;
     }
@@ -72,19 +64,13 @@ const ChatIndividual = () => {
     }
   };
 
-  // Editar mensaje
   const editarMensaje = async (idMensaje, nuevoContenido) => {
     try {
-      await axios.patch(
-        `http://localhost:8080/editarMensajePrivado/${idMensaje}`,
-        nuevoContenido,
-        {
-          headers: { "Content-Type": "text/plain" },
-          withCredentials: true,
-        }
-      );
+      await axios.patch(`http://localhost:8080/editarMensajePrivado/${idMensaje}`, nuevoContenido, {
+        headers: { "Content-Type": "text/plain" },
+        withCredentials: true,
+      });
 
-      // Actualizar el estado de los mensajes
       setMensajes(mensajes.map((msg) =>
         msg.idMensaje === idMensaje ? { ...msg, contenido: nuevoContenido } : msg
       ));
@@ -94,11 +80,9 @@ const ChatIndividual = () => {
     }
   };
 
-  // Borrar mensaje
   const borrarMensaje = async (idMensaje) => {
     try {
       await axios.delete(`http://localhost:8080/borrarMensaje/${idMensaje}`, { withCredentials: true });
-
       setMensajes(mensajes.filter((msg) => msg.idMensaje !== idMensaje));
     } catch (error) {
       console.error("Error al borrar el mensaje:", error);
@@ -106,59 +90,150 @@ const ChatIndividual = () => {
   };
 
   return (
-    <Container className="mt-4">
-      <Card>
-        <Card.Header as="h5">Chat con usuario {mail}</Card.Header>
-        <Card.Body>
-          <ListGroup>
+    <Container className="mt-5 d-flex justify-content-center">
+      <Card style={{
+        width: "60%",
+        boxShadow: "0 8px 15px rgba(0, 0, 0, 0.1)",
+        borderRadius: "20px",
+        border: "none",
+        backgroundColor: "#f9fafb"
+      }}>
+        {/* Header */}
+        <Card.Header as="h5" className="text-center bg-gradient-primary text-white" 
+          style={{ 
+            borderTopLeftRadius: "20px", 
+            borderTopRightRadius: "20px", 
+            padding: "15px", 
+            fontSize: "1.5rem",
+            background: "linear-gradient(90deg, #6a11cb, #2575fc)"
+          }}>
+          Chat con {mail}
+        </Card.Header>
+
+        {/* Body */}
+        <Card.Body style={{ maxHeight: "500px", overflowY: "auto", padding: "20px" }}>
+          <ListGroup variant="flush">
             {mensajes.length === 0 ? (
-              null // No mostrar nada si no hay mensajes
+              <p className="text-center text-muted" style={{ fontStyle: "italic", fontSize: "1.1rem" }}>
+                No hay mensajes aún.
+              </p>
             ) : (
-              mensajes.map((msg) => {
-                return (
-                  <ListGroup.Item key={msg.idMensaje} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <div>
-                      <strong>{msg.mail}:</strong>{" "}
-                      {editandoId === msg.idMensaje ? (
-                        <input
-                          type="text"
-                          value={nuevoContenido}
-                          onChange={(e) => setNuevoContenido(e.target.value)}
-                          style={{ marginLeft: "10px" }}
-                        />
+              mensajes.map((msg) => (
+                <ListGroup.Item
+                  key={msg.idMensaje}
+                  className={`mb-3 p-3 rounded ${msg.mail === userEmail ? "bg-light-primary" : "bg-light-secondary"}`}
+                  style={{
+                    maxWidth: "80%",
+                    marginLeft: msg.mail === userEmail ? "auto" : "0",
+                    marginRight: msg.mail !== userEmail ? "auto" : "0",
+                    position: "relative",
+                    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                    transition: "transform 0.2s ease-in-out",
+                    transform: "scale(1)",
+                    animation: "fadeIn 0.5s ease-in-out"
+                  }}
+                >
+                  {/* Message Content */}
+                  <div style={{ display: "flex", flexDirection: "column" }}>
+                    <strong style={{ fontSize: "0.9rem", color: "#555" }}>{msg.mail}:</strong>
+                    {editandoId === msg.idMensaje ? (
+                      <input
+                        type="text"
+                        value={nuevoContenido}
+                        onChange={(e) => setNuevoContenido(e.target.value)}
+                        className="form-control mt-2"
+                        style={{
+                          width: "100%",
+                          padding: "8px",
+                          borderRadius: "20px",
+                          border: "1px solid #ddd",
+                          outline: "none",
+                          transition: "border-color 0.2s ease-in-out"
+                        }}
+                      />
+                    ) : (
+                      <span style={{ fontSize: "1rem", color: "#333" }}>{msg.contenido}</span>
+                    )}
+                  </div>
+
+                  {/* Edit/Delete Buttons */}
+                  <div style={{ marginTop: "10px", display: "flex", gap: "10px" }}>
+                    {msg.mail === userEmail && (
+                      editandoId === msg.idMensaje ? (
+                        <>
+                          <FaCheck
+                            className="text-success"
+                            style={{ cursor: "pointer", fontSize: "1.2rem" }}
+                            onClick={() => editarMensaje(msg.idMensaje, nuevoContenido)}
+                          />
+                          <FaTimes
+                            className="text-danger"
+                            style={{ cursor: "pointer", fontSize: "1.2rem" }}
+                            onClick={() => setEditandoId(null)}
+                          />
+                        </>
                       ) : (
-                        <span style={{ marginLeft: "10px" }}>{msg.contenido}</span>
-                      )}
-                    </div>
-                    <div>
-                      {msg.mail === userEmail && ( // Solo mostrar botones si el mensaje fue enviado por el usuario logueado
-                        editandoId === msg.idMensaje ? (
-                          <>
-                            <FaCheck style={{ cursor: "pointer", marginRight: "10px" }} onClick={() => editarMensaje(msg.idMensaje, nuevoContenido)} />
-                            <FaTimes style={{ cursor: "pointer" }} onClick={() => setEditandoId(null)} />
-                          </>
-                        ) : (
-                          <>
-                            <FaEdit style={{ cursor: "pointer", marginRight: "10px" }} onClick={() => { setEditandoId(msg.idMensaje); setNuevoContenido(msg.contenido); }} />
-                            <FaTrash style={{ cursor: "pointer" }} onClick={() => borrarMensaje(msg.idMensaje)} />
-                          </>
-                        )
-                      )}
-                    </div>
-                  </ListGroup.Item>
-                );
-              })
+                        <>
+                          <FaEdit
+                            className="text-info"
+                            style={{ cursor: "pointer", fontSize: "1.2rem" }}
+                            onClick={() => {
+                              setEditandoId(msg.idMensaje);
+                              setNuevoContenido(msg.contenido);
+                            }}
+                          />
+                          <FaTrash
+                            className="text-danger"
+                            style={{ cursor: "pointer", fontSize: "1.2rem" }}
+                            onClick={() => borrarMensaje(msg.idMensaje)}
+                          />
+                        </>
+                      )
+                    )}
+                  </div>
+                </ListGroup.Item>
+              ))
             )}
           </ListGroup>
-          <Form className="mt-3">
-            <Form.Group>
-              <Form.Control type="text" value={mensaje} onChange={(e) => setMensaje(e.target.value)} placeholder="Escribe un mensaje..." />
-            </Form.Group>
-            <Button className="mt-2" variant="primary" onClick={enviarMensaje} disabled={mensaje.length < 2 || mensaje.length > 255}>
+        </Card.Body>
+
+        {/* Input Section */}
+        <Card.Footer className="p-3" style={{ borderTop: "1px solid #ddd" }}>
+          <Form className="d-flex align-items-center">
+            <Form.Control
+              type="text"
+              value={mensaje}
+              onChange={(e) => setMensaje(e.target.value)}
+              placeholder="Escribe un mensaje..."
+              className="me-2"
+              style={{
+                flex: 1,
+                padding: "10px",
+                borderRadius: "20px",
+                border: "1px solid #ddd",
+                outline: "none",
+                transition: "border-color 0.2s ease-in-out",
+                fontSize: "1rem"
+              }}
+            />
+            <Button
+              variant="primary"
+              onClick={enviarMensaje}
+              disabled={mensaje.length < 2 || mensaje.length > 255}
+              style={{
+                padding: "10px 20px",
+                borderRadius: "20px",
+                fontSize: "1rem",
+                backgroundColor: "#2575fc",
+                borderColor: "#2575fc",
+                fontWeight: "bold",
+                transition: "background-color 0.2s ease-in-out"
+              }}
+            >
               Enviar
             </Button>
           </Form>
-        </Card.Body>
+        </Card.Footer>
       </Card>
     </Container>
   );

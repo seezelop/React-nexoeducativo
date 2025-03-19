@@ -107,6 +107,7 @@ class BajaAdministrativo extends Component {
                                         <Dropdown.Item
                                             key={administrativo.idUsuario}
                                             eventKey={JSON.stringify({ idUsuario: administrativo.idUsuario, nombre: administrativo.nombre })}
+                                            style={{ color: 'black' }} // Estilo para texto negro
                                         >
                                             {administrativo.nombre}
                                         </Dropdown.Item>
