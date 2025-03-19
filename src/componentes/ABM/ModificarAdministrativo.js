@@ -198,6 +198,7 @@ class ModificarAdministrativo extends Component {
                                                 idAdministrativo: administrativo.idAdministrativo,
                                                 nombre: administrativo.nombre,
                                             })}
+                                            style={{ color: 'black' }} // Estilo para texto negro
                                         >
                                             {administrativo.nombre}
                                         </Dropdown.Item>

@@ -29,7 +29,10 @@ function ABMEscuelas() {
 
         {/* Sección Modificación Escuela */}
         <section className="col-md-8 mb-5">
+          <div className="card shadow-sm p-3">
+            <h3 className="mb-4 text-center">MODIFICACIÓN ESCUELA</h3>
             <ModificacionEscuela />
+          </div>
         </section>
 
         {/* Botón para redirigir a Consultar Escuelas */}

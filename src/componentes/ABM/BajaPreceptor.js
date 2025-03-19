@@ -107,6 +107,7 @@ class BajaPreceptor extends Component {
                                         <Dropdown.Item
                                             key={preceptor.idUsuario}
                                             eventKey={JSON.stringify({ idUsuario: preceptor.idUsuario, nombre: preceptor.nombre })}
+                                            style={{ color: 'black' }} // Estilo para texto negro
                                         >
                                             {preceptor.nombre}
                                         </Dropdown.Item>

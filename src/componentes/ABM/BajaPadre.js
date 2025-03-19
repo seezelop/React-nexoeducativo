@@ -107,6 +107,7 @@ class BajaPadre extends Component {
                                         <Dropdown.Item
                                             key={padre.idUsuario}
                                             eventKey={JSON.stringify({ idUsuario: padre.idUsuario, nombre: padre.nombre })}
+                                            style={{ color: 'black' }} // Estilo para texto negro
                                         >
                                             {padre.nombre}
                                         </Dropdown.Item>

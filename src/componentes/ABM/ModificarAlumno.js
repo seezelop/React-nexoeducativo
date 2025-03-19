@@ -300,6 +300,7 @@ class ModificarAlumno extends Component {
                                                 id_usuario: profesor.id_usuario,
                                                 nombre: profesor.nombre,
                                             })}
+                                            style={{ color: 'black' }} // Estilo para texto negro
                                         >
                                             {profesor.nombre}
                                         </Dropdown.Item>

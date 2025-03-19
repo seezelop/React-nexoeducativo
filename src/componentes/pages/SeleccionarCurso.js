@@ -118,10 +118,12 @@ class SeleccionarCurso extends Component {
                                         <Dropdown.Item
                                             key={curso.idCurso}
                                             eventKey={JSON.stringify(curso)}
+                                            style={{ color: 'black' }} // Estilo para texto negro
                                         >
                                             {curso.nombre}
                                         </Dropdown.Item>
                                     ))}
+                                    
                                 </DropdownButton>
                             </div>
 
