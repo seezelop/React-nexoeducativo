@@ -24,23 +24,6 @@ const Administrativo = () => {
           <button className="btn btn-primary" onClick={redirectToPrecioCuota}>
             Establecer Precio Cuota
           </button>
-
-          {/* Botón para enviar comunicación */}
-          <button
-            className="btn btn-info text-white"
-            onClick={() => alert("Comunicación enviada")}
-          >
-            Enviar Comunicación
-          </button>
-
-          {/* Botón para editar comunicación */}
-          <button
-            className="btn btn-warning text-dark"
-            onClick={() => alert("Comunicación editada")}
-          >
-            Editar Comunicación
-          </button>
-
           {/* Botón para gestiones de pago */}
           <button className="btn btn-success" onClick={redirectToGestionesPago}>
             Gestiones de Pago
