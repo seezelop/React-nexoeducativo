@@ -5,19 +5,42 @@ import { Container, Card, Form, Button, ListGroup } from "react-bootstrap";
 import { FaEdit, FaTrash, FaCheck, FaTimes } from "react-icons/fa";
 
 const ChatIndividual = () => {
-  const { mail } = useParams(); 
+  const { mail } = useParams(); // Usuario seleccionado
   const [mensajes, setMensajes] = useState([]);
   const [mensaje, setMensaje] = useState("");
-  const [editandoId, setEditandoId] = useState(null); 
-  const [nuevoContenido, setNuevoContenido] = useState(""); 
+  const [editandoId, setEditandoId] = useState(null);
+  const [nuevoContenido, setNuevoContenido] = useState("");
+  const [userEmail, setUserEmail] = useState(""); // Correo del usuario logueado
 
+  // Obtener el correo del usuario logueado
+  useEffect(() => {
+    const obtenerUsuarioAutenticado = async () => {
+      try {
+        const response = await axios.get("http://localhost:8080/api/usuario/usuarioLogueado", {
+          withCredentials: true,
+        });
+        setUserEmail(response.data); // Suponiendo que el backend devuelve el correo del usuario
+      } catch (error) {
+        console.error("Error al obtener el usuario autenticado:", error);
+      }
+    };
+
+    obtenerUsuarioAutenticado();
+  }, []);
+
+  // Cargar mensajes
   useEffect(() => {
     const cargarMensajes = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/obtenerMensajeDestinatario/${mail}`, {
-          withCredentials: true,
-        });
-        setMensajes(response.data);
+        const response = await axios.get(
+          `http://localhost:8080/obtenerMensajesEntreUsuarios/${mail}`,
+          { withCredentials: true }
+        );
+        if (response.status === 204) {
+          setMensajes([]); // Si no hay contenido, se deja vacío
+        } else {
+          setMensajes(response.data);
+        }
       } catch (error) {
         console.error("Error al cargar los mensajes:", error);
       }
@@ -26,6 +49,7 @@ const ChatIndividual = () => {
     cargarMensajes();
   }, [mail]);
 
+  // Enviar mensaje
   const enviarMensaje = async () => {
     if (!mensaje.trim()) return;
     if (mensaje.length < 2 || mensaje.length > 255) {
@@ -33,70 +57,52 @@ const ChatIndividual = () => {
       return;
     }
 
-    const nuevoMensaje = {
-      contenido: mensaje,
-      destinatario: mail,
-    };
+    const nuevoMensaje = { contenido: mensaje, destinatario: mail };
 
     try {
       await axios.post("http://localhost:8080/nuevoMensaje", nuevoMensaje, {
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         withCredentials: true,
       });
 
-      setMensajes([...mensajes, { idMensaje: Date.now(), contenido: mensaje, mail: "Tú" }]);
+      setMensajes([...mensajes, { idMensaje: Date.now(), contenido: mensaje, mail: userEmail }]);
       setMensaje("");
     } catch (error) {
       console.error("Error al enviar el mensaje:", error);
     }
   };
 
+  // Editar mensaje
   const editarMensaje = async (idMensaje, nuevoContenido) => {
     try {
       await axios.patch(
         `http://localhost:8080/editarMensajePrivado/${idMensaje}`,
         nuevoContenido,
         {
-          headers: {
-            "Content-Type": "text/plain",
-          },
+          headers: { "Content-Type": "text/plain" },
           withCredentials: true,
         }
       );
 
-      const mensajesActualizados = mensajes.map((msg) =>
+      // Actualizar el estado de los mensajes
+      setMensajes(mensajes.map((msg) =>
         msg.idMensaje === idMensaje ? { ...msg, contenido: nuevoContenido } : msg
-      );
-      setMensajes(mensajesActualizados);
-      setEditandoId(null); // Termina la edición
+      ));
+      setEditandoId(null);
     } catch (error) {
       console.error("Error al editar el mensaje:", error);
     }
   };
 
+  // Borrar mensaje
   const borrarMensaje = async (idMensaje) => {
     try {
-      await axios.delete(`http://localhost:8080/borrarMensaje/${idMensaje}`, {
-        withCredentials: true,
-      });
+      await axios.delete(`http://localhost:8080/borrarMensaje/${idMensaje}`, { withCredentials: true });
 
-      const mensajesActualizados = mensajes.filter((msg) => msg.idMensaje !== idMensaje);
-      setMensajes(mensajesActualizados);
+      setMensajes(mensajes.filter((msg) => msg.idMensaje !== idMensaje));
     } catch (error) {
       console.error("Error al borrar el mensaje:", error);
     }
-  };
-
-  const iniciarEdicion = (idMensaje, contenidoActual) => {
-    setEditandoId(idMensaje); // Activa la edición para este mensaje
-    setNuevoContenido(contenidoActual); 
-  };
-
-  const cancelarEdicion = () => {
-    setEditandoId(null); // Cancela la edición
-    setNuevoContenido(""); // Limpia el campo de edición
   };
 
   return (
@@ -105,67 +111,51 @@ const ChatIndividual = () => {
         <Card.Header as="h5">Chat con usuario {mail}</Card.Header>
         <Card.Body>
           <ListGroup>
-            {mensajes.map((msg) => (
-              <ListGroup.Item
-                key={msg.idMensaje}
-                style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
-              >
-                <div>
-                  <strong>{msg.mail}:</strong>
-                  {editandoId === msg.idMensaje ? (
-                    <input
-                      type="text"
-                      value={nuevoContenido}
-                      onChange={(e) => setNuevoContenido(e.target.value)}
-                      style={{ marginLeft: "10px" }}
-                    />
-                  ) : (
-                    <span style={{ marginLeft: "10px" }}>{msg.contenido}</span>
-                  )}
-                </div>
-                <div>
-                  {editandoId === msg.idMensaje ? (
-                    <>
-                      <FaCheck
-                        style={{ cursor: "pointer", marginRight: "10px" }}
-                        onClick={() => editarMensaje(msg.idMensaje, nuevoContenido)}
-                      />
-                      <FaTimes
-                        style={{ cursor: "pointer" }}
-                        onClick={cancelarEdicion}
-                      />
-                    </>
-                  ) : (
-                    <>
-                      <FaEdit
-                        style={{ cursor: "pointer", marginRight: "10px" }}
-                        onClick={() => iniciarEdicion(msg.idMensaje, msg.contenido)}
-                      />
-                      <FaTrash
-                        style={{ cursor: "pointer" }}
-                        onClick={() => borrarMensaje(msg.idMensaje)}
-                      />
-                    </>
-                  )}
-                </div>
-              </ListGroup.Item>
-            ))}
+            {mensajes.length === 0 ? (
+              <p>No hay mensajes con este usuario.</p>
+            ) : (
+              mensajes.map((msg) => {
+                
+                return (
+                  <ListGroup.Item key={msg.idMensaje} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <div>
+                      <strong>{msg.mail}:</strong>{" "}
+                      {editandoId === msg.idMensaje ? (
+                        <input
+                          type="text"
+                          value={nuevoContenido}
+                          onChange={(e) => setNuevoContenido(e.target.value)}
+                          style={{ marginLeft: "10px" }}
+                        />
+                      ) : (
+                        <span style={{ marginLeft: "10px" }}>{msg.contenido}</span>
+                      )}
+                    </div>
+                    <div>
+                      {msg.mail === userEmail && ( // Solo mostrar botones si el mensaje fue enviado por el usuario logueado
+                        editandoId === msg.idMensaje ? (
+                          <>
+                            <FaCheck style={{ cursor: "pointer", marginRight: "10px" }} onClick={() => editarMensaje(msg.idMensaje, nuevoContenido)} />
+                            <FaTimes style={{ cursor: "pointer" }} onClick={() => setEditandoId(null)} />
+                          </>
+                        ) : (
+                          <>
+                            <FaEdit style={{ cursor: "pointer", marginRight: "10px" }} onClick={() => { setEditandoId(msg.idMensaje); setNuevoContenido(msg.contenido); }} />
+                            <FaTrash style={{ cursor: "pointer" }} onClick={() => borrarMensaje(msg.idMensaje)} />
+                          </>
+                        )
+                      )}
+                    </div>
+                  </ListGroup.Item>
+                );
+              })
+            )}
           </ListGroup>
           <Form className="mt-3">
             <Form.Group>
-              <Form.Control
-                type="text"
-                value={mensaje}
-                onChange={(e) => setMensaje(e.target.value)}
-                placeholder="Escribe un mensaje..."
-              />
+              <Form.Control type="text" value={mensaje} onChange={(e) => setMensaje(e.target.value)} placeholder="Escribe un mensaje..." />
             </Form.Group>
-            <Button
-              className="mt-2"
-              variant="primary"
-              onClick={enviarMensaje}
-              disabled={mensaje.length < 2 || mensaje.length > 255}
-            >
+            <Button className="mt-2" variant="primary" onClick={enviarMensaje} disabled={mensaje.length < 2 || mensaje.length > 255}>
               Enviar
             </Button>
           </Form>

@@ -30,7 +30,7 @@ const Chats = () => {
   }, []);
 
   const iniciarChat = (usuario) => {
-    navigate(`/admin/chat/${usuario.mail}`);
+    navigate(`/usuario/chat/${usuario.mail}`);
   };
 
   if (error) {

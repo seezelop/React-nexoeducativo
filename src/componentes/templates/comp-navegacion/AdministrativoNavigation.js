@@ -5,7 +5,7 @@ const AdministrativoNavigation = () => {
   return (
     <>
       <li className="nav-item me-3">
-        <Link className="nav-link active" to="/admin/chats">
+        <Link className="nav-link active" to="/usuario/chats">
           Chats
         </Link>
       </li>

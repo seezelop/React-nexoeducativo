@@ -156,8 +156,8 @@ function App() {
 
 
              {/* Rutas para chats  */}
-              <Route path="/admin/chats" element={<Chats />} />
-              <Route path="/admin/chat/:mail" element={<ChatIndividual />} />
+              <Route path="/usuario/chats" element={<Chats />} />
+              <Route path="/usuario/chat/:mail" element={<ChatIndividual />} />
 
             
           </Routes>

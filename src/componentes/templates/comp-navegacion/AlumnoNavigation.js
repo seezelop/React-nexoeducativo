@@ -21,7 +21,7 @@ const AlumnoNavigation = () => {
            </Link>
          </li>
          <li className="nav-item me-3">
-           <Link className="nav-link active">
+           <Link className="nav-link active" to="/usuario/chats">
              Enviar mensaje privado
            </Link>
          </li>
