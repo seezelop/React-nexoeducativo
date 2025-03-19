@@ -12,9 +12,12 @@ const GestionarAsistenciaProfesor = () => {
   const [fechasAsistencias, setFechasAsistencias] = useState([]);
   const [fechaSeleccionada, setFechaSeleccionada] = useState('');
   const [profesorSeleccionado, setProfesorSeleccionado] = useState('');
+  const [isPremium, setIsPremium] = useState(false); // Nuevo estado para controlar si el plan es premium
 
+  // Comprobamos si el plan del usuario es premium al cargar el componente
   useEffect(() => {
     obtenerProfesores();
+    obtenerPlanUsuario();
     if (activeTab === 'modificar') {
       obtenerFechasAsistencias();
     }
@@ -25,7 +28,7 @@ const GestionarAsistenciaProfesor = () => {
     try {
       const response = await axios.get('http://localhost:8080/api/usuario/verProfesAdministrativo', { withCredentials: true });
       setProfesores(response.data);
-      
+
       // Inicializar asistencia para cada profesor
       const asistenciaInicial = response.data.reduce((acc, profe) => {
         acc[profe.id_usuario] = { asistio: 0, mediaFalta: 0, retiroAntes: 0 };
@@ -39,13 +42,27 @@ const GestionarAsistenciaProfesor = () => {
     }
   };
 
+  // Nueva función para obtener el plan del usuario
+  const obtenerPlanUsuario = async () => {
+    try {
+      const response = await axios.get('http://localhost:8080/api/usuario/getPlanEscuela', { withCredentials: true });
+
+      //console.log(response.data)
+      if (response.data === 2) {
+        setIsPremium(true); // Si el plan es premium, actualizar el estado
+      }
+    } catch (err) {
+      setError('Error al cargar el plan del usuario: ' + (err.response?.data || err.message));
+    }
+  };
+
   const obtenerFechasAsistencias = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:8080/api/usuario/obtenerAsistenciasProfe', { 
-        withCredentials: true 
+      const response = await axios.get('http://localhost:8080/api/usuario/obtenerAsistenciasProfe', {
+        withCredentials: true
       });
-      
+
       setFechasAsistencias(response.data);
     } catch (err) {
       if (err.response?.status === 204) {
@@ -66,10 +83,10 @@ const GestionarAsistenciaProfesor = () => {
         acc[profe.id_usuario] = { asistio: 0, mediaFalta: 0, retiroAntes: 0 };
         return acc;
       }, {});
-      
+
       // Buscar en fechasAsistencias los registros para esta fecha
       const asistenciasFecha = fechasAsistencias.find(a => a.fecha === fecha);
-      
+
       if (asistenciasFecha && asistenciasFecha.asistencias) {
         // Actualizar el estado con los datos obtenidos
         asistenciasFecha.asistencias.forEach(registro => {
@@ -82,7 +99,7 @@ const GestionarAsistenciaProfesor = () => {
           }
         });
       }
-      
+
       setAsistencia(asistenciaInicial);
     } catch (err) {
       setError('Error al obtener asistencias: ' + (err.response?.data || err.message));
@@ -104,19 +121,19 @@ const GestionarAsistenciaProfesor = () => {
     try {
       const data = {
         alumnosCurso: Object.keys(asistencia).map((id_usuario) => ({
-          idUsuario: parseInt(id_usuario),  
+          idUsuario: parseInt(id_usuario),
           asistio: asistencia[id_usuario].asistio,
           mediaFalta: asistencia[id_usuario].mediaFalta,
           retiroAntes: asistencia[id_usuario].retiroAntes,
         })),
       };
-      
-      console.log('esto se va a enviar: '+JSON.stringify(data));
-      
+
+      //console.log('esto se va a enviar: '+JSON.stringify(data));
+
       await axios.post('http://localhost:8080/api/usuario/tomarAsistenciaProfesor', data, { withCredentials: true });
 
       setMensaje('Asistencia registrada correctamente');
-      
+
       // Si se registra correctamente, actualizar la lista de fechas
       if (activeTab === 'modificar') {
         obtenerFechasAsistencias();
@@ -151,12 +168,10 @@ const GestionarAsistenciaProfesor = () => {
 
       console.log('Datos a enviar para edición:', JSON.stringify(dataToSend));
       console.log('Fecha seleccionada:', fechaSeleccionada);
-      
-      // Formato de fecha esperado por el backend: yyyy-MM-dd
-      // Asegurarse de que fechaSeleccionada está en el formato correcto
+
       await axios.patch(
-        `http://localhost:8080/api/usuario/editarAsistenciaProfe?fecha=${fechaSeleccionada}`, 
-        dataToSend, 
+        `http://localhost:8080/api/usuario/editarAsistenciaProfe?fecha=${fechaSeleccionada}`,
+        dataToSend,
         { withCredentials: true }
       );
 
@@ -189,214 +204,114 @@ const GestionarAsistenciaProfesor = () => {
 
   const getProfesorSeleccionadoData = () => {
     if (!profesorSeleccionado) return null;
-    
+
     const profesor = profesores.find(p => p.id_usuario === parseInt(profesorSeleccionado));
     if (!profesor) return null;
-    
+
     return {
       profesor,
       asistencia: asistencia[profesor.id_usuario]
     };
   };
 
+  // Mostrar solo si el plan es premium (ID 2)
+  if (!isPremium) {
+    return <Alert variant="warning">La toma y modificacion de asistencia para profesores no esta disponible para tu escuela</Alert>;
+  }
+
   return (
     <Container className="mt-4">
       <h1 className="text-center mb-4">Gestión de Asistencia de Profesores</h1>
-      
+
       <div className="mb-3">
-        <Button 
-          variant={activeTab === 'tomar' ? 'primary' : 'outline-primary'} 
-          className="me-2" 
+        <Button
+          variant={activeTab === 'tomar' ? 'primary' : 'outline-primary'}
+          className="me-2"
           onClick={() => toggleTab('tomar')}
         >
           Tomar Asistencia
         </Button>
-        <Button 
-          variant={activeTab === 'modificar' ? 'primary' : 'outline-primary'} 
+        <Button
+          variant={activeTab === 'modificar' ? 'primary' : 'outline-primary'}
           onClick={() => toggleTab('modificar')}
         >
           Modificar Asistencia
         </Button>
       </div>
-      
+
       {loading && <Spinner animation="border" />}
       {error && <Alert variant="danger">{error}</Alert>}
       {mensaje && <Alert variant={mensaje.includes('Error') ? 'danger' : 'success'}>{mensaje}</Alert>}
 
       {activeTab === 'tomar' && (
-        <Card className="mb-4">
+        <Card>
           <Card.Body>
-            <h2 className="mb-3">Tomar Asistencia</h2>
-            {profesores.length > 0 ? (
-              <Table striped bordered hover>
-                <thead>
-                  <tr>
-                    <th>Nombre</th>
-                    <th>Asistió</th>
-                    <th>Media Falta</th>
-                    <th>Retiro Antes</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {profesores.map((profesor) => (
-                    <tr key={profesor.id_usuario}>
-                      <td>{profesor.nombreCompleto || `${profesor.nombre} ${profesor.apellido}`}</td>
-                      <td>
-                        <Form.Check
-                          type="checkbox"
-                          checked={asistencia[profesor.id_usuario]?.asistio === 1}
-                          onChange={() => handleCheckboxChange(profesor.id_usuario, 'asistio')}
-                          disabled={asistencia[profesor.id_usuario]?.mediaFalta === 1 || asistencia[profesor.id_usuario]?.retiroAntes === 1}
-                        />
-                      </td>
-                      <td>
-                        <Form.Check
-                          type="checkbox"
-                          checked={asistencia[profesor.id_usuario]?.mediaFalta === 1}
-                          onChange={() => handleCheckboxChange(profesor.id_usuario, 'mediaFalta')}
-                          disabled={asistencia[profesor.id_usuario]?.asistio === 1 || asistencia[profesor.id_usuario]?.retiroAntes === 1}
-                        />
-                      </td>
-                      <td>
-                        <Form.Check
-                          type="checkbox"
-                          checked={asistencia[profesor.id_usuario]?.retiroAntes === 1}
-                          onChange={() => handleCheckboxChange(profesor.id_usuario, 'retiroAntes')}
-                          disabled={asistencia[profesor.id_usuario]?.asistio === 1 || asistencia[profesor.id_usuario]?.mediaFalta === 1}
-                        />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
-            ) : (
-              !loading && <Alert variant="warning">No hay profesores disponibles</Alert>
-            )}
-
-            <Button className="mt-3" onClick={enviarAsistencia} disabled={loading || profesores.length === 0}>
-              {loading ? 'Procesando...' : 'Registrar Asistencia'}
-            </Button>
+            <Row>
+              <Col>
+                <Form.Group>
+                  <Form.Label>Profesor</Form.Label>
+                  <Form.Control as="select" onChange={handleProfesorChange}>
+                    <option value="">Seleccione un profesor</option>
+                    {profesores.map(profesor => (
+                      <option key={profesor.id_usuario} value={profesor.id_usuario}>
+                        {profesor.nombre} {profesor.apellido}
+                      </option>
+                    ))}
+                  </Form.Control>
+                </Form.Group>
+              </Col>
+              <Col>
+                <Button
+                  variant="success"
+                  onClick={enviarAsistencia}
+                  disabled={!profesorSeleccionado}
+                >
+                  Registrar Asistencia
+                </Button>
+              </Col>
+            </Row>
           </Card.Body>
         </Card>
       )}
 
       {activeTab === 'modificar' && (
-        <Card className="mb-4">
+        <Card>
           <Card.Body>
-            <h2 className="mb-3">Modificar Asistencia</h2>
-            
-            <Row className="mb-4">
-              <Col md={6}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Seleccionar Fecha</Form.Label>
-                  <Form.Control
-                    as="select"
-                    value={fechaSeleccionada}
-                    onChange={handleFechaChange}
-                    className="form-select"
-                  >
+            <Row>
+              <Col>
+                <Form.Group>
+                  <Form.Label>Fecha</Form.Label>
+                  <Form.Control as="select" value={fechaSeleccionada} onChange={handleFechaChange}>
                     <option value="">Seleccione una fecha</option>
-                    {fechasAsistencias.map((asistencia, index) => (
-                      <option key={index} value={asistencia.fecha}>
-                        {asistencia.fecha}
-                      </option>
+                    {fechasAsistencias.map(fecha => (
+                      <option key={fecha} value={fecha}>{fecha}</option>
                     ))}
                   </Form.Control>
                 </Form.Group>
               </Col>
-              <Col md={6}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Seleccionar Profesor</Form.Label>
-                  <Form.Control
-                    as="select"
-                    value={profesorSeleccionado}
-                    onChange={handleProfesorChange}
-                    disabled={!fechaSeleccionada}
-                    className="form-select"
-                  >
+              <Col>
+                <Form.Group>
+                  <Form.Label>Profesor</Form.Label>
+                  <Form.Control as="select" value={profesorSeleccionado} onChange={handleProfesorChange}>
                     <option value="">Seleccione un profesor</option>
-                    {profesores.map((profesor) => (
+                    {profesores.map(profesor => (
                       <option key={profesor.id_usuario} value={profesor.id_usuario}>
-                        {profesor.nombreCompleto || `${profesor.nombre} ${profesor.apellido}`}
+                        {profesor.nombre} {profesor.apellido}
                       </option>
                     ))}
                   </Form.Control>
                 </Form.Group>
               </Col>
-            </Row>
-
-            {fechaSeleccionada && profesorSeleccionado && (
-              <>
-                <h4 className="mt-4">Modificar Asistencia del Profesor</h4>
-                <Table striped bordered hover>
-                  <thead>
-                    <tr>
-                      <th>Profesor</th>
-                      <th>Presente</th>
-                      <th>Media Falta</th>
-                      <th>Retiro Anticipado</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {(() => {
-                      const profesorData = getProfesorSeleccionadoData();
-                      if (!profesorData) return null;
-                      
-                      return (
-                        <tr key={profesorData.profesor.id_usuario}>
-                          <td>
-                            {profesorData.profesor.nombreCompleto || 
-                              `${profesorData.profesor.nombre} ${profesorData.profesor.apellido}`}
-                          </td>
-                          <td>
-                            <Form.Check
-                              type="checkbox"
-                              checked={profesorData.asistencia?.asistio === 1}
-                              onChange={() => handleCheckboxChange(profesorData.profesor.id_usuario, 'asistio')}
-                              disabled={
-                                profesorData.asistencia?.mediaFalta === 1 || 
-                                profesorData.asistencia?.retiroAntes === 1
-                              }
-                            />
-                          </td>
-                          <td>
-                            <Form.Check
-                              type="checkbox"
-                              checked={profesorData.asistencia?.mediaFalta === 1}
-                              onChange={() => handleCheckboxChange(profesorData.profesor.id_usuario, 'mediaFalta')}
-                              disabled={
-                                profesorData.asistencia?.asistio === 1 || 
-                                profesorData.asistencia?.retiroAntes === 1
-                              }
-                            />
-                          </td>
-                          <td>
-                            <Form.Check
-                              type="checkbox"
-                              checked={profesorData.asistencia?.retiroAntes === 1}
-                              onChange={() => handleCheckboxChange(profesorData.profesor.id_usuario, 'retiroAntes')}
-                              disabled={
-                                profesorData.asistencia?.asistio === 1 || 
-                                profesorData.asistencia?.mediaFalta === 1
-                              }
-                            />
-                          </td>
-                        </tr>
-                      );
-                    })()}
-                  </tbody>
-                </Table>
-
+              <Col>
                 <Button
                   variant="warning"
                   onClick={editarAsistencia}
-                  disabled={loading || !fechaSeleccionada || !profesorSeleccionado}
-                  className="mt-3"
+                  disabled={!fechaSeleccionada || !profesorSeleccionado}
                 >
-                  {loading ? 'Editando...' : 'Editar Asistencia'}
+                  Editar Asistencia
                 </Button>
-              </>
-            )}
+              </Col>
+            </Row>
           </Card.Body>
         </Card>
       )}
