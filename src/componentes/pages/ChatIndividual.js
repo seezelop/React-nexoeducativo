@@ -112,10 +112,9 @@ const ChatIndividual = () => {
         <Card.Body>
           <ListGroup>
             {mensajes.length === 0 ? (
-              <p>No hay mensajes con este usuario.</p>
+              null // No mostrar nada si no hay mensajes
             ) : (
               mensajes.map((msg) => {
-                
                 return (
                   <ListGroup.Item key={msg.idMensaje} style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                     <div>

@@ -52,7 +52,6 @@ const Chats = () => {
           ))}
         </ul>
       )}
-      <h3> Editar mensajes enviados</h3>
     </div>
     
   );

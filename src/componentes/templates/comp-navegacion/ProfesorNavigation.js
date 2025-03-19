@@ -5,8 +5,8 @@ const ProfesorNavigation = () => {
   return (
     <>
       <li className="nav-item me-3">
-        <Link className="nav-link active" to="/admin/chats">
-          Chats
+        <Link className="nav-link active" to="/usuario/chats">
+          Enviar mensaje privado
         </Link>
       </li>
       <li className="nav-item me-3">
