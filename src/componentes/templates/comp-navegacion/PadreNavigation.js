@@ -12,7 +12,7 @@ const PadreNavigation = () => {
           </li>
           <li className="nav-item me-3">
             <Link className="nav-link active" to="/usuario/chats">
-              Enviar Mensaje privado
+              Chats
             </Link>
           </li>
           <li className="nav-item me-3">
