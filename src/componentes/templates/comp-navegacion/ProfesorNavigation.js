@@ -20,8 +20,8 @@ const ProfesorNavigation = () => {
         </Link>
         </li>
       <li className="nav-item me-3">
-        <Link className="nav-link active" to="/ABMcomunicaciones">
-            ABM comunicaciones
+        <Link className="nav-link active" to="/altaComunicacion">
+            Alta Comunicacion
         </Link>
       </li>
         <li className="nav-item me-3">

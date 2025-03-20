@@ -56,6 +56,7 @@ import CantInasistenciasAlumno from './componentes/pages/CantInasistenciasAlumno
 import CantInasistencias from './componentes/pages/CantInasistencias';
 import SeleccionarProfePremium from './componentes/pages/SeleccionarProfePremium';
 import InformacionPago from './componentes/pages/InformacionPago';
+import AltaComunicacion from './componentes/ABM/AltaComunicacion';
 
 function App() {
   return (
@@ -101,6 +102,7 @@ function App() {
             <Route path="/cantInasistencias" element={<CantInasistencias />} />
             <Route path="/seleccionarProfePremium" element={<SeleccionarProfePremium />} />
             <Route path="/infoPago" element={<InformacionPago />} />
+            <Route path="/altaComunicacion" element={<AltaComunicacion />} />
 
 
             {/* Rutas para admin y user */}

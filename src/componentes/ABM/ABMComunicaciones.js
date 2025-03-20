@@ -16,22 +16,6 @@ function ABMComunicaciones() {
           </div>
         </section>
 
-        {/* Sección Baja Comunicación */}
-        <section className="col-md-8 mb-5">
-          <div className="card shadow-sm p-3">
-            <h3 className="mb-4 text-center">BAJA COMUNICACIÓN</h3>
-            <BajaComunicacion />
-          </div>
-        </section>
-
-        {/* Sección Modificar Comunicación */}
-        <section className="col-md-8 mb-5">
-          <div className="card shadow-sm p-3">
-            <h3 className="mb-4 text-center">MODIFICAR COMUNICACIÓN</h3>
-            <ModificarComunicacion />
-          </div>
-        </section>
-
       </div>
     </section>
   );
