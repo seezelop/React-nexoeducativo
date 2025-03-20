@@ -15,6 +15,24 @@ const PadreNavigation = () => {
               Chats
             </Link>
           </li>
+
+          <li className="nav-item me-3">
+            <Link className="nav-link active" to="/infoPago">
+              Informacion de pago
+            </Link>
+          </li>
+
+          <li className="nav-item me-3">
+            <Link className="nav-link active" to="/cantInasistencias">
+              Cantidad de faltas
+            </Link>
+          </li>
+
+          <li className="nav-item me-3">
+            <Link className="nav-link active" to="/RealizarPago">
+              Pagar cuota
+            </Link>
+          </li>
           <li className="nav-item me-3">
         <Link className="nav-link active" to="/padre">
           Mi Perfil
