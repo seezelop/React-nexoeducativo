@@ -30,6 +30,11 @@ const AlumnoNavigation = () => {
              Cantidad de faltas
            </Link>
          </li>
+         <li className="nav-item me-3">
+           <Link className="nav-link active" to="/alumno">
+             Mi Perfil
+           </Link>
+         </li>
        </>
   );
 };

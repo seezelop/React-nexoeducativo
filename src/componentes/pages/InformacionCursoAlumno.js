@@ -65,10 +65,6 @@ function InformacionCursoAlumno() {
             )}
           </div>
         )}
-
-        <button className="btn btn-secondary mt-4" onClick={() => navigate(-1)}>
-          Volver
-        </button>
       </div>
     </section>
   );
