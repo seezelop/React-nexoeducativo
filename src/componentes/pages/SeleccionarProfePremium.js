@@ -8,30 +8,13 @@ const SeleccionarProfePremium = () => {
   const [error, setError] = useState(null);
   const [profesorSeleccionado, setProfesorSeleccionado] = useState('');
   const [infoProfesor, setInfoProfesor] = useState(null);
-  const [rol, setRol] = useState("profesor");
-  const [isPremium, setIsPremium] = useState(false); // Estado para controlar si el plan es premium
+  const[rol, setRol]=useState("profesor")
 
-  // Verificar el plan de la escuela al montar el componente
+  // Cargar profesores al montar el componente
   useEffect(() => {
-    obtenerPlanUsuario();
     cargarProfesores();
   }, []);
 
-  // Función para verificar si el plan es premium
-  const obtenerPlanUsuario = async () => {
-    try {
-      const response = await axios.get('http://localhost:8080/api/usuario/getPlanEscuela', { withCredentials: true });
-
-      // Si el plan es premium (ID 2), actualizar el estado
-      if (response.data === 2) {
-        setIsPremium(true);
-      }
-    } catch (err) {
-      setError('Error al cargar el plan del usuario: ' + (err.response?.data || err.message));
-    }
-  };
-
-  // Cargar la lista de profesores
   const cargarProfesores = async () => {
     setLoading(true);
     try {
@@ -52,7 +35,6 @@ const SeleccionarProfePremium = () => {
     }
   };
 
-  // Manejar la selección de un profesor
   const handleProfesorChange = async (e) => {
     const idUsuario = e.target.value;
     setProfesorSeleccionado(idUsuario);
@@ -76,18 +58,6 @@ const SeleccionarProfePremium = () => {
     }
   };
 
-  // Si el plan no es premium, mostrar un mensaje
-  if (!isPremium) {
-    return (
-      <Container className="mt-4">
-        <Alert variant="warning">
-          La funcionalidad de selección de profesores premium no está disponible para tu escuela.
-        </Alert>
-      </Container>
-    );
-  }
-
-  // Si el plan es premium, mostrar el componente
   return (
     <Container className="mt-4">
       <h1 className="text-center mb-4">Información del Profesor</h1>

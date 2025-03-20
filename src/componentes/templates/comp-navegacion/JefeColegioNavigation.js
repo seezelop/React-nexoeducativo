@@ -20,6 +20,11 @@ const JefeColegioNavigation = () => {
         </Link>
       </li>
       <li className="nav-item me-3">
+        <Link className="nav-link active" to="/seleccionarProfePremium">
+          Seleccionar Profesor
+        </Link>
+      </li>
+      <li className="nav-item me-3">
         <Link className="nav-link active" to="/JefeColegio">
           Mi Perfil
         </Link>

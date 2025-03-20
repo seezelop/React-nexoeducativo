@@ -54,6 +54,7 @@ import ModificarCursoPreceptor from './componentes/ABM/ModificarCursoPreceptor';
 import BajaCursoPreceptor from './componentes/ABM/BajaCursoPreceptor';
 import CantInasistenciasAlumno from './componentes/pages/CantInasistenciasAlumno';
 import CantInasistencias from './componentes/pages/CantInasistencias';
+import SeleccionarProfePremium from './componentes/pages/SeleccionarProfePremium';
 
 function App() {
   return (
@@ -97,7 +98,7 @@ function App() {
             <Route path="/consultar-escuelas" element={<ConsultarEscuelas />} />
             <Route path="/cantInasistenciasAlumno" element={<CantInasistenciasAlumno />} />
             <Route path="/cantInasistencias" element={<CantInasistencias />} />
-            
+            <Route path="/seleccionarProfePremium" element={<SeleccionarProfePremium />} />
 
 
 
