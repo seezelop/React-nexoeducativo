@@ -6,13 +6,8 @@ const AlumnoNavigation = () => {
   return (
    <>
          <li className="nav-item me-3">
-           <Link className="nav-link active">
+           <Link className="nav-link active" to="/verNovedades">
              Novedades
-           </Link>
-         </li>
-         <li className="nav-item me-3">
-           <Link className="nav-link active">
-             Notificacion privada
            </Link>
          </li>
          <li className="nav-item me-3">
