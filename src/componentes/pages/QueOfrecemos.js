@@ -14,7 +14,7 @@ function QueOfrecemos() {
                 <div className="card-body d-flex flex-column"> {/* Utilizar flex para distribuir el contenido */}
                   <h5 className="card-title">Gestión académica</h5>
                   <p className="card-text flex-grow-1"> {/* flex-grow-1 para que el texto ocupe el espacio restante */}
-                    Los alumnos van a poder acceder fácilmente con un par de clics a toda la información relacionada a sus estudios, ya sea el acceso al material, las notas de sus evaluaciones, la agenda de sus próximos eventos y un registro sobre la cantidad de inasistencias, además de ver las novedades subidas por las distintas autoridades.
+                    Los alumnos van a poder acceder fácilmente con un par de clics a toda la información relacionada a sus estudios, como las notas de sus evaluaciones, la agenda de sus próximos eventos y un registro sobre la cantidad de inasistencias, además de ver las novedades subidas por sus profesores.
                   </p>
                 </div>
               </div>
@@ -25,7 +25,7 @@ function QueOfrecemos() {
                 <div className="card-body d-flex flex-column"> {/* Utilizar flex para distribuir el contenido */}
                   <h5 className="card-title">Comunicación clara</h5>
                   <p className="card-text flex-grow-1"> {/* flex-grow-1 para que el texto ocupe el espacio restante */}
-                    Tanto padres como alumnos van a poder comunicarse con profesores, preceptores y personal administrativo de forma instantánea y sin interrupciones, gracias a que nuestra plataforma tiene su propia mensajería.
+                    Tanto padres como alumnos van a poder comunicarse con profesores, preceptores y personal administrativo gracias a que nuestra plataforma tiene su propia mensajería.
                   </p>
                 </div>
               </div>
@@ -52,8 +52,6 @@ function QueOfrecemos() {
                 </div>
               </div>
             </div>
-
-            {/* Puedes agregar más tarjetas aquí */}
           </div>
         </section>
       </section>
