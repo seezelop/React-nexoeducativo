@@ -59,7 +59,7 @@ const Header = () => {
     <nav className="navbar navbar-expand-lg bg-dark" data-bs-theme="dark">
       <div className="container-fluid">
         {/* Enlace al inicio */}
-        <Link className="nav-link active me-3" to="/">
+        <Link className="nav-link text-white me-3" to="/">
           Inicio
         </Link>
 
