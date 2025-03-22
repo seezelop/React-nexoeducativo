@@ -74,7 +74,7 @@ function App() {
                 <section className="container my-4">
                   <h1 className="text-center">Bienvenido a Nexo Educativo</h1>
                   <p className="text-center">
-                    Aca va a ir nuestra descripción
+                    Somos la plataforma lider de Gestión Educativa. 
                   </p>
                 </section>
                 <section className="container my-4">
