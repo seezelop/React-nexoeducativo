@@ -28,7 +28,7 @@ function PreguntasFrecuentes() {
     </h2>
     <div id="collapseTwo" className="accordion-collapse collapse" data-bs-parent="#accordionExample">
       <div className="accordion-body">
-        Tu escuela debe previamente registrarte en el sistema con tu mail y contraseña, luego colocar esta informacion en <strong><a href="/login">este link</a></strong> y listo! 
+        Tu escuela debe previamente registrarte en el sistema con tu mail y contraseña, luego colocar esta informacion en <a href="/contacto" style={{ color: 'black' }}>este link</a> y listo! 
       </div>
     </div>
   </div>
@@ -76,7 +76,7 @@ function PreguntasFrecuentes() {
     </h2>
     <div id="collapseSix" className="accordion-collapse collapse" data-bs-parent="#accordionExample">
       <div className="accordion-body">
-       No te preocupes! Podes comunicarnos tu problema en<strong><a href="/contacto"> este link</a></strong> y lo solucionaremos lo mas pronto posible
+       No te preocupes! Podes comunicarnos tu problema en <a href="/contacto" style={{ color: 'black' }}>este link</a> y lo solucionaremos lo mas pronto posible
       </div>
     </div>
   </div>
