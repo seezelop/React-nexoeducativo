@@ -80,7 +80,7 @@ const GestionarAsistenciaAlumnos = () => {
   };
 
   // Obtener asistencias por fecha
-  const fetchAsistenciasPorFecha = async (cursoId, idAsistencia) => {
+  /*const fetchAsistenciasPorFecha = async (cursoId, idAsistencia) => {
     if (!cursoId || !idAsistencia) return;
 
     setLoading(true);
@@ -109,7 +109,7 @@ const GestionarAsistenciaAlumnos = () => {
       setMensaje({ text: 'Hubo un error al cargar las asistencias.', type: 'danger' });
       setLoading(false);
     }
-  };
+  };*/
 
   // Manejar el cambio de curso seleccionado (Tomar Asistencia)
   const handleCursoChange = (e) => {
@@ -135,9 +135,9 @@ const GestionarAsistenciaAlumnos = () => {
       await fetchAlumnos(cursoId);
       await fetchFechasAsistencias(cursoId);
 
-      if (idAsistenciaSeleccionada) {
+      /*if (idAsistenciaSeleccionada) {
         await fetchAsistenciasPorFecha(cursoId, idAsistenciaSeleccionada);
-      }
+      }*/
     } else {
       setAlumnos([]);
       setAsistencia([]);
@@ -305,7 +305,7 @@ const GestionarAsistenciaAlumnos = () => {
     }
     
     if (cursoSeleccionado && idAsistencia) {
-      fetchAsistenciasPorFecha(cursoSeleccionado, idAsistencia);
+      //fetchAsistenciasPorFecha(cursoSeleccionado, idAsistencia);
     }
   };
 
