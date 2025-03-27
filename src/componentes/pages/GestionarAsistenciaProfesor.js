@@ -4,26 +4,57 @@ import axios from 'axios';
 
 const GestionarAsistenciaProfesor = () => {
   const [profesores, setProfesores] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState({
+    general: false,
+    profesores: false,
+    asistencias: false,
+    guardando: false
+  });
   const [error, setError] = useState(null);
   const [mensaje, setMensaje] = useState('');
   const [asistencia, setAsistencia] = useState({});
-  const [activeTab, setActiveTab] = useState('tomar'); // 'tomar' or 'modificar'
+  const [activeTab, setActiveTab] = useState('tomar');
   const [fechasAsistencias, setFechasAsistencias] = useState([]);
   const [fechaSeleccionada, setFechaSeleccionada] = useState('');
   const [profesorSeleccionado, setProfesorSeleccionado] = useState('');
+  const [planValido, setPlanValido] = useState(null); // null: no verificado, true: válido, false: no válido
 
+  // Verificar el plan al cargar el componente
   useEffect(() => {
-    obtenerProfesores();
-    if (activeTab === 'modificar') {
-      obtenerFechasAsistencias();
+    const verificarPlan = async () => {
+      setLoading(prev => ({ ...prev, general: true }));
+      try {
+        const response = await axios.get('http://localhost:8080/api/usuario/getPlanEscuela', { 
+          withCredentials: true 
+        });
+        setPlanValido(response.data === 2);
+      } catch (err) {
+        setError('Error al verificar el plan de la escuela');
+        setPlanValido(false);
+      } finally {
+        setLoading(prev => ({ ...prev, general: false }));
+      }
+    };
+
+    verificarPlan();
+  }, []);
+
+  // Cargar datos si el plan es válido
+  useEffect(() => {
+    if (planValido === true) {
+      obtenerProfesores();
+      if (activeTab === 'modificar') {
+        obtenerFechasAsistencias();
+      }
     }
-  }, [activeTab]);
+  }, [planValido, activeTab]);
 
   const obtenerProfesores = async () => {
-    setLoading(true);
+    setLoading(prev => ({ ...prev, profesores: true }));
     try {
-      const response = await axios.get('http://localhost:8080/api/usuario/verProfesAdministrativo', { withCredentials: true });
+      const response = await axios.get('http://localhost:8080/api/usuario/verProfesAdministrativo', { 
+        withCredentials: true 
+      });
       setProfesores(response.data);
       
       // Inicializar asistencia para cada profesor
@@ -35,12 +66,12 @@ const GestionarAsistenciaProfesor = () => {
     } catch (err) {
       setError('Error al cargar los profesores: ' + (err.response?.data || err.message));
     } finally {
-      setLoading(false);
+      setLoading(prev => ({ ...prev, profesores: false }));
     }
   };
 
   const obtenerFechasAsistencias = async () => {
-    setLoading(true);
+    setLoading(prev => ({ ...prev, asistencias: true }));
     try {
       const response = await axios.get('http://localhost:8080/api/usuario/obtenerAsistenciaProfe', { 
         withCredentials: true 
@@ -54,12 +85,12 @@ const GestionarAsistenciaProfesor = () => {
         setError('Error al cargar las fechas de asistencias: ' + (err.response?.data || err.message));
       }
     } finally {
-      setLoading(false);
+      setLoading(prev => ({ ...prev, asistencias: false }));
     }
   };
 
   const obtenerAsistenciasPorFecha = async (fecha) => {
-    setLoading(true);
+    setLoading(prev => ({ ...prev, asistencias: true }));
     try {
       // Reiniciar asistencia a ceros
       const asistenciaInicial = profesores.reduce((acc, profe) => {
@@ -87,7 +118,7 @@ const GestionarAsistenciaProfesor = () => {
     } catch (err) {
       setError('Error al obtener asistencias: ' + (err.response?.data || err.message));
     } finally {
-      setLoading(false);
+      setLoading(prev => ({ ...prev, asistencias: false }));
     }
   };
 
@@ -100,7 +131,7 @@ const GestionarAsistenciaProfesor = () => {
   };
 
   const enviarAsistencia = async () => {
-    setLoading(true);
+    setLoading(prev => ({ ...prev, guardando: true }));
     try {
       const data = {
         alumnosCurso: Object.keys(asistencia).map((id_usuario) => ({
@@ -111,9 +142,9 @@ const GestionarAsistenciaProfesor = () => {
         })),
       };
       
-      console.log('esto se va a enviar: '+JSON.stringify(data));
-      
-      await axios.post('http://localhost:8080/api/usuario/tomarAsistenciaProfesor', data, { withCredentials: true });
+      await axios.post('http://localhost:8080/api/usuario/tomarAsistenciaProfesor', data, { 
+        withCredentials: true 
+      });
 
       setMensaje('Asistencia registrada correctamente');
       
@@ -124,7 +155,7 @@ const GestionarAsistenciaProfesor = () => {
     } catch (err) {
       setMensaje('Error al registrar la asistencia: ' + (JSON.stringify(err.response?.data) || err.message));
     } finally {
-      setLoading(false);
+      setLoading(prev => ({ ...prev, guardando: false }));
     }
   };
 
@@ -139,7 +170,7 @@ const GestionarAsistenciaProfesor = () => {
       return;
     }
 
-    setLoading(true);
+    setLoading(prev => ({ ...prev, guardando: true }));
     try {
       // Solo enviar la asistencia del profesor seleccionado
       const dataToSend = [{
@@ -148,12 +179,7 @@ const GestionarAsistenciaProfesor = () => {
         mediaFalta: asistencia[profesorSeleccionado].mediaFalta,
         retiroAntes: asistencia[profesorSeleccionado].retiroAntes,
       }];
-
-      console.log('Datos a enviar para edición:', JSON.stringify(dataToSend));
-      console.log('Fecha seleccionada:', fechaSeleccionada);
       
-      // Formato de fecha esperado por el backend: yyyy-MM-dd
-      // Asegurarse de que fechaSeleccionada está en el formato correcto
       await axios.patch(
         `http://localhost:8080/api/usuario/editarAsistenciaProfe?fecha=${fechaSeleccionada}`, 
         dataToSend, 
@@ -164,7 +190,7 @@ const GestionarAsistenciaProfesor = () => {
     } catch (err) {
       setMensaje('Error al editar la asistencia: ' + (JSON.stringify(err.response?.data) || err.message));
     } finally {
-      setLoading(false);
+      setLoading(prev => ({ ...prev, guardando: false }));
     }
   };
 
@@ -199,6 +225,30 @@ const GestionarAsistenciaProfesor = () => {
     };
   };
 
+  // Si aún no se ha verificado el plan
+  if (planValido === null) {
+    return (
+      <Container className="mt-4 text-center">
+        <Spinner animation="border" />
+        <p>Verificando permisos...</p>
+      </Container>
+    );
+  }
+
+  // Si el plan no es válido
+  if (planValido === false) {
+    return (
+      <Container className="mt-4">
+        <Alert variant="danger">
+          <h4>Acceso restringido</h4>
+          <p>Su plan escolar no permite acceder a esta funcionalidad.</p>
+          <p>Por favor, contacte al administrador para más información.</p>
+        </Alert>
+      </Container>
+    );
+  }
+
+  // Si el plan es válido (2), mostrar el componente
   return (
     <Container className="mt-4">
       <h1 className="text-center mb-4">Gestión de Asistencia de Profesores</h1>
@@ -219,7 +269,7 @@ const GestionarAsistenciaProfesor = () => {
         </Button>
       </div>
       
-      {loading && <Spinner animation="border" />}
+      {loading.general && <Spinner animation="border" />}
       {error && <Alert variant="danger">{error}</Alert>}
       {mensaje && <Alert variant={mensaje.includes('Error') ? 'danger' : 'success'}>{mensaje}</Alert>}
 
@@ -246,7 +296,10 @@ const GestionarAsistenciaProfesor = () => {
                           type="checkbox"
                           checked={asistencia[profesor.id_usuario]?.asistio === 1}
                           onChange={() => handleCheckboxChange(profesor.id_usuario, 'asistio')}
-                          disabled={asistencia[profesor.id_usuario]?.mediaFalta === 1 || asistencia[profesor.id_usuario]?.retiroAntes === 1}
+                          disabled={
+                            asistencia[profesor.id_usuario]?.mediaFalta === 1 || 
+                            asistencia[profesor.id_usuario]?.retiroAntes === 1
+                          }
                         />
                       </td>
                       <td>
@@ -254,7 +307,10 @@ const GestionarAsistenciaProfesor = () => {
                           type="checkbox"
                           checked={asistencia[profesor.id_usuario]?.mediaFalta === 1}
                           onChange={() => handleCheckboxChange(profesor.id_usuario, 'mediaFalta')}
-                          disabled={asistencia[profesor.id_usuario]?.asistio === 1 || asistencia[profesor.id_usuario]?.retiroAntes === 1}
+                          disabled={
+                            asistencia[profesor.id_usuario]?.asistio === 1 || 
+                            asistencia[profesor.id_usuario]?.retiroAntes === 1
+                          }
                         />
                       </td>
                       <td>
@@ -262,7 +318,10 @@ const GestionarAsistenciaProfesor = () => {
                           type="checkbox"
                           checked={asistencia[profesor.id_usuario]?.retiroAntes === 1}
                           onChange={() => handleCheckboxChange(profesor.id_usuario, 'retiroAntes')}
-                          disabled={asistencia[profesor.id_usuario]?.asistio === 1 || asistencia[profesor.id_usuario]?.mediaFalta === 1}
+                          disabled={
+                            asistencia[profesor.id_usuario]?.asistio === 1 || 
+                            asistencia[profesor.id_usuario]?.mediaFalta === 1
+                          }
                         />
                       </td>
                     </tr>
@@ -270,11 +329,15 @@ const GestionarAsistenciaProfesor = () => {
                 </tbody>
               </Table>
             ) : (
-              !loading && <Alert variant="warning">No hay profesores disponibles</Alert>
+              !loading.profesores && <Alert variant="warning">No hay profesores disponibles</Alert>
             )}
 
-            <Button className="mt-3" onClick={enviarAsistencia} disabled={loading || profesores.length === 0}>
-              {loading ? 'Procesando...' : 'Registrar Asistencia'}
+            <Button 
+              className="mt-3" 
+              onClick={enviarAsistencia} 
+              disabled={loading.guardando || profesores.length === 0}
+            >
+              {loading.guardando ? 'Procesando...' : 'Registrar Asistencia'}
             </Button>
           </Card.Body>
         </Card>
@@ -294,6 +357,7 @@ const GestionarAsistenciaProfesor = () => {
                     value={fechaSeleccionada}
                     onChange={handleFechaChange}
                     className="form-select"
+                    disabled={loading.asistencias}
                   >
                     <option value="">Seleccione una fecha</option>
                     {fechasAsistencias.map((asistencia, index) => (
@@ -311,7 +375,7 @@ const GestionarAsistenciaProfesor = () => {
                     as="select"
                     value={profesorSeleccionado}
                     onChange={handleProfesorChange}
-                    disabled={!fechaSeleccionada}
+                    disabled={!fechaSeleccionada || loading.asistencias}
                     className="form-select"
                   >
                     <option value="">Seleccione un profesor</option>
@@ -390,10 +454,10 @@ const GestionarAsistenciaProfesor = () => {
                 <Button
                   variant="warning"
                   onClick={editarAsistencia}
-                  disabled={loading || !fechaSeleccionada || !profesorSeleccionado}
+                  disabled={loading.guardando || !fechaSeleccionada || !profesorSeleccionado}
                   className="mt-3"
                 >
-                  {loading ? 'Editando...' : 'Editar Asistencia'}
+                  {loading.guardando ? 'Editando...' : 'Editar Asistencia'}
                 </Button>
               </>
             )}
