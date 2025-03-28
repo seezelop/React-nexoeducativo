@@ -40,7 +40,7 @@ app.post('/crear-preferencia', async (req, res) => {
 console.log('lo que esta en successurl: '+successUrl)
   const failureUrl = platform === 'web'
     ? 'http://localhost:3000/padre'
-    : 'exp://192.168.0.160:8081/pago-fallido';
+    : 'exp://192.168.0.160:8081/padre';
 
   const preference = {
     items,
@@ -51,7 +51,7 @@ console.log('lo que esta en successurl: '+successUrl)
     auto_return: platform === 'web' ? 'approved' : undefined,
   };
 
-  console.log('la prefernecias XD '+preference)
+  console.log('la prefernecias XD '+JSON.stringify(preference))
 
   try {
     const response = await axios.post(
