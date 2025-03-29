@@ -71,19 +71,20 @@ function Padre() {
 
   return (
     <section className="d-flex flex-column min-vh-100">
-      <div className="container flex-grow-1">
-        <h1 className="mb-4">Bienvenido Padre</h1>
-        <p className="mb-5">Consulta el progreso académico y la asistencia de tus hijos en esta sección.</p>
-
-        {estadoPago === "approved" && (
-          <p className="text-success">El pago fue aprobado, y estas al dia con la cuota</p>
-        )}
-
-        <div className="d-flex flex-wrap justify-content-center gap-3">
-         
-        </div>
-      </div>
-    </section>
+    <div className="container flex-grow-1">
+      <h1 className="mb-4 text-white">Bienvenido Padre</h1>
+      <p className="mb-5 text-white fs-4">
+        Consulta el progreso académico y la asistencia de tus hijos en esta sección.
+      </p>
+  
+      {estadoPago === "approved" && (
+        <p className="text-white fs-4">El pago fue aprobado, y estás al día con la cuota.</p>
+      )}
+  
+      <div className="d-flex flex-wrap justify-content-center gap-3"></div>
+    </div>
+  </section>
+  
   );
 }
 
