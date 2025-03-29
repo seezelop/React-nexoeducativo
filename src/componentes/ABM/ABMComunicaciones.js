@@ -1,7 +1,5 @@
 import React from 'react';
 import AltaComunicacion from './AltaComunicacion';
-import BajaComunicacion from './BajaComunicacion';
-import ModificarComunicacion from './ModificarComunicacion';
 
 function ABMComunicaciones() {
   return (
