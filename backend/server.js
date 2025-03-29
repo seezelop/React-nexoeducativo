@@ -35,11 +35,11 @@ app.post('/crear-preferencia', async (req, res) => {
   const { items, platform } = req.body;
 
   const successUrl = platform === 'web'
-    ? 'http://localhost:3000/padre'          // React web
+    ? 'http://localhost:3000/Padre'          // React web
     : 'exp://192.168.0.160:8081/padre';      // React Native (Expo)
 console.log('lo que esta en successurl: '+successUrl)
   const failureUrl = platform === 'web'
-    ? 'http://localhost:3000/padre'
+    ? 'http://localhost:3000/Padre'
     : 'exp://192.168.0.160:8081/padre';
 
   const preference = {
