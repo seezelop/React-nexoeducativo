@@ -7,22 +7,19 @@ const cors = require('cors');
 const app = express();
 const PORT = 5000;
 
-// Configuración de CORS para aceptar múltiples orígenes (React web + React Native)
 const allowedOrigins = [
   'http://localhost:3000',
-  'http://192.168.0.160:3000',        // React web (desarrollo)
-  'http://localhost:19006',     // Expo (React Native)
-  'exp://192.168.0.160:8081',    // Expo en Android fisico
+  'http://192.168.0.160:3000',
+  'http://localhost:19006',
+  'exp://192.168.0.160:8081',
 ];
 
 app.use(cors({
   origin: function (origin, callback) {
-    // Permitir solicitudes sin origen (como apps móviles o Postman)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) {
+    if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('Origen no permitido por CORS'));
+      callback(new Error('Origen no permitido'));
     }
   },
   methods: ['GET', 'POST'],
@@ -30,17 +27,17 @@ app.use(cors({
 
 app.use(bodyParser.json());
 
-// Ruta para crear preferencia de pago (compatible con web y mobile)
 app.post('/crear-preferencia', async (req, res) => {
   const { items, platform } = req.body;
 
+  // URLs con parámetro status
   const successUrl = platform === 'web'
-    ? 'http://localhost:3000/padre'          // React web
-    : 'exp://192.168.0.160:8081/padre';      // React Native (Expo)
-console.log('lo que esta en successurl: '+successUrl)
+    ? 'http://localhost:3000/Padre?status=approved'
+    : 'exp://192.168.0.160:8081/padre?status=approved';
+
   const failureUrl = platform === 'web'
-    ? 'http://localhost:3000/padre'
-    : 'exp://192.168.0.160:8081/padre';
+    ? 'http://localhost:3000/Padre?status=rejected'
+    : 'exp://192.168.0.160:8081/padre?status=rejected';
 
   const preference = {
     items,
@@ -48,10 +45,8 @@ console.log('lo que esta en successurl: '+successUrl)
       success: successUrl,
       failure: failureUrl,
     },
-    auto_return: platform === 'web' ? 'approved' : undefined,
+    auto_return: 'approved', // Forzar auto-redirección
   };
-
-  console.log('la prefernecias XD '+JSON.stringify(preference))
 
   try {
     const response = await axios.post(
@@ -63,17 +58,18 @@ console.log('lo que esta en successurl: '+successUrl)
         },
       }
     );
-    res.json({ 
+    
+    res.json({
       preferenceId: response.data.id,
-      init_point: response.data.sandbox_init_point // Usa sandbox para desarrollo
+      init_point: response.data.init_point // Usar init_point real
     });
+    
   } catch (error) {
     console.error('Error en MercadoPago:', error.response?.data || error.message);
     res.status(500).json({ error: 'Error al crear la preferencia' });
   }
 });
 
-// Iniciar servidor
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Servidor listo en http://localhost:${PORT}`);
 });

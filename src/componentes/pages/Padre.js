@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import axios from "axios";
 
@@ -7,84 +7,58 @@ function Padre() {
   const [estadoPago, setEstadoPago] = useState('');
   const [precio, setPrecio] = useState(null);
   const navigate = useNavigate();
-  const primeraCarga = useRef(true); // Evita ejecutar en la primera carga
 
   useEffect(() => {
-    // Evita que el efecto se dispare en la primera carga
-    if (primeraCarga.current) {
-      primeraCarga.current = false;
-      return;
-    }
-
     const status = searchParams.get("status");
-    setEstadoPago(status);
+    setEstadoPago(status || ''); // Siempre actualiza el estado
 
-    // Si el estado es "approved" y viene de una redirección, obtenemos el precio y generamos el comprobante
     if (status === "approved") {
       obtenerPrecioYGenerarComprobante();
     }
-  }, [searchParams]); // Se ejecuta solo si cambia el parámetro en la URL
+  }, [searchParams]); // Se ejecuta con cada cambio en la URL
 
-  // Obtiene el precio antes de generar el comprobante
   const obtenerPrecioYGenerarComprobante = async () => {
     try {
       const response = await axios.get("http://localhost:8080/api/usuario/obtenerInfoCuota", {
         withCredentials: true,
       });
-
-      const nuevoPrecio = response.data;
-      setPrecio(nuevoPrecio);
-
-      console.log("Precio obtenido:", nuevoPrecio);
-
-      // Generamos el comprobante solo si se obtuvo un precio válido
-      if (nuevoPrecio) {
-        generarComprobante(nuevoPrecio);
+      
+      setPrecio(response.data);
+      if (response.data) {
+        generarComprobante(response.data);
       }
     } catch (error) {
-      console.error("Error al obtener la información de la cuota:", error);
+      console.error("Error al obtener la información:", error);
     }
   };
 
   const generarComprobante = async (importe) => {
-    if (!importe) {
-      console.error("Error: el importe es inválido");
-      return;
-    }
-
     try {
-      const response = await axios.post(
+      await axios.post(
         "http://localhost:8080/api/usuario/generarComprobante",
-        { importe }, // Enviar datos como JSON
+        { importe },
         {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: true, // Para enviar cookies si es necesario
+          headers: { "Content-Type": "application/json" },
+          withCredentials: true,
         }
       );
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Error al generar comprobante:", error);
     }
   };
 
-
   return (
     <section className="d-flex flex-column min-vh-100">
-    <div className="container flex-grow-1">
-      <h1 className="mb-4 text-white">Bienvenido Padre</h1>
-      <p className="mb-5 text-white fs-4">
-        Consulta el progreso académico y la asistencia de tus hijos en esta sección.
-      </p>
-  
-      {estadoPago === "approved" && (
-        <p className="text-white fs-4">El pago fue aprobado, y estás al día con la cuota.</p>
-      )}
-  
-      <div className="d-flex flex-wrap justify-content-center gap-3"></div>
-    </div>
-  </section>
-  
+      <div className="container flex-grow-1">
+        <h1 className="mb-4 text-white">Bienvenido Padre</h1>
+        {estadoPago === "approved" && (
+          <p className="text-white fs-4">✅ El pago fue aprobado, y estás al día con la cuota.</p>
+        )}
+        {estadoPago === "rejected" && (
+          <p className="text-danger fs-4">❌ El pago fue rechazado. Por favor, intenta nuevamente.</p>
+        )}
+      </div>
+    </section>
   );
 }
 
