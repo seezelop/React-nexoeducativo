@@ -44,8 +44,12 @@ function RealizarPago() {
   return (
     <section className="d-flex flex-column align-items-center justify-content-center min-vh-100">
       <div className="container text-center">
-        <h1 className="mb-4">Pago a través de Mercado Pago</h1>
-        <p className="mb-5"><strong>Precio:</strong> {precio !== null ? `$${precio}` : "Cargando..."}</p>
+        {/* Título con margen inferior aumentado */}
+        <h1 className="text-white fs-4 mb-4">Pago a través de Mercado Pago</h1>
+        
+        {/* Precio con margen inferior y tamaño de fuente ajustado */}
+        <p className="text-white mb-4 fs-5"><strong>Precio:</strong> {precio !== null ? `$${precio}` : "Cargando..."}</p>
+        
         <button 
           className="btn btn-primary" 
           onClick={redirigirAMercadoPago} 
@@ -55,7 +59,7 @@ function RealizarPago() {
         </button>
       </div>
     </section>
-  );
+);
 }
 
 export default RealizarPago;
