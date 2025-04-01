@@ -1,121 +1,80 @@
 import React, { Component } from 'react';
-import { Dropdown, DropdownButton, Button, Form } from 'react-bootstrap';
+import { Dropdown, DropdownButton, Button, Form, Alert, Spinner } from 'react-bootstrap';
 import axios from 'axios';
 
 class ModificarJefeColegio extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      jefesColegio: [], // Lista de jefes del colegio
+      jefesColegio: [],
       jefeSeleccionado: 'Seleccione un jefe',
       idUsuario: null,
       nombre: '',
       apellido: '',
-      rol: 'jefe%20colegio', // %20 para espacio en la request
+      rol: 'jefe%20colegio',
       dni: '',
       mail: '',
       telefono: '',
-      activo: true, // Cambiado a true por defecto
-      activoModificado: false, // Flag para controlar si el usuario modificó el campo activo
-      errores: {}, // Errores de validación
-      camposModificados: {}, // Seguimiento de campos modificados
+      activo: true,
+      errores: {},
+      error: null,
+      success: null,
+      loading: false
     };
   }
 
-  // Validar campo individual
+  // Validación mejorada de campos
   validarCampo = (id, value) => {
-    let error = '';
+    if (!value.trim()) return '';
     
-    // Solo validar si el campo ha sido modificado y no está vacío
-    if (value.trim() === '') {
-      return '';
-    }
+    const validaciones = {
+      nombre: {
+        regex: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{3,30}$/,
+        mensaje: 'El nombre debe tener entre 3 y 30 letras'
+      },
+      apellido: {
+        regex: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{4,30}$/,
+        mensaje: 'El apellido debe tener entre 4 y 30 letras'
+      },
+      dni: {
+        regex: /^\d{6,8}$/,
+        mensaje: 'El DNI debe tener entre 6 y 8 dígitos'
+      },
+      mail: {
+        regex: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+        mensaje: 'Formato de email inválido'
+      },
+      telefono: {
+        regex: /^\d{7,9}$/,
+        mensaje: 'El teléfono debe tener entre 7 y 9 dígitos'
+      }
+    };
 
-    switch (id) {
-      case 'nombre':
-        if (!/^[a-zA-Z]{3,30}$/.test(value)) {
-          error = 'El nombre debe tener entre 3 y 30 letras.';
-        }
-        break;
-      case 'apellido':
-        if (!/^[a-zA-Z]{4,30}$/.test(value)) {
-          error = 'El apellido debe tener entre 4 y 30 letras.';
-        }
-        break;
-      case 'dni':
-        if (!/^\d{6,8}$/.test(value)) {
-          error = 'El DNI debe tener entre 6 y 8 dígitos.';
-        }
-        break;
-      case 'mail':
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-          error = 'Formato de email inválido.';
-        }
-        break;
-      case 'telefono':
-        if (!/^\d{7,9}$/.test(value)) {
-          error = 'El teléfono debe tener entre 7 y 9 dígitos.';
-        }
-        break;
-      default:
-        break;
-    }
-    return error;
+    return validaciones[id] && !validaciones[id].regex.test(value) 
+      ? validaciones[id].mensaje 
+      : '';
   };
 
-  // Manejar cambios en los inputs y validar
   handleInputChange = (event) => {
     const { id, value } = event.target;
-    
-    // Marcar el campo como modificado
-    this.setState(prevState => ({
-      camposModificados: {
-        ...prevState.camposModificados,
-        [id]: true
-      }
-    }));
-    
-    // Actualizar el valor del campo
-    this.setState({ [id]: value });
-    
-    // Validar solo si el campo no está vacío
-    if (value.trim() !== '') {
-      const error = this.validarCampo(id, value);
-      
-      this.setState(prevState => ({
-        errores: {
-          ...prevState.errores,
-          [id]: error
-        }
-      }));
-    } else {
-      // Si el campo está vacío, eliminar cualquier error existente
-      this.setState(prevState => ({
-        errores: {
-          ...prevState.errores,
-          [id]: ''
-        }
-      }));
-    }
-  };
+    const error = this.validarCampo(id, value);
 
-  // Manejar cambio específico para el checkbox
-  handleCheckboxChange = (event) => {
-    const isChecked = event.target.checked;
-    
-    this.setState({ 
-      activo: isChecked,
-      activoModificado: true,
-      camposModificados: {
-        ...this.state.camposModificados,
-        activo: true
-      }
+    this.setState({
+      [id]: value,
+      errores: {
+        ...this.state.errores,
+        [id]: error
+      },
+      error: null
     });
-    
-    console.log('Checkbox cambiado a:', isChecked);
   };
 
-  // Cargar la lista de jefes del colegio
+  handleCheckboxChange = (event) => {
+    this.setState({ 
+      activo: event.target.checked
+    });
+  };
+
   cargarJefes = async () => {
     try {
       const response = await axios.get(
@@ -123,131 +82,135 @@ class ModificarJefeColegio extends Component {
         { withCredentials: true }
       );
 
-      console.log('Respuesta del servidor:', response.data);
-
-      const jefesColegio = response.data.map((jefe) => ({
+      const jefesColegio = response.data.map(jefe => ({
         idUsuario: jefe.idUsuario,
         nombre: `${jefe.nombre} ${jefe.apellido} ${jefe.dni}`,
       }));
 
-      console.log('Jefes mapeados:', jefesColegio);
-
       this.setState({ jefesColegio });
     } catch (error) {
-      console.error('Error al cargar los jefes:', error);
-      alert('Ocurrió un error al cargar los datos de los jefes.');
+      this.mostrarError('Error al cargar la lista de jefes', error);
     }
   };
 
-  // Manejar selección de jefe en el Dropdown
-  handleDropdownChange = async (value) => {
+  handleDropdownChange = (value) => {
     const parsedValue = JSON.parse(value);
-    console.log('Jefe seleccionado:', parsedValue);
-
+    
+    // Solo establecemos el ID y nombre del jefe seleccionado
+    // NO cargamos los demás datos
     this.setState({
       jefeSeleccionado: parsedValue.nombre,
       idUsuario: parsedValue.idUsuario,
-      // Resetear camposModificados cuando se selecciona un nuevo jefe
-      camposModificados: {},
-      activoModificado: false, // Resetear el flag cuando se selecciona un nuevo jefe
+      nombre: '',
+      apellido: '',
+      dni: '',
+      mail: '',
+      telefono: '',
+      activo: true,
       errores: {},
-      activo: true // Establecer a true por defecto cuando se selecciona un nuevo jefe
+      error: null,
+      success: null
     });
-
-    try {
-      const response = await axios.get(
-        `http://localhost:8080/api/usuario/modificarUsuario/${parsedValue.idUsuario}`,
-        { withCredentials: true }
-      );
-
-      console.log('Datos del jefe seleccionado:', response.data);
-
-      const { nombre, apellido, dni, mail, telefono } = response.data;
-      this.setState({
-        nombre: nombre || '',
-        apellido: apellido || '',
-        dni: dni || '',
-        mail: mail || '',
-        telefono: telefono || '',
-        activo: true, // Siempre establecer a true, ignorando el valor de la API
-      });
-    } catch (error) {
-      console.error('Error al cargar los datos del jefe:', error);
-    }
   };
 
-  // Manejar envío del formulario
   handleSubmit = async (event) => {
     event.preventDefault();
+    const { idUsuario, nombre, apellido, dni, mail, telefono, activo, errores } = this.state;
 
-    const { idUsuario, nombre, apellido, dni, mail, telefono, activo, errores, camposModificados, activoModificado } = this.state;
-
-    // Validar que idUsuario no sea null o vacío
+    // Validaciones básicas
     if (!idUsuario) {
-      alert('Por favor, seleccione un jefe.');
+      this.setState({ error: 'Debe seleccionar un jefe de colegio' });
       return;
     }
 
-    // Verificar si hay errores en los campos modificados
-    const hayErrores = Object.keys(camposModificados).some(campo => 
-      camposModificados[campo] && errores[campo]
-    );
+    // Validar que al menos un campo tenga datos
+    if (!nombre && !apellido && !dni && !mail && !telefono) {
+      this.setState({ error: 'Debe completar al menos un campo' });
+      return;
+    }
 
+    // Verificar si hay errores de validación
+    const hayErrores = Object.values(errores).some(error => error);
     if (hayErrores) {
-      alert('Por favor, corrija los errores antes de guardar los cambios.');
+      this.setState({ error: 'Corrija los errores antes de enviar' });
       return;
     }
-
-    // Crear objeto con los campos modificados
-    const datosActualizados = {};
-    if (camposModificados.nombre) datosActualizados.nombre = nombre;
-    if (camposModificados.apellido) datosActualizados.apellido = apellido;
-    if (camposModificados.dni) datosActualizados.dni = dni;
-    if (camposModificados.mail) datosActualizados.mail = mail;
-    if (camposModificados.telefono) datosActualizados.telefono = telefono;
-    
-    // Lógica para el campo activo:
-    // Si el usuario modificó el campo, enviar el valor convertido (1 para true, 0 para false)
-    // Si no lo modificó, se envía 1 por defecto
-    datosActualizados.activo = activoModificado ? (activo ? 1 : 0) : 1;
-
-    // Si no hay campos modificados aparte de activo, verificar
-    if (Object.keys(datosActualizados).length === 1 && 'activo' in datosActualizados && !activoModificado) {
-      alert('No se han realizado cambios.');
-      return;
-    }
-
-    console.log('Datos a enviar:', datosActualizados); // Para depuración
 
     try {
+      this.setState({ loading: true, error: null, success: null });
+      
+      const datos = {
+        nombre: nombre.trim(),
+        apellido: apellido.trim(),
+        dni: dni.trim(),
+        mail: mail.trim(),
+        telefono: telefono.trim(),
+        activo: activo ? 1 : 0
+      };
+
+      // Eliminar campos vacíos antes de enviar
+      Object.keys(datos).forEach(key => {
+        if (datos[key] === '') delete datos[key];
+      });
+
       const response = await axios.patch(
         `http://localhost:8080/api/usuario/modificarUsuario/${idUsuario}`,
-        datosActualizados,
-        { withCredentials: true }
+        datos,
+        { 
+          withCredentials: true,
+          headers: { 'Content-Type': 'application/json' }
+        }
       );
 
       if (response.status === 200) {
-        alert('Jefe modificado exitosamente!');
+        this.mostrarExito('Jefe modificado exitosamente!');
         this.cargarJefes();
-        this.setState({
-          jefeSeleccionado: 'Seleccione un jefe',
-          idUsuario: null,
-          nombre: '',
-          apellido: '',
-          dni: '',
-          mail: '',
-          telefono: '',
-          activo: true, // Restablecer a true al terminar
-          activoModificado: false, // Resetear el flag
-          camposModificados: {},
-          errores: {}
-        });
-      } else {
-        alert('Error al modificar el jefe');
+        this.resetearFormulario();
       }
     } catch (error) {
-      console.error('Error al modificar el jefe:', error);
+      this.mostrarError('Error al modificar el jefe', error);
+    } finally {
+      this.setState({ loading: false });
     }
+  };
+
+  mostrarError = (mensaje, error) => {
+    let errorDetails = null;
+    
+    if (error.response) {
+      if (error.response.status === 400) {
+        if (error.response.data && error.response.data.errors) {
+          errorDetails = error.response.data.errors.map(err => err.msg).join(', ');
+        } else if (error.response.data && error.response.data.message) {
+          errorDetails = error.response.data.message;
+        } else {
+          errorDetails = 'El mail y/o dni que desea ingresar ya existe en el sistema';
+        }
+      }
+    }
+
+    this.setState({
+      error: mensaje,
+      errorDetails: errorDetails || error.message
+    });
+  };
+
+  mostrarExito = (mensaje) => {
+    this.setState({
+      success: mensaje
+    });
+  };
+
+  resetearFormulario = () => {
+    this.setState({
+      nombre: '',
+      apellido: '',
+      dni: '',
+      mail: '',
+      telefono: '',
+      activo: true,
+      errores: {}
+    });
   };
 
   componentDidMount() {
@@ -255,30 +218,62 @@ class ModificarJefeColegio extends Component {
   }
 
   render() {
-    const { jefesColegio, jefeSeleccionado, nombre, apellido, dni, mail, telefono, activo, errores } = this.state;
+    const { 
+      jefesColegio, 
+      jefeSeleccionado, 
+      nombre, 
+      apellido, 
+      dni, 
+      mail, 
+      telefono, 
+      activo, 
+      errores,
+      error,
+      errorDetails,
+      success,
+      loading
+    } = this.state;
+
+    const campos = [
+      { id: 'nombre', label: 'Nombre', type: 'text' },
+      { id: 'apellido', label: 'Apellido', type: 'text' },
+      { id: 'dni', label: 'DNI', type: 'number' },
+      { id: 'mail', label: 'Email', type: 'email' },
+      { id: 'telefono', label: 'Teléfono', type: 'tel' }
+    ];
 
     return (
       <section className="d-flex flex-column">
         <section className="container d-flex justify-content-center align-items-center flex-grow-1">
-          <section className="col-lg-12">
-            <form onSubmit={this.handleSubmit}>
-              <div className="pb-5">
-                <label htmlFor="dropdown-basic-button" className="form-label">
-                  Jefe Colegio
-                </label>
+          <section className="col-lg-8">
+            {/* Mensajes de feedback */}
+            {error && (
+              <Alert variant="danger" onClose={() => this.setState({ error: null, errorDetails: null })} dismissible>
+                <strong>{error}</strong>
+                {errorDetails && <div className="mt-2">{errorDetails}</div>}
+              </Alert>
+            )}
+
+            {success && (
+              <Alert variant="success" onClose={() => this.setState({ success: null })} dismissible>
+                {success}
+              </Alert>
+            )}
+
+            <Form onSubmit={this.handleSubmit}>
+              <div className="mb-4">
+                <Form.Label>Jefe de Colegio</Form.Label>
                 <DropdownButton
-                  id="dropdown-basic-button"
+                  variant="outline-secondary"
                   title={jefeSeleccionado}
                   onSelect={this.handleDropdownChange}
-                  size="sm"
+                  className="w-100"
                 >
-                  {jefesColegio.map((jefe) => (
+                  {jefesColegio.map(jefe => (
                     <Dropdown.Item
                       key={jefe.idUsuario}
-                      eventKey={JSON.stringify({
-                        idUsuario: jefe.idUsuario,
-                        nombre: jefe.nombre,
-                      })}
+                      eventKey={JSON.stringify(jefe)}
+                      className="text-dark"
                     >
                       {jefe.nombre}
                     </Dropdown.Item>
@@ -288,45 +283,57 @@ class ModificarJefeColegio extends Component {
 
               {jefeSeleccionado !== 'Seleccione un jefe' && (
                 <>
-                  {[{ id: 'nombre', label: 'Nombre', type: 'text' },
-                    { id: 'apellido', label: 'Apellido', type: 'text' },
-                    { id: 'dni', label: 'DNI', type: 'number' },
-                    { id: 'mail', label: 'Email', type: 'email' },
-                    { id: 'telefono', label: 'Teléfono', type: 'number' }].map(({ id, label, type }) => (
-                    <div className="mb-3" key={id}>
-                      <label htmlFor={id} className="form-label">
-                        {label}
-                      </label>
+                  {campos.map(({ id, label, type }) => (
+                    <Form.Group key={id} className="mb-3">
+                      <Form.Label>{label}</Form.Label>
                       <Form.Control
                         id={id}
                         type={type}
                         value={this.state[id]}
                         onChange={this.handleInputChange}
-                        className={errores[id] ? 'is-invalid' : ''}
-                        placeholder={`Ingresa ${label.toLowerCase()}`}
+                        isInvalid={!!errores[id]}
+                        placeholder={`Ingrese ${label.toLowerCase()}`}
                       />
-                      {errores[id] && <div style={{ color: 'red' }}>{errores[id]}</div>}
-                    </div>
+                      <Form.Control.Feedback type="invalid">
+                        {errores[id]}
+                      </Form.Control.Feedback>
+                    </Form.Group>
                   ))}
 
-                  <div className="mb-3">
-                    <label htmlFor="activo" className="form-label">Activo:</label>
+                  <Form.Group className="mb-4">
                     <Form.Check
+                      type="switch"
                       id="activo"
-                      type="checkbox"
+                      label="Activo"
                       checked={activo}
                       onChange={this.handleCheckboxChange}
                     />
-                  </div>
+                  </Form.Group>
 
-                  <div className="d-grid gap-2 mb-4">
-                    <Button type="submit" className="btn btn-primary">
-                      Guardar Cambios
+                  <div className="d-grid">
+                    <Button 
+                      variant="primary" 
+                      type="submit"
+                      disabled={loading}
+                    >
+                      {loading ? (
+                        <>
+                          <Spinner
+                            as="span"
+                            animation="border"
+                            size="sm"
+                            role="status"
+                            aria-hidden="true"
+                            className="me-2"
+                          />
+                          Procesando...
+                        </>
+                      ) : 'Guardar Cambios'}
                     </Button>
                   </div>
                 </>
               )}
-            </form>
+            </Form>
           </section>
         </section>
       </section>
@@ -335,4 +342,3 @@ class ModificarJefeColegio extends Component {
 }
 
 export default ModificarJefeColegio;
-
