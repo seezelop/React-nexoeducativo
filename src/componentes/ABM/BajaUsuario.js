@@ -33,8 +33,6 @@ class BajaUsuario extends Component {
             }));
 
             this.setState({ usuarios });
-            console.log("usuarios cargadas: "+usuarios)
-
         } catch (error) {
             console.error('Error al cargar los usuarios:', error);
         }
@@ -52,10 +50,6 @@ class BajaUsuario extends Component {
             usuarioSeleccionado: parsedValue.nombre,
             idUsuario: parsedValue.idUsuario
         });
-
-        console.log("ID del usuario seleccionado:", parsedValue.idUsuario); // Imprimir en consola
-        //this.state.id_escuela = parsedValue.id_escuela
-        //console.log("id del estado "+this.state.id_escuela)
     };
 
     //manejar envio del formulario
@@ -68,8 +62,6 @@ class BajaUsuario extends Component {
            const response = await axios.delete(`http://localhost:8080/api/usuario/borrarUsuario/${this.state.idUsuario}`,{
             withCredentials: true
         });
-
-            console.log("lo que se va a enviar: "+response)
 
             //reestablecer la lista sin incluir la escuela borrada
             this.setState({
@@ -96,18 +88,21 @@ class BajaUsuario extends Component {
 
     handleShowConfirmModal = () => {
         //en caso de que no se seleccione una opcion
-        console.log('id del usuario a guardar:', this.state.idUsuario); // Debug log
+        console.log('id del usuario a guardar:', this.state.idUsuario); 
         if (!this.state.idUsuario) {
             alert('Por favor, seleccione un usuario primero');
-            console.log("id enviado al backend"+this.state.idUsuario);
             return;
         }
         this.setState({ showConfirmModal: true });
     };
 
-    handleCloseConfirmModal = () => {
-        this.setState({ showModal: false });
-    };
+        handleCloseConfirmModal = () => {
+            this.setState({
+                showConfirmModal: false, 
+                usuarioSeleccionado: 'Seleccione un usuario',
+                idUsuario: null
+            });
+        }
 
     render() {
         return (
@@ -128,6 +123,7 @@ class BajaUsuario extends Component {
                                         <Dropdown.Item
                                             key={escuela.idUsuario}
                                             eventKey={JSON.stringify({ idUsuario: escuela.idUsuario, nombre: escuela.nombre })}
+                                            style={{ color: 'black' }}
                                         >
                                             {escuela.nombre}
                                         </Dropdown.Item>

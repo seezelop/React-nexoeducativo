@@ -14,6 +14,8 @@ class AltaJefeColegio extends Component {
       rol: 2, // por defecto
       showModal: false,
       errores: {}, // Almacena los errores de validación
+      mensaje: "", // Mensaje de éxito o error
+      tipoMensaje: "", // "success" o "error"
     };
   }
 
@@ -53,7 +55,7 @@ class AltaJefeColegio extends Component {
           )
         ) {
           error =
-            "La clave debe tener entre 8 y 32 caracteres, al menos una letra mayúscula, una minúscula, un número y un carácter especial.";
+            "La clave debe tener entre 8 y 32 caracteres, al menos una mayúscula, una minúscula, un número y un carácter especial.";
         }
         break;
 
@@ -85,7 +87,7 @@ class AltaJefeColegio extends Component {
   handleSubmit = (e) => {
     e.preventDefault();
 
-    const { errores, ...datosUsuario } = this.state;
+    const { errores, mensaje, tipoMensaje, ...datosUsuario } = this.state;
 
     // Verifica si hay errores
     const erroresPendientes = Object.keys(datosUsuario).reduce((acc, key) => {
@@ -98,7 +100,6 @@ class AltaJefeColegio extends Component {
 
     if (Object.keys(erroresPendientes).length > 0) {
       this.setState({ errores: erroresPendientes });
-      alert("Por favor, corrija los errores antes de enviar.");
       return;
     }
 
@@ -113,22 +114,43 @@ class AltaJefeColegio extends Component {
     })
       .then((response) => {
         if (response.ok) {
-          alert("Jefe Colegio creado correctamente.");
-          window.location.reload(); // Recarga la página
+          this.setState({
+            mensaje: "Jefe Colegio creado correctamente.",
+            tipoMensaje: "success",
+            nombre: "",
+            apellido: "",
+            dni: "",
+            mail: "",
+            clave: "",
+            telefono: "",
+            errores: {},
+          });
+        } else {
+          return response.text().then((text) => {
+            throw new Error(text || "Error al crear usuario");
+          });
         }
-        return response.text();
       })
-      .then((data) => console.log("User created:", data))
-      .catch((error) => console.error("Error creating user:", error));
+      .catch((error) => {
+        this.setState({
+          mensaje: error.message,
+          tipoMensaje: "error",
+        });
+      });
   };
 
   render() {
-    const { errores } = this.state;
+    const { errores, mensaje, tipoMensaje } = this.state;
 
     return (
       <section className="d-flex flex-column">
         <section className="container d-flex justify-content-center align-items-center flex-grow-1">
           <section className="col-lg-12">
+            {mensaje && (
+              <div className={`alert ${tipoMensaje === "success" ? "alert-success" : "alert-danger"}`}>
+                {mensaje}
+              </div>
+            )}
             <form onSubmit={this.handleSubmit}>
               {[{ id: "nombre", label: "Nombre", type: "text" },
                 { id: "apellido", label: "Apellido", type: "text" },
@@ -151,14 +173,7 @@ class AltaJefeColegio extends Component {
                       required
                     />
                     {errores[id] && (
-                      <div
-                        style={{
-                          color: "black",
-                          fontWeight: "bold",
-                          fontSize: "0.9rem",
-                          marginTop: "0.3rem",
-                        }}
-                      >
+                      <div className="text-danger" style={{ fontWeight: "bold", fontSize: "0.9rem", marginTop: "0.3rem" }}>
                         {errores[id]}
                       </div>
                     )}

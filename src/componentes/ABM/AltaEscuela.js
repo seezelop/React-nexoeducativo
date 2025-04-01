@@ -115,8 +115,17 @@ class AltaEscuela extends Component {
                 });
             }
         } catch (error) {
-            console.error("Error al crear la escuela:", error);
-            alert("Ocurrió un error al intentar crear la escuela. Por favor, inténtalo nuevamente.");
+            if (error.response) {
+                const { status, data } = error.response;
+    
+                if (status === 404 || status === 409) { 
+                    alert(data.message || "La escuela ya existe en la plataforma.");
+                } else {
+                    alert("Ocurrió un error inesperado. Inténtalo nuevamente.");
+                }
+            } else {
+                alert("No se pudo conectar con el servidor.");
+            }
         }
     };
 
