@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Dropdown, DropdownButton, Button, Form } from 'react-bootstrap';
+import { Dropdown, DropdownButton, Button, Form, Alert } from 'react-bootstrap';
 import axios from 'axios';
 
 class ModificarEscuela extends Component {
@@ -8,11 +8,15 @@ class ModificarEscuela extends Component {
     this.state = {
       escuelaSeleccionada: 'Seleccione un colegio',
       id_escuela: null,
-      nombre: '',
-      direccion: '',
-      activo: false,
+      nombre: null,
+      direccion: null,
+      activo: null,
       plan_id_plan: null,
       escuelas: [],
+      usuarioModificoActivo: false,
+      error: null,
+      success: null,
+      loading: false
     };
   }
 
@@ -32,6 +36,9 @@ class ModificarEscuela extends Component {
       this.setState({ escuelas });
     } catch (error) {
       console.error('Error al cargar las escuelas:', error);
+      this.setState({ 
+        error: 'Error al cargar la lista de escuelas' 
+      });
     }
   };
 
@@ -42,48 +49,145 @@ class ModificarEscuela extends Component {
       id_escuela: parsedValue.id_escuela,
       nombre: '',
       direccion: '',
-      activo: false,
+      activo: null,
       plan_id_plan: null,
+      usuarioModificoActivo: false,
+      error: null,
+      success: null
     });
   };
 
   handleInputChange = (event) => {
     const { id, value, type, checked } = event.target;
-    this.setState({ [id]: type === 'checkbox' ? checked : value });
+    
+    if (id === 'activo') {
+      this.setState({ 
+        [id]: checked,
+        usuarioModificoActivo: true
+      });
+    } else {
+      this.setState({ 
+        [id]: type === 'checkbox' ? checked : value,
+        error: null
+      });
+    }
   };
 
   handleSubmit = async (event) => {
     event.preventDefault();
-    const { id_escuela, nombre, direccion, activo, plan_id_plan } = this.state;
-
+    const { id_escuela, nombre, direccion, activo, plan_id_plan, usuarioModificoActivo } = this.state;
+  
+    if (!id_escuela) {
+      this.setState({ error: 'Debe seleccionar una escuela para modificar' });
+      return;
+    }
+  
+    if (!usuarioModificoActivo && !nombre && !direccion && !plan_id_plan) {
+      this.setState({ error: 'Debe modificar al menos un campo' });
+      return;
+    }
+  
+    const datos = {};
+  
+    if (usuarioModificoActivo) {
+      datos.activo = activo ? 1 : 0;
+    }
+  
+    if (nombre && nombre.trim() !== '') {
+      datos.nombre = nombre.trim();
+    }
+  
+    if (direccion && direccion.trim() !== '') {
+      datos.direccion = direccion.trim();
+    }
+  
+    if (plan_id_plan) {
+      datos.idPlan = plan_id_plan;
+    }
+  
     try {
-      const datos = { nombre, direccion, activo: activo ? 1 : 0, plan_id_plan };
+      this.setState({ loading: true, error: null, success: null });
+
       const response = await axios.patch(
         `http://localhost:8080/api/usuario/modificarEscuela/${id_escuela}`,
         datos,
-        { withCredentials: true }
+        { 
+          withCredentials: true,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
       );
-
+  
       if (response.status === 200) {
-        alert('Escuela modificada exitosamente!');
+        this.setState({ 
+          success: 'Escuela modificada exitosamente!',
+          loading: false,
+          nombre: '',
+          direccion: '',
+          plan_id_plan: null,
+          usuarioModificoActivo: false
+        });
         this.cargarEscuelas();
       }
     } catch (error) {
       console.error('Error al modificar la escuela:', error);
-      alert('Ocurrió un error al intentar modificar la escuela.');
+      
+      let errorMessage = 'Ocurrió un error al modificar la escuela';
+      
+      if (error.response) {
+        if (error.response.data && error.response.data.message) {
+          errorMessage = error.response.data.message;
+        } else if (error.response.status === 400) {
+          errorMessage = 'Datos inválidos enviados al servidor';
+        } else if (error.response.status === 401) {
+          errorMessage = 'No autorizado. Por favor inicie sesión.';
+        } else if (error.response.status === 404) {
+          errorMessage = 'Ya hay una escuela registrada en esa direccion';
+        }
+      } else if (error.request) {
+        errorMessage = 'No se recibió respuesta del servidor. Verifique su conexión.';
+      }
+  
+      this.setState({ 
+        error: errorMessage,
+        loading: false
+      });
     }
   };
-
+  
   render() {
-    const { escuelaSeleccionada, escuelas, nombre, direccion, activo, plan_id_plan, id_escuela } = this.state;
+    const { 
+      escuelaSeleccionada, 
+      escuelas, 
+      nombre, 
+      direccion, 
+      activo, 
+      plan_id_plan, 
+      id_escuela,
+      error,
+      success,
+      loading
+    } = this.state;
 
     return (
       <section className="d-flex flex-column">
         <div className="container d-flex flex-column justify-content-center align-items-center flex-grow-1">
-          
           <section className="col-md-8 mb-5">
             <div className="card shadow-sm p-3"> 
-              <h3 className="mb-4 text-center">Seleccionar escuela</h3>
+              <h3 className="mb-4 text-center">Modificar escuela</h3>
+
+              {error && (
+                <Alert variant="danger" onClose={() => this.setState({ error: null })} dismissible>
+                  {error}
+                </Alert>
+              )}
+
+              {success && (
+                <Alert variant="success" onClose={() => this.setState({ success: null })} dismissible>
+                  {success}
+                </Alert>
+              )}
 
               <Form onSubmit={this.handleSubmit}>
                 <div className="mb-4">
@@ -97,7 +201,7 @@ class ModificarEscuela extends Component {
                       <Dropdown.Item
                         key={escuela.id_escuela}
                         eventKey={JSON.stringify({ id_escuela: escuela.id_escuela, nombre: escuela.nombre })}
-                        className="text-dark"  // COLOR NEGRO PARA LOS TEXTOS DEL DESPLEGABLE
+                        className="text-dark"
                       >
                         {escuela.nombre}
                       </Dropdown.Item>
@@ -113,7 +217,7 @@ class ModificarEscuela extends Component {
                         type="text"
                         className="form-control"
                         id="nombre"
-                        value={nombre}
+                        value={nombre || ''}
                         onChange={this.handleInputChange}
                         placeholder="Nuevo nombre"
                       />
@@ -125,21 +229,21 @@ class ModificarEscuela extends Component {
                         type="text"
                         className="form-control"
                         id="direccion"
-                        value={direccion}
+                        value={direccion || ''}
                         onChange={this.handleInputChange}
                         placeholder="Nueva dirección"
                       />
                     </div>
 
-                    <div className="mb-3">
-                      <label htmlFor="activo" className="form-label">Activo:</label>
+                    <div className="mb-3 form-check">
                       <input
                         type="checkbox"
                         className="form-check-input"
                         id="activo"
-                        checked={activo}
+                        checked={activo || false}
                         onChange={this.handleInputChange}
                       />
+                      <label htmlFor="activo" className="form-check-label">Activo</label>
                     </div>
 
                     <div className="mb-3">
@@ -157,7 +261,18 @@ class ModificarEscuela extends Component {
                     </div>
 
                     <div className="d-grid gap-2">
-                      <Button type="submit" className="btn btn-primary">Guardar cambios</Button>
+                      <Button 
+                        type="submit" 
+                        variant="primary"
+                        disabled={loading}
+                      >
+                        {loading ? (
+                          <>
+                            <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                            Guardando...
+                          </>
+                        ) : 'Guardar cambios'}
+                      </Button>
                     </div>
                   </>
                 )}

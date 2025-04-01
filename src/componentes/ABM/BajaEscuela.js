@@ -28,7 +28,6 @@ class BajaEscuela extends Component {
             }));
 
             this.setState({ escuelas });
-            console.log("Escuelas cargadas: ", escuelas);
         } catch (error) {
             console.error('Error al cargar las escuelas:', error);
         }
