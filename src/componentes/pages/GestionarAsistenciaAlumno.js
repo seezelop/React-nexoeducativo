@@ -210,7 +210,7 @@ const GestionarAsistenciaAlumnos = () => {
   const asistenciaActual = asistencia.find(a => a.idUsuario === parseInt(alumnoSeleccionado)) || {};
 
   return (
-    <div className="container mt-4">
+    <div className="container mt-4 text-white pb-5">
       <h2>Gestionar Asistencia de Alumnos</h2>
 
       {mensaje.text && <Alert variant={mensaje.type}>{mensaje.text}</Alert>}
