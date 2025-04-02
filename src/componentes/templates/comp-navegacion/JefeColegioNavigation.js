@@ -5,11 +5,6 @@ const JefeColegioNavigation = () => {
   return (
     <>
       <li className="nav-item me-3">
-        <Link className="nav-link active" to="/admin/chats">
-          Chats
-        </Link>
-      </li>
-      <li className="nav-item me-3">
         <Link className="nav-link active" to="/ABMadministrativo">
           ABM administrativos
         </Link>
