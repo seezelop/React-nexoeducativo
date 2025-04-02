@@ -26,18 +26,19 @@ function CantInasistenciasAlumno() {
   }, []);
 
   return (
-    <div>
-      <h3>Inasistencias del Alumno</h3>
-
+    <div style={{ marginTop: "50px", marginBottom: "50px", marginLeft: "50px" }}>
+      <h3 style={{ color: "white" }}>Inasistencias del Alumno</h3>
+  
       {cargando ? (
-        <p>Cargando...</p>
+        <p style={{ color: "white" }}>Cargando...</p>
       ) : error ? (
         <p style={{ color: "red" }}>{error}</p>
       ) : (
-        <p>{inasistencias}</p>
+        <p style={{ color: "white" }}>{inasistencias}</p>
       )}
     </div>
-  );
+  ); 
+  
 }
 
 export default CantInasistenciasAlumno;
