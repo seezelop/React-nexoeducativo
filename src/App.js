@@ -71,7 +71,7 @@ function App() {
             {/* Ruta principal */}
             <Route path="/" element={
               <>
-                <section className="container my-4">
+                <section className="container my-4 text-white">
                   <h1 className="text-center">Bienvenido a Nexo Educativo</h1>
                   <p className="text-center">
                     Somos la plataforma lider de Gestión Educativa. 
