@@ -119,14 +119,14 @@ const FormularioCuota = () => {
 
                     {/* Botón para registrar */}
                     <div className="d-grid mb-2">
-                        <button type="submit" className="btn btn-primary" onClick={handleSubmit}>
+                        <button type="submit" className="btn btn-success" onClick={handleSubmit}>
                             Registrar Cuota
                         </button>
                     </div>
 
                     {/* Botón para modificar */}
                     <div className="d-grid">
-                        <button type="submit" className="btn btn-warning" onClick={handleUpdate}>
+                        <button type="submit" className="btn btn-secondary" onClick={handleUpdate}>
                             Modificar Cuota
                         </button>
                     </div>
