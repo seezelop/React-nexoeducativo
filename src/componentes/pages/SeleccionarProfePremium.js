@@ -8,7 +8,7 @@ const SeleccionarProfePremium = () => {
   const [error, setError] = useState(null);
   const [profesorSeleccionado, setProfesorSeleccionado] = useState('');
   const [infoProfesor, setInfoProfesor] = useState(null);
-  const[rol, setRol]=useState("profesor")
+  const [rol, setRol] = useState("profesor");
 
   // Cargar profesores al montar el componente
   useEffect(() => {
@@ -59,47 +59,49 @@ const SeleccionarProfePremium = () => {
   };
 
   return (
-    <Container className="mt-4">
-      <h1 className="text-center mb-4">Información del Profesor</h1>
+    <Container className="mt-4 d-flex flex-column min-vh-100">
+      <div className="flex-grow-1">
+        <h1 className="text-center text-white mb-4">Información del Profesor</h1>
 
-      {loading && <Spinner animation="border" />}
-      {error && <Alert variant="danger">{error}</Alert>}
+        {loading && <Spinner animation="border" />}
+        {error && <Alert variant="danger">{error}</Alert>}
 
-      <Card>
-        <Card.Body>
-          <Row>
-            <Col>
-              <Form.Group>
-                <Form.Label>Seleccione un profesor</Form.Label>
-                <Form.Control as="select" value={profesorSeleccionado} onChange={handleProfesorChange}>
-                  <option value="">Seleccione un profesor</option>
-                  {profesores.map((profesor) => (
-                    <option key={profesor.idProfesor} value={profesor.idProfesor}>
-                      {profesor.nombre}
-                    </option>
-                  ))}
-                </Form.Control>
-              </Form.Group>
-            </Col>
-          </Row>
-        </Card.Body>
-      </Card>
-
-      {infoProfesor && (
-        <Card className="mt-4">
+        <Card>
           <Card.Body>
-            <h4>Información del Profesor Seleccionado</h4>
-            <p><strong>Cantidad de Cursos:</strong> {infoProfesor.cantCursos}</p>
-            <p><strong>Horas Totales:</strong> {infoProfesor.cantHoras}</p>
-            <p><strong>Asistencias:</strong></p>
-            <ul>
-              {infoProfesor.asistencias.map((asistencia, index) => (
-                <li key={index}>{asistencia}</li>
-              ))}
-            </ul>
+            <Row>
+              <Col>
+                <Form.Group>
+                  <Form.Label>Seleccione un profesor</Form.Label>
+                  <Form.Control as="select" value={profesorSeleccionado} onChange={handleProfesorChange}>
+                    <option value="">Seleccione un profesor</option>
+                    {profesores.map((profesor) => (
+                      <option key={profesor.idProfesor} value={profesor.idProfesor}>
+                        {profesor.nombre}
+                      </option>
+                    ))}
+                  </Form.Control>
+                </Form.Group>
+              </Col>
+            </Row>
           </Card.Body>
         </Card>
-      )}
+
+        {infoProfesor && (
+          <Card className="mt-4">
+            <Card.Body>
+              <h4>Información del Profesor Seleccionado</h4>
+              <p><strong>Cantidad de Cursos:</strong> {infoProfesor.cantCursos}</p>
+              <p><strong>Horas Totales:</strong> {infoProfesor.cantHoras}</p>
+              <p><strong>Asistencias:</strong></p>
+              <ul>
+                {infoProfesor.asistencias.map((asistencia, index) => (
+                  <li key={index}>{asistencia}</li>
+                ))}
+              </ul>
+            </Card.Body>
+          </Card>
+        )}
+      </div>
     </Container>
   );
 };

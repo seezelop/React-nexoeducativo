@@ -85,7 +85,7 @@ class SeleccionarCurso extends Component {
                     <section className="col-lg-12">
                         <form>
                             <div className="pb-5">
-                                <label htmlFor="dropdown-basic-button" className="form-label">Curso</label>
+                                <label htmlFor="dropdown-basic-button" className="form-label text-white">Curso</label>
                                 <DropdownButton
                                     id="dropdown-basic-button"
                                     title={cursoSeleccionado}

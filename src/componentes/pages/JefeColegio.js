@@ -11,8 +11,8 @@ const JefeColegioNavigation = () => {
   return (
     <section className="d-flex flex-column min-vh-100">
       <div className="container d-flex flex-column justify-content-center align-items-center flex-grow-1">
-        <h1 className="mb-5">Bienvenido Jefe de Colegio</h1>
-        <h3 className="mb-5">Panel para gestionar la membresía</h3>
+        <h1 className="text-white mb-5">Bienvenido Jefe de Colegio</h1>
+        <h3 className="text-white mb-5">Panel para gestionar la membresía</h3>
 
         <div className="d-flex justify-content-center">
           <button className="btn btn-primary me-3" onClick={redirigirARenovar}>
