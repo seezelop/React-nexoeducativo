@@ -115,7 +115,8 @@ Comentarios: ${formData.comentarios}`
             <section className="d-flex flex-column min-vh-100">
                 <section className="container d-flex justify-content-center align-items-center flex-grow-1">
                     <section className="col-md-8">
-                        <h2 className="text-center mb-4 pt-4">Dejanos tu consulta</h2>
+                    <h2 className="text-center mb-4 pt-4 text-white">Dejanos tu consulta</h2>
+
                         
                         {successMessage && (
                             <div className="alert alert-success mb-4" role="alert">

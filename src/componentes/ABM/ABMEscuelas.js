@@ -8,7 +8,7 @@ function ABMEscuelas() {
   const navigate = useNavigate(); // Hook para redirigir
 
   return (
-    <section className="d-flex flex-column min-vh-100">
+    <section className="d-flex flex-column min-vh-100 pt-5">
       <div className="container d-flex flex-column justify-content-center align-items-center flex-grow-1">
         
         {/* Sección Alta Escuela */}
@@ -35,12 +35,15 @@ function ABMEscuelas() {
           </div>
         </section>
 
-        {/* Botón para redirigir a Consultar Escuelas */}
+        {/*
+        
         <section className="col-md-8 mb-5">
           <button className="btn btn-primary" onClick={() => navigate('/consultar-escuelas')}>
             Consultar Escuelas
           </button>
         </section>
+          */}
+
       </div>
     </section>
   );
