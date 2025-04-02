@@ -48,7 +48,7 @@ function Padre() {
   };
 
   return (
-    <section className="d-flex flex-column min-vh-100">
+    <section className="d-flex flex-column min-vh-100 pt-5">
       <div className="container flex-grow-1">
         <h1 className="mb-4 text-white">Bienvenido Padre</h1>
         {estadoPago === "approved" && (

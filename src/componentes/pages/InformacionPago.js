@@ -46,7 +46,7 @@ const InformacionPago = () => {
   }
 
   return (
-    <Container className="mt-4">
+    <Container className="pt-5 pb-5">
       <Card>
         <Card.Header as="h5">Información de Pago</Card.Header>
         <Card.Body>

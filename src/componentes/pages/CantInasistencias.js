@@ -50,11 +50,11 @@ function CantInasistencias() {
   }, [hijoSeleccionado]);  // Este useEffect se activa cada vez que cambia el hijo seleccionado
 
   return (
-    <div className="container mt-4">
-      <h3 className="text-center mb-4">Inasistencias</h3>
+    <div className="container mt-4 pt-5 pb-5">
+      <h3 className="text-center mb-4 text-white ">Inasistencias</h3>
 
       {/* Muestra un dropdown para seleccionar un hijo */}
-      <div className="form-group">
+      <div className="form-group text-white">
         <label htmlFor="hijoSelect">Seleccione un hijo</label>
         <select
           id="hijoSelect"
