@@ -63,7 +63,7 @@ class SeleccionarCurso extends Component {
                 apellidoP: curso.apellidoP || '',
             });
 
-            console.info('INFO CURSO:', curso);
+            //console.info('INFO CURSO:', curso);
         } catch (error) {
             console.error('Error al cargar la información:', error.response?.data || error.message);
         }
