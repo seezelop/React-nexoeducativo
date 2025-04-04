@@ -31,7 +31,7 @@ class BajaAdministrativo extends Component {
             }));
 
             this.setState({ administrativos });
-            console.log("Administrativos cargados: ", administrativos);
+           // console.log("Administrativos cargados: ", administrativos);
 
         } catch (error) {
             console.error('Error al cargar los administrativos:', error);
@@ -49,7 +49,7 @@ class BajaAdministrativo extends Component {
             idUsuario: parsedValue.idUsuario
         });
 
-        console.log("ID del administrativo seleccionado:", parsedValue.idUsuario);
+       // console.log("ID del administrativo seleccionado:", parsedValue.idUsuario);
     };
 
     handleSubmit = async (event) => {

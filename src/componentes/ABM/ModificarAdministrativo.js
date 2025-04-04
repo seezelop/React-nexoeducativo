@@ -142,6 +142,8 @@ class ModificarAdministrativo extends Component {
         if (mail !== valoresOriginales.mail) datosModificados.mail = mail;
         if (telefono !== valoresOriginales.telefono) datosModificados.telefono = telefono;
         if (activo !== valoresOriginales.activo) datosModificados.activo = activo;
+
+        //console.log('datos a enviar: '+JSON.stringify(datosModificados))
         try {
             const response = await axios.patch(
                 `http://localhost:8080/api/usuario/modificarUsuario/${idAdministrativo}`,
