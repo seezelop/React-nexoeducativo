@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { Form, Button } from "react-bootstrap";
+import { Form, Button, Row, Col } from "react-bootstrap";
 
 const RenovarMembresia = () => {
   const [planes, setPlanes] = useState([]);
   const [selectedPlan, setSelectedPlan] = useState("");
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();  // Para redirigir después de la acción
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchPlanes = async () => {
@@ -15,7 +15,7 @@ const RenovarMembresia = () => {
         const response = await axios.get("http://localhost:8080/api/usuario/getInfoPlanes", {
           withCredentials: true,
         });
-        setPlanes(response.data);  // Guardamos los planes obtenidos
+        setPlanes(response.data);
       } catch (error) {
         console.error("Error al cargar los planes:", error);
         alert("Error al cargar los planes.");
@@ -24,27 +24,38 @@ const RenovarMembresia = () => {
     fetchPlanes();
   }, []);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!selectedPlan) {
+  const handleRenovacion = async (renovar) => {
+    if (!selectedPlan && renovar) {
       alert("Por favor, selecciona un plan.");
       return;
     }
+    
     setLoading(true);
     try {
-      const response = await axios.post("http://localhost:8080/api/usuario/renovarMembresia", { plan: selectedPlan }, {
-        withCredentials: true,
-      });
-      console.log('infoo: '+response.data)
+      const response = await axios.post(
+        "http://localhost:8080/api/usuario/renovarMembresia", 
+        { 
+          idPlan: renovar ? parseInt(selectedPlan) : 0, 
+          renovo: renovar 
+        }, 
+        {
+          withCredentials: true,
+        }
+      );
+      
       if (response.status === 200) {
-        alert("Membresía renovada exitosamente.");
-        navigate('/JefeColegio');  // Redirige a la página de jefe colegio después de renovar membresia
+        if (renovar) {
+          alert("Tu solicitud para renovar la membresia ha ingresado al sistema");
+        } else {
+          alert("Todos los usuarios de su escuela han sido desactivados debido a que decidio no renovar su membresia");
+        }
+        navigate('/JefeColegio');
       } else {
-        alert("Hubo un problema al renovar la membresía.");
+        alert("Hubo un problema al procesar la solicitud.");
       }
     } catch (error) {
-      console.error("Error al renovar la membresía:", error);
-      alert("Hubo un error en la renovación.");
+      console.error("Error en la operación:", error);
+      alert("Hubo un error al procesar su solicitud.");
     } finally {
       setLoading(false);
     }
@@ -53,13 +64,12 @@ const RenovarMembresia = () => {
   return (
     <div className="container mt-5">
       <h2>Renovar Membresía</h2>
-      <Form onSubmit={handleSubmit}>
+      <Form>
         <Form.Group className="mb-3">
           <Form.Label>Selecciona el tipo de plan</Form.Label>
           <Form.Select
             value={selectedPlan}
             onChange={(e) => setSelectedPlan(e.target.value)}
-            required
           >
             <option value="">Seleccione un plan</option>
             {planes.map((plan) => (
@@ -69,9 +79,29 @@ const RenovarMembresia = () => {
             ))}
           </Form.Select>
         </Form.Group>
-        <Button type="submit" variant="success" disabled={loading} className="mb-5"> {/* Añade la clase 'mb-5' */}
-          {loading ? "Procesando..." : "Renovar Membresía"}
-        </Button>
+        
+        <Row className="mb-5">
+          <Col>
+            <Button 
+              variant="success" 
+              disabled={loading} 
+              onClick={() => handleRenovacion(true)}
+              className="w-100"
+            >
+              {loading ? "Procesando..." : "Renovar Membresía"}
+            </Button>
+          </Col>
+          <Col>
+            <Button 
+              variant="danger" 
+              disabled={loading} 
+              onClick={() => handleRenovacion(false)}
+              className="w-100"
+            >
+              {loading ? "Procesando..." : "No Renovar"}
+            </Button>
+          </Col>
+        </Row>
       </Form>
     </div>
   );
