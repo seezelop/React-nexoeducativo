@@ -51,7 +51,7 @@ const GestionesPago = () => {
       <div className="mt-3">
         {/* Solo botón para subir información */}
         <button
-          className="btn btn-success"
+          className="btn btn-success mb-5"
           onClick={handleSubmit}
         >
           Subir Información

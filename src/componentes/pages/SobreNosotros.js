@@ -5,7 +5,7 @@ class SobreNosotros extends Component {
         return (
             <>
                 <div className="container p-4 pb-0">
-                    <h1 className="text-center mb-4">¿Por qué decidimos fundar Nexo Educativo?</h1>
+                    <h1 className="text-center mb-4 text-white">¿Por qué decidimos fundar Nexo Educativo?</h1>
                     <div className="card mb-4"> {/* Tarjeta envolvente con margen inferior */}
                         <div className="card-body">
                             <p className="SobreNosotros">

@@ -6,7 +6,7 @@ function QueOfrecemos() {
       {/* Contenedor principal usando section */}
       <section className="container flex-grow-1">
         <section className="col-md-8 mx-auto">
-          <h2 className="text-center mb-4 pt-3">¿Qué ofrecemos?</h2>
+          <h2 className="text-center mb-4 pt-3 text-white">¿Qué ofrecemos?</h2>
           {/* Renglón para las tarjetas */}
           <div className="row">
             <div className="col-md-6 mb-4">

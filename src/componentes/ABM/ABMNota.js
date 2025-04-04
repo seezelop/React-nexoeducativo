@@ -3,7 +3,7 @@ import ModificarNota from './ModificarNota';
 
 function ABMNota() {
   return (
-    <section className="d-flex flex-column min-vh-100">
+    <section className="d-flex flex-column min-vh-100 pt-5">
       <div className="container d-flex flex-column justify-content-center align-items-center flex-grow-1">
         {/* Sección Modificar Nota */}
         <section className="col-md-8 mb-5">

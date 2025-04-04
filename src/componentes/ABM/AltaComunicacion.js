@@ -47,7 +47,7 @@ function AltaComunicacion() {
   };
 
   return (
-    <div className="container mt-4">
+    <div className="container mt-5 pb-5">
       <div className="card shadow">
         <div className="card-header bg-primary text-white">
           <h4>Enviar Comunicación</h4>

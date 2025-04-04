@@ -92,10 +92,13 @@ function Login() {
     <section className="d-flex flex-column min-vh-100">
       <section className="container d-flex justify-content-center align-items-center flex-grow-1">
         <section className="col-md-6">
-          <h2 className="text-center mb-4">Iniciar sesión</h2>
+          <h2 className="text-center text-white mb-4">Iniciar sesión</h2>
           <form onSubmit={handleSubmit}>
             <section className="mb-3">
-              <label htmlFor="email" className="form-label">Correo electrónico</label>
+            <label htmlFor="email" className="form-label text-white">
+              Correo electrónico
+            </label>
+
               <input
                 type="email"
                 className="form-control"
@@ -107,7 +110,7 @@ function Login() {
               />
             </section>
             <section className="mb-3">
-              <label htmlFor="password" className="form-label">Contraseña</label>
+              <label htmlFor="password" className="form-label text-white">Contraseña</label>
               <input
                 type="password"
                 className="form-control"

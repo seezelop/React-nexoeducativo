@@ -16,7 +16,7 @@ const ProfesorNavigation = () => {
       </li>
       <li className="nav-item me-3">
         <Link className="nav-link active" to="/ABMnota">
-            ABM nota
+            Modificar nota
         </Link>
         </li>
       <li className="nav-item me-3">

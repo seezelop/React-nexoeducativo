@@ -16,8 +16,8 @@ const Administrativo = () => {
   return (
     <section className="d-flex flex-column min-vh-100">
       <div className="container d-flex flex-column justify-content-center align-items-center flex-grow-1">
-        <h1 className="mb-5">Bienvenido Administrativo</h1>
-        <h3 className="mb-5">Panel de Gestión Administrativa</h3>
+        <h1 className="text-white mb-5">Bienvenido Administrativo</h1>
+        <h3 className="text-white mb-5">Panel de Gestión Administrativa</h3>
 
         <div className="d-flex flex-column align-items-center gap-3">
           {/* Botón para establecer precio de cuota */}
