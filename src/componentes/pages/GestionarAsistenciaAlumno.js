@@ -21,6 +21,14 @@ const GestionarAsistenciaAlumnos = () => {
           withCredentials: true,
         });
         setCursos(response.data);
+
+        // Verificar si no hay cursos y mostrar mensaje
+        if (response.data.length === 0) {
+          setMensaje({
+            text: 'No tenes cursos asignados',
+            type: 'info'
+          });
+        }
       } catch (error) {
         console.error('Error al obtener cursos:', error);
         setMensaje({ text: 'Hubo un error al cargar los cursos.', type: 'danger' });
@@ -69,7 +77,7 @@ const GestionarAsistenciaAlumnos = () => {
         `http://localhost:8080/api/usuario/obtenerAsistencia/${cursoId}`,
         { withCredentials: true }
       );
-      
+
       // Asegurarse de que siempre trabajamos con un array
       const data = Array.isArray(response.data) ? response.data : [response.data];
       setFechasAsistencias(data);
@@ -230,11 +238,15 @@ const GestionarAsistenciaAlumnos = () => {
                     disabled={loading}
                   >
                     <option value="">Seleccione un curso</option>
-                    {cursos.map(curso => (
-                      <option key={curso.idCurso} value={curso.idCurso}>
-                        {curso.numero}° {curso.division}
-                      </option>
-                    ))}
+                    {cursos.length > 0 ? (
+                      cursos.map(curso => (
+                        <option key={curso.idCurso} value={curso.idCurso}>
+                          {curso.numero}° {curso.division}
+                        </option>
+                      ))
+                    ) : (
+                      <option disabled>No hay cursos disponibles</option>
+                    )}
                   </Form.Control>
                 </Form.Group>
               </Col>
@@ -402,8 +414,8 @@ const GestionarAsistenciaAlumnos = () => {
                   </tr>
                 </tbody>
               </Table>
-              <Button 
-                variant="warning" 
+              <Button
+                variant="warning"
                 onClick={handleEditarAsistencia}
                 disabled={loading || !fechaSeleccionada}
               >

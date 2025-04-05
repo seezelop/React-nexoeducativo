@@ -115,7 +115,7 @@ class BajaCursoPreceptor extends Component {
                   <option value="">Seleccione un curso</option>
                   {cursos.map((curso) => (
                     <option key={curso.idCurso} value={curso.idCurso}>
-                      {curso.numero}° "{curso.division}"
+                      {curso.numero}° {curso.division}
                     </option>
                   ))}
                 </Form.Select>
