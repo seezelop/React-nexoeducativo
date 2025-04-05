@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Button, Row, Col, Table } from 'react-bootstrap';
+import { Form, Button, Row, Col, Table, Alert, Spinner } from 'react-bootstrap';
 import axios from 'axios';
 
 const ModificarCursoPreceptor = () => {
@@ -20,9 +20,13 @@ const ModificarCursoPreceptor = () => {
   });
   const [loading, setLoading] = useState(false);
   const [editingIndices, setEditingIndices] = useState({});
+  const [error, setError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
 
   useEffect(() => {
     const fetchCursos = async () => {
+      setLoading(true);
+      setError(null);
       try {
         const response = await axios.get('http://localhost:8080/api/usuario/verCursoPreceptor', {
           withCredentials: true,
@@ -30,27 +34,32 @@ const ModificarCursoPreceptor = () => {
         setCursos(response.data);
       } catch (error) {
         console.error('Error al obtener cursos:', error);
-        alert('Hubo un error al cargar los cursos.');
+        setError('Hubo un error al cargar los cursos.');
+      } finally {
+        setLoading(false);
       }
     };
     fetchCursos();
   }, []);
 
   const obtenerInfoMaterias = async (idCurso) => {
+    setLoading(true);
+    setError(null);
     try {
       const response = await axios.get(`http://localhost:8080/api/usuario/infoMateriasActualizarCurso/${idCurso}`, {
         withCredentials: true,
       });
 
-      // Guardamos una copia de las materias originales para comparar después
       const materiasData = response.data;
-      console.log('Materias obtenidas:', materiasData);
       setMaterias(materiasData);
-      setMateriasOriginales(JSON.parse(JSON.stringify(materiasData))); // Copia profunda
-      setEditingIndices({}); // Reiniciar el estado de edición
-
+      setMateriasOriginales(JSON.parse(JSON.stringify(materiasData)));
+      setEditingIndices({});
+      setSuccessMessage(null);
     } catch (error) {
       console.error('Error al cargar las materias:', error.response?.data || error.message);
+      setError('Error al cargar las materias del curso.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -65,9 +74,9 @@ const ModificarCursoPreceptor = () => {
       };
       
       setFormData(cursoData);
-      setFormDataOriginal(JSON.parse(JSON.stringify(cursoData))); // Copia profunda
-
-      // Obtener las materias cuando se selecciona un curso
+      setFormDataOriginal(JSON.parse(JSON.stringify(cursoData)));
+      setError(null);
+      setSuccessMessage(null);
       obtenerInfoMaterias(cursoSeleccionado.idCurso);
     }
   };
@@ -87,14 +96,12 @@ const ModificarCursoPreceptor = () => {
     }));
   };
 
-  // Manejar la edición de campos de materia
   const handleMateriaChange = (index, field, value) => {
     const nuevasMaterias = [...materias];
     nuevasMaterias[index][field] = value;
     setMaterias(nuevasMaterias);
   };
 
-  // Alternar el modo de edición para una materia
   const toggleEditing = (index) => {
     setEditingIndices(prev => ({
       ...prev,
@@ -102,14 +109,11 @@ const ModificarCursoPreceptor = () => {
     }));
   };
 
-  // Obtener solo los datos modificados del curso
   const getModifiedCourseData = () => {
     const modified = {};
     
-    // Siempre incluir el ID del curso
     modified.idCurso = formData.idCurso;
     
-    // Verificar cada campo para ver si ha cambiado
     if (formData.numero !== formDataOriginal.numero) {
       modified.numero = formData.numero;
     }
@@ -125,7 +129,6 @@ const ModificarCursoPreceptor = () => {
     return modified;
   };
 
-  // Obtener solo las materias modificadas
   const getModifiedSubjects = () => {
     const materiasModificadas = [];
     
@@ -134,13 +137,10 @@ const ModificarCursoPreceptor = () => {
       const modified = {};
       let hasChanges = false;
       
-      // Siempre incluir el ID de la materia si existe
       if (materia.idMateria) {
         modified.idMateria = materia.idMateria;
       }
       
-      // Verificar solo los campos editables para ver si han cambiado
-      // Excluimos 'nombre', 'nombreProfesor', 'apellidoProfesor'
       const camposAComparar = ['dia', 'horaInicio', 'horaFin'];
       
       camposAComparar.forEach(campo => {
@@ -150,7 +150,6 @@ const ModificarCursoPreceptor = () => {
         }
       });
       
-      // Solo agregar la materia si tiene cambios
       if (hasChanges) {
         materiasModificadas.push(modified);
       }
@@ -159,34 +158,28 @@ const ModificarCursoPreceptor = () => {
     return materiasModificadas;
   };
 
-  // Método unificado para enviar al backend
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!formData.idCurso) {
-      alert('Debe seleccionar un curso para modificar.');
+      setError('Debe seleccionar un curso para modificar.');
       return;
     }
 
     setLoading(true);
+    setError(null);
     try {
-      // Obtener solo los datos modificados del curso y materias
       const cursoModificado = getModifiedCourseData();
       const materiasModificadas = getModifiedSubjects();
       
-      // Crear el objeto de datos a enviar
       const dataToSend = {
         ...cursoModificado
       };
       
-      // Solo incluir materias si hay cambios
       if (materiasModificadas.length > 0) {
         dataToSend.materias = materiasModificadas;
       }
 
-      console.log('INFO A EDITAR: '+JSON.stringify(dataToSend))
-      
-      // Actualizar la información del curso (esto incluirá las materias modificadas)
       const cursoResponse = await axios.patch(
         `http://localhost:8080/api/usuario/modificarCurso/${formData.idCurso}`,
         dataToSend,
@@ -194,164 +187,202 @@ const ModificarCursoPreceptor = () => {
       );
 
       if (cursoResponse.status === 200) {
-        alert('Curso modificado exitosamente!');
-        // Actualizar la lista de cursos y materias
+        setSuccessMessage('Curso modificado exitosamente!');
         const cursosActualizados = await axios.get('http://localhost:8080/api/usuario/verCursoAdministrativo', {
           withCredentials: true,
         });
         setCursos(cursosActualizados.data);
         obtenerInfoMaterias(formData.idCurso);
-        //comentario
       } else {
-        alert('Error al modificar el curso.');
+        setError('Error al modificar el curso.');
       }
     } catch (error) {
       console.error('Error al modificar el curso:', error);
-      alert('Hubo un error al modificar el curso.');
+      setError(error.response?.data?.message || 'Hubo un error al modificar el curso.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Form onSubmit={handleSubmit}>
-      <Form.Group className="mb-3">
-        <Form.Label>Seleccionar Curso</Form.Label>
-        <Form.Control
-          as="select"
-          value={formData.idCurso}
-          onChange={handleCursoChange}
-          required
-          className="form-select text-dark bg-white"
-        >
-          <option value="">Seleccione un curso</option>
-          {cursos.map((curso) => (
-            <option key={curso.idCurso} value={curso.idCurso}>
-              {curso.numero + curso.division}
-            </option>
-          ))}
-        </Form.Control>
-      </Form.Group>
-
-      <Row>
-        <Col md={6}>
-          <Form.Group className="mb-3">
-            <Form.Label>Número del Curso</Form.Label>
+    <div className="p-4 border rounded">
+      <h3 className="mb-4">Modificar Curso</h3>
+      
+      {error && <Alert variant="danger" className="mb-3">{error}</Alert>}
+      {successMessage && <Alert variant="success" className="mb-3">{successMessage}</Alert>}
+      
+      <Form onSubmit={handleSubmit}>
+        <Form.Group className="mb-3">
+          <Form.Label>Seleccionar Curso</Form.Label>
+          {cursos.length === 0 ? (
+            <Alert variant="info">
+              No hay cursos disponibles para modificar.
+            </Alert>
+          ) : (
             <Form.Control
-              type="number"
-              name="numero"
-              value={formData.numero}
-              onChange={handleInputChange}
+              as="select"
+              value={formData.idCurso}
+              onChange={handleCursoChange}
               required
-            />
-          </Form.Group>
-        </Col>
+              className="form-select text-dark bg-white"
+              disabled={loading}
+            >
+              <option value="">Seleccione un curso</option>
+              {cursos.map((curso) => (
+                <option key={curso.idCurso} value={curso.idCurso}>
+                  {curso.numero}° "{curso.division}"
+                </option>
+              ))}
+            </Form.Control>
+          )}
+        </Form.Group>
 
-        <Col md={6}>
-          <Form.Group className="mb-3">
-            <Form.Label>División</Form.Label>
-            <Form.Control
-              type="text"
-              name="division"
-              value={formData.division}
-              onChange={handleInputChange}
-              maxLength="1"
-              pattern="[A-Za-z]"
-              required
-            />
-          </Form.Group>
-        </Col>
-      </Row>
+        {formData.idCurso && (
+          <>
+            <Row>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Número del Curso</Form.Label>
+                  <Form.Control
+                    type="number"
+                    name="numero"
+                    value={formData.numero}
+                    onChange={handleInputChange}
+                    required
+                    disabled={loading}
+                  />
+                </Form.Group>
+              </Col>
 
-      <Form.Group className="mb-3">
-        <Form.Check
-          type="checkbox"
-          label="Curso Activo"
-        
-          onChange={handleCheckboxChange}
-        />
-      </Form.Group>
+              <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>División</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="division"
+                    value={formData.division}
+                    onChange={handleInputChange}
+                    maxLength="1"
+                    pattern="[A-Za-z]"
+                    required
+                    disabled={loading}
+                  />
+                </Form.Group>
+              </Col>
+            </Row>
 
-      {/* Tabla de Materias */}
-      {materias.length > 0 && (
-        <div className="mt-4">
-          <h4>Materias del Curso</h4>
-          <Table striped>
-  <thead>
-    <tr>
-      <th>Día</th>
-      <th>Hora Inicio</th>
-      <th>Hora Fin</th>
-      <th>Materia</th>
-      <th>Profesor</th>
-      <th>Acción</th>
-    </tr>
-  </thead>
-  <tbody>
-  {materias.map((materia, index) => (
-    <tr key={index}>
-      <td>
-        {editingIndices[index] ? (
-          <Form.Control
-            type="text"
-            value={materia.dia}
-            onChange={(e) => handleMateriaChange(index, 'dia', e.target.value)}
-          />
-        ) : (
-          materia.dia
+            <Form.Group className="mb-3">
+              <Form.Check
+                type="checkbox"
+                label="Curso Activo"
+                checked={formData.activo === 1}
+                onChange={handleCheckboxChange}
+                disabled={loading}
+              />
+            </Form.Group>
+
+            {materias.length > 0 ? (
+              <div className="mt-4">
+                <h4>Materias del Curso</h4>
+                <Table striped bordered hover responsive>
+                  <thead>
+                    <tr>
+                      <th>Día</th>
+                      <th>Hora Inicio</th>
+                      <th>Hora Fin</th>
+                      <th>Materia</th>
+                      <th>Profesor</th>
+                      <th>Acción</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {materias.map((materia, index) => (
+                      <tr key={index}>
+                        <td>
+                          {editingIndices[index] ? (
+                            <Form.Control
+                              type="text"
+                              value={materia.dia}
+                              onChange={(e) => handleMateriaChange(index, 'dia', e.target.value)}
+                              disabled={loading}
+                            />
+                          ) : (
+                            materia.dia
+                          )}
+                        </td>
+                        <td>
+                          {editingIndices[index] ? (
+                            <Form.Control
+                              type="time"
+                              value={materia.horaInicio}
+                              onChange={(e) => handleMateriaChange(index, 'horaInicio', e.target.value)}
+                              disabled={loading}
+                            />
+                          ) : (
+                            materia.horaInicio
+                          )}
+                        </td>
+                        <td>
+                          {editingIndices[index] ? (
+                            <Form.Control
+                              type="time"
+                              value={materia.horaFin}
+                              onChange={(e) => handleMateriaChange(index, 'horaFin', e.target.value)}
+                              disabled={loading}
+                            />
+                          ) : (
+                            materia.horaFin
+                          )}
+                        </td>
+                        <td>{materia.nombre}</td>
+                        <td>{`${materia.nombreProfesor} ${materia.apellidoProfesor}`}</td>
+                        <td>
+                          <Button
+                            variant={editingIndices[index] ? "success" : "primary"}
+                            size="sm"
+                            onClick={() => toggleEditing(index)}
+                            disabled={loading}
+                          >
+                            {editingIndices[index] ? (
+                              loading ? <Spinner size="sm" /> : "Guardar"
+                            ) : "Editar"}
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </Table>
+              </div>
+            ) : formData.idCurso && !loading && (
+              <Alert variant="info" className="mt-3">
+                Este curso no tiene materias asignadas.
+              </Alert>
+            )}
+
+            <Button 
+              variant="primary" 
+              type="submit" 
+              disabled={loading} 
+              className="mt-3"
+            >
+              {loading ? (
+                <>
+                  <Spinner
+                    as="span"
+                    animation="border"
+                    size="sm"
+                    role="status"
+                    aria-hidden="true"
+                    className="me-2"
+                  />
+                  Modificando...
+                </>
+              ) : 'Modificar Curso'}
+            </Button>
+          </>
         )}
-      </td>
-      <td>
-        {editingIndices[index] ? (
-          <Form.Control
-            type="text"
-            value={materia.horaInicio}
-            onChange={(e) => handleMateriaChange(index, 'horaInicio', e.target.value)}
-          />
-        ) : (
-          materia.horaInicio
-        )}
-      </td>
-      <td>
-        {editingIndices[index] ? (
-          <Form.Control
-            type="text"
-            value={materia.horaFin}
-            onChange={(e) => handleMateriaChange(index, 'horaFin', e.target.value)}
-          />
-        ) : (
-          materia.horaFin
-        )}
-      </td>
-      <td>
-        {/* Materia siempre no editable */}
-        {materia.nombre}
-      </td>
-      <td>
-        {/* Profesor siempre no editable */}
-        {`${materia.nombreProfesor} ${materia.apellidoProfesor}`}
-      </td>
-      <td>
-        <Button
-          variant={editingIndices[index] ? "success" : "primary"}
-          size="sm"
-          onClick={() => toggleEditing(index)}
-        >
-          {editingIndices[index] ? "Guardar" : "Editar"}
-        </Button>
-      </td>
-    </tr>
-  ))}
-</tbody>
-</Table>
-
-        </div>
-      )}
-
-      <Button variant="primary" type="submit" disabled={loading} className="mt-3">
-        {loading ? 'Modificando...' : 'Modificar Curso'}
-      </Button>
-    </Form>
+      </Form>
+    </div>
   );
 };
 

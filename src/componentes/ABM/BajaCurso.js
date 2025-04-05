@@ -22,6 +22,7 @@ class BajaCurso extends Component {
         withCredentials: true,
       });
       this.setState({ cursos: response.data });
+      console.log('info api: '+JSON.stringify(response.data))
     } catch (error) {
       console.error('Error al cargar los cursos:', error);
       alert('Error al cargar los cursos.');

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Form, Button } from 'react-bootstrap';
+import { Form, Button, Alert, Spinner } from 'react-bootstrap';
 import axios from 'axios';
 
 class BajaCursoPreceptor extends Component {
@@ -8,6 +8,9 @@ class BajaCursoPreceptor extends Component {
     this.state = {
       cursos: [],
       cursoSeleccionado: '',
+      loading: false,
+      error: null,
+      successMessage: null
     };
   }
 
@@ -15,95 +18,137 @@ class BajaCursoPreceptor extends Component {
     this.cargarCursos();
   }
 
-  // Cargar cursos desde el endpoint
   cargarCursos = async () => {
+    this.setState({ loading: true, error: null });
     try {
       const response = await axios.get('http://localhost:8080/api/usuario/verCursoPreceptor', {
         withCredentials: true,
       });
-      this.setState({ cursos: response.data });
-      //console.log('CARGANDO CURSOS PRECEPTOR: '+response.data)
+      this.setState({ 
+        cursos: response.data,
+        loading: false 
+      });
     } catch (error) {
       console.error('Error al cargar los cursos:', error);
-      alert('Error al cargar los cursos.');
+      this.setState({ 
+        error: 'Error al cargar los cursos. Por favor, intente nuevamente.',
+        loading: false 
+      });
     }
   };
 
-  // Manejar cambio en el desplegable de curso
   handleCursoChange = (event) => {
-    const cursoSeleccionado = event.target.value;
-    this.setState({ cursoSeleccionado});
+    this.setState({ 
+      cursoSeleccionado: event.target.value,
+      successMessage: null // Limpiar mensaje de éxito al cambiar selección
+    });
   };
 
-  // Manejar envío del formulario para eliminar la materia
   handleSubmit = async (event) => {
     event.preventDefault();
+    const { cursoSeleccionado } = this.state;
   
-  const { cursoSeleccionado } = this.state;
+    if (!cursoSeleccionado) {
+      this.setState({ error: 'Por favor, seleccione un curso para eliminar.' });
+      return;
+    }
   
-  // Validar que se haya seleccionado un curso
-  if (!cursoSeleccionado) {
-    alert('Por favor, seleccione un curso para eliminar.');
-    return;
-  }
+    const confirmar = window.confirm('¿Está seguro que desea eliminar este curso? Esta acción no se puede deshacer.');
   
-  // Confirmación antes de eliminar
-  const confirmar = window.confirm('¿Está seguro que desea eliminar este curso? Esta acción no se puede deshacer.');
-  
-  if (confirmar) {
-    try {
-      // Llamada a la API para eliminar el curso
-      await axios.delete(`http://localhost:8080/api/usuario/borrarCurso/${cursoSeleccionado}`, {
-        withCredentials: true,
-      });
-      
-      // Actualizar la lista de cursos después de eliminar
-      this.cargarCursos();
-      
-      // Resetear la selección
-      this.setState({ cursoSeleccionado: '' });
-      
-      // Notificar al usuario
-      alert('Curso eliminado con éxito.');
-    } catch (error) {
-      console.error('Error al eliminar el curso:', error);
-      
-      // Mostrar mensaje de error específico si está disponible
-      if (error.response && error.response.data) {
-        alert(`Error: ${error.response.data.mensaje || error.response.data}`);
-      } else {
-        alert('Error al eliminar el curso. Por favor, intente nuevamente.');
+    if (confirmar) {
+      this.setState({ loading: true, error: null });
+      try {
+        await axios.delete(`http://localhost:8080/api/usuario/borrarCurso/${cursoSeleccionado}`, {
+          withCredentials: true,
+        });
+        
+        await this.cargarCursos();
+        
+        this.setState({ 
+          cursoSeleccionado: '',
+          successMessage: 'Curso eliminado con éxito.',
+          loading: false
+        });
+      } catch (error) {
+        console.error('Error al eliminar el curso:', error);
+        let errorMessage = 'Error al eliminar el curso. Por favor, intente nuevamente.';
+        
+        if (error.response && error.response.data) {
+          errorMessage = error.response.data.mensaje || error.response.data;
+        }
+        
+        this.setState({ 
+          error: errorMessage,
+          loading: false 
+        });
       }
     }
   }
-  }
 
   render() {
-    const { cursos,cursoSeleccionado} = this.state;
+    const { cursos, cursoSeleccionado, loading, error, successMessage } = this.state;
 
     return (
-      <form onSubmit={this.handleSubmit}>
-        {/* Desplegable de Cursos */}
-        <div className="mb-3">
-          <label htmlFor="cursoSeleccionado" className="form-label">Seleccionar Curso:</label>
-          <Form.Select
-            id="cursoSeleccionado"
-            value={cursoSeleccionado}
-            onChange={this.handleCursoChange}
-            required
-          >
-            <option value="">Seleccione un curso</option>
-            {cursos.map((curso) => (
-              <option key={curso.idCurso} value={curso.idCurso}>
-                {curso.numero+curso.division}
-              </option>
-            ))}
-          </Form.Select>
-        </div>
+      <div className="p-4 border rounded">
+        <h3 className="mb-4">Eliminar Curso</h3>
+        
+        <Form onSubmit={this.handleSubmit}>
+          {/* Mensajes de estado */}
+          {error && <Alert variant="danger" className="mb-3">{error}</Alert>}
+          {successMessage && <Alert variant="success" className="mb-3">{successMessage}</Alert>}
+          
+          {/* Selector de cursos */}
+          <Form.Group className="mb-3">
+            <Form.Label>Seleccionar Curso:</Form.Label>
+            {cursos.length === 0 ? (
+              <div className="alert alert-info">
+                No hay cursos disponibles para eliminar.
+              </div>
+            ) : (
+              <>
+                <Form.Select
+                  value={cursoSeleccionado}
+                  onChange={this.handleCursoChange}
+                  required
+                  disabled={loading}
+                >
+                  <option value="">Seleccione un curso</option>
+                  {cursos.map((curso) => (
+                    <option key={curso.idCurso} value={curso.idCurso}>
+                      {curso.numero}° "{curso.division}"
+                    </option>
+                  ))}
+                </Form.Select>
+                <Form.Text className="text-muted">
+                  {cursos.length} cursos disponibles
+                </Form.Text>
+              </>
+            )}
+          </Form.Group>
 
-
-        <Button type="submit" className="btn btn-danger">Eliminar Curso</Button>
-      </form>
+          {/* Botón de eliminar (solo visible si hay cursos) */}
+          {cursos.length > 0 && (
+            <Button 
+              variant="danger" 
+              type="submit" 
+              disabled={loading || !cursoSeleccionado}
+            >
+              {loading ? (
+                <>
+                  <Spinner
+                    as="span"
+                    animation="border"
+                    size="sm"
+                    role="status"
+                    aria-hidden="true"
+                  />
+                  {' Eliminando...'}
+                </>
+              ) : 'Eliminar Curso'}
+            </Button>
+          )}
+        </Form>
+      </div>
     );
   }
 }
