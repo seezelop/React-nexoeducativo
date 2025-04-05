@@ -6,6 +6,7 @@ const ModificarCurso = () => {
   const [cursos, setCursos] = useState([]);
   const [materias, setMaterias] = useState([]);
   const [materiasOriginales, setMateriasOriginales] = useState([]);
+  const [mensaje, setMensaje] = useState({ text: '', type: '' });
   const [formData, setFormData] = useState({
     idCurso: '',
     numero: '',
@@ -44,7 +45,7 @@ const ModificarCurso = () => {
 
       // Guardamos una copia de las materias originales para comparar después
       const materiasData = response.data;
-      console.log('Materias obtenidas:', materiasData);
+      //console.log('Materias obtenidas:', materiasData);
       setMaterias(materiasData);
       setMateriasOriginales(JSON.parse(JSON.stringify(materiasData))); // Copia profunda
       setEditingIndices({}); // Reiniciar el estado de edición
@@ -140,7 +141,7 @@ const ModificarCurso = () => {
       }
       
       // Verificar solo los campos editables para ver si han cambiado
-      // Excluimos 'nombre', 'nombreProfesor', 'apellidoProfesor'
+     
       const camposAComparar = ['dia', 'horaInicio', 'horaFin'];
       
       camposAComparar.forEach(campo => {
@@ -194,7 +195,7 @@ const ModificarCurso = () => {
       );
 
       if (cursoResponse.status === 200) {
-        alert('Curso modificado exitosamente!');
+        setMensaje({ text: 'Curso modificado exitosamente!', type: 'success' });
         // Actualizar la lista de cursos y materias
         const cursosActualizados = await axios.get('http://localhost:8080/api/usuario/verCursoAdministrativo', {
           withCredentials: true,
@@ -207,7 +208,22 @@ const ModificarCurso = () => {
       }
     } catch (error) {
       console.error('Error al modificar el curso:', error);
-      alert('Hubo un error al modificar el curso.');
+      
+      if (error.response) {
+        const errorMessage = typeof error.response.data === 'string' 
+          ? error.response.data 
+          : (error.response.data?.message || 'Error al modificar el curso');
+          
+        setMensaje({ 
+          text: errorMessage, 
+          type: 'danger' 
+        });
+      } else {
+        setMensaje({ 
+          text: 'Hubo un error inesperado al modificar el curso.', 
+          type: 'danger' 
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -227,7 +243,7 @@ const ModificarCurso = () => {
           <option value="">Seleccione un curso</option>
           {cursos.map((curso) => (
             <option key={curso.idCurso} value={curso.idCurso}>
-              {curso.numero + curso.division}
+              {curso.numero}{curso.division}
             </option>
           ))}
         </Form.Control>

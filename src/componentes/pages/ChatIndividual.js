@@ -52,12 +52,22 @@ const ChatIndividual = () => {
     const nuevoMensaje = { contenido: mensaje, destinatario: mail };
 
     try {
-      await axios.post("http://localhost:8080/nuevoMensaje", nuevoMensaje, {
+      const response = await axios.post("http://localhost:8080/nuevoMensaje", nuevoMensaje, {
         headers: { "Content-Type": "application/json" },
         withCredentials: true,
       });
-
-      setMensajes([...mensajes, { idMensaje: Date.now(), contenido: mensaje, mail: userEmail }]);
+      
+      // Si el backend devuelve el mensaje creado, usamos eso
+      if (response.data) {
+        setMensajes([...mensajes, response.data]);
+      } else {
+        // Si no, creamos uno temporal con la información que tenemos
+        setMensajes([...mensajes, { 
+          idMensaje: Date.now(), 
+          contenido: mensaje, 
+          mail: userEmail  // Asegúrate de que este es el correo y no el ID
+        }]);
+      }
       setMensaje("");
     } catch (error) {
       console.error("Error al enviar el mensaje:", error);
@@ -66,7 +76,10 @@ const ChatIndividual = () => {
 
   const editarMensaje = async (idMensaje, nuevoContenido) => {
     try {
-      await axios.patch(`http://localhost:8080/editarMensajePrivado/${idMensaje}`, nuevoContenido, {
+      // Convertir idMensaje a número si es una cadena
+      const id = typeof idMensaje === 'string' ? parseInt(idMensaje, 10) : idMensaje;
+      
+      await axios.patch(`http://localhost:8080/editarMensajePrivado/${id}`, nuevoContenido, {
         headers: { "Content-Type": "text/plain" },
         withCredentials: true,
       });
@@ -77,15 +90,23 @@ const ChatIndividual = () => {
       setEditandoId(null);
     } catch (error) {
       console.error("Error al editar el mensaje:", error);
+      alert("Error al editar el mensaje. Verifica la consola para más detalles.");
     }
   };
 
   const borrarMensaje = async (idMensaje) => {
     try {
-      await axios.delete(`http://localhost:8080/borrarMensaje/${idMensaje}`, { withCredentials: true });
+      // Convertir idMensaje a número si es una cadena
+      const id = typeof idMensaje === 'string' ? parseInt(idMensaje, 10) : idMensaje;
+      
+      await axios.delete(`http://localhost:8080/borrarMensaje/${id}`, { 
+        withCredentials: true 
+      });
+      
       setMensajes(mensajes.filter((msg) => msg.idMensaje !== idMensaje));
     } catch (error) {
       console.error("Error al borrar el mensaje:", error);
+      alert("Error al borrar el mensaje. Verifica la consola para más detalles.");
     }
   };
 
@@ -130,12 +151,16 @@ const ChatIndividual = () => {
                     boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
                     transition: "transform 0.2s ease-in-out",
                     transform: "scale(1)",
-                    animation: "fadeIn 0.5s ease-in-out"
+                    animation: "fadeIn 0.5s ease-in-out",
+                    backgroundColor: msg.mail === userEmail ? "#e6f7ff" : "#f0f2f5"
                   }}
                 >
                   {/* Message Content */}
                   <div style={{ display: "flex", flexDirection: "column" }}>
-                    <strong style={{ fontSize: "0.9rem", color: "#555" }}>{msg.mail}:</strong>
+                    <strong style={{ fontSize: "0.9rem", color: "#555" }}>
+                      {/* Asegúrate de que aquí se muestre el correo y no el ID */}
+                      {msg.mail || userEmail}:
+                    </strong>
                     {editandoId === msg.idMensaje ? (
                       <input
                         type="text"
