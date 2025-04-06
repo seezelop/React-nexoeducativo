@@ -22,6 +22,7 @@ const ModificarCursoPreceptor = () => {
   const [editingIndices, setEditingIndices] = useState({});
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   useEffect(() => {
     const fetchCursos = async () => {
@@ -54,7 +55,6 @@ const ModificarCursoPreceptor = () => {
       setMaterias(materiasData);
       setMateriasOriginales(JSON.parse(JSON.stringify(materiasData)));
       setEditingIndices({});
-      setSuccessMessage(null);
     } catch (error) {
       console.error('Error al cargar las materias:', error.response?.data || error.message);
       setError('Error al cargar las materias del curso.');
@@ -77,6 +77,7 @@ const ModificarCursoPreceptor = () => {
       setFormDataOriginal(JSON.parse(JSON.stringify(cursoData)));
       setError(null);
       setSuccessMessage(null);
+      setShowSuccess(false);
       obtenerInfoMaterias(cursoSeleccionado.idCurso);
     }
   };
@@ -160,6 +161,9 @@ const ModificarCursoPreceptor = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(null);
+    setSuccessMessage(null);
+    setShowSuccess(false);
 
     if (!formData.idCurso) {
       setError('Debe seleccionar un curso para modificar.');
@@ -167,7 +171,7 @@ const ModificarCursoPreceptor = () => {
     }
 
     setLoading(true);
-    setError(null);
+    
     try {
       const cursoModificado = getModifiedCourseData();
       const materiasModificadas = getModifiedSubjects();
@@ -180,21 +184,25 @@ const ModificarCursoPreceptor = () => {
         dataToSend.materias = materiasModificadas;
       }
 
-      const cursoResponse = await axios.patch(
+      console.log('lo que se envia xd: '+JSON.stringify(dataToSend))
+      const response = await axios.patch(
         `http://localhost:8080/api/usuario/modificarCurso/${formData.idCurso}`,
         dataToSend,
         { withCredentials: true }
       );
 
-      if (cursoResponse.status === 200) {
-        setSuccessMessage('Curso modificado exitosamente!');
-        const cursosActualizados = await axios.get('http://localhost:8080/api/usuario/verCursoAdministrativo', {
-          withCredentials: true,
-        });
-        setCursos(cursosActualizados.data);
-        obtenerInfoMaterias(formData.idCurso);
-      } else {
-        setError('Error al modificar el curso.');
+      if (response.status === 200) {
+        setSuccessMessage('¡Curso modificado exitosamente!');
+        setShowSuccess(true);
+        
+        // Actualizar datos locales
+        if (response.data.curso) {
+          setFormData(response.data.curso);
+          setFormDataOriginal(response.data.curso);
+        }
+        
+        // Recargar las materias
+        await obtenerInfoMaterias(formData.idCurso);
       }
     } catch (error) {
       console.error('Error al modificar el curso:', error);
@@ -208,9 +216,35 @@ const ModificarCursoPreceptor = () => {
     <div className="p-4 border rounded">
       <h3 className="mb-4">Modificar Curso</h3>
       
-      {error && <Alert variant="danger" className="mb-3">{error}</Alert>}
-      {successMessage && <Alert variant="success" className="mb-3">{successMessage}</Alert>}
+      {/* Mensaje de error */}
+      {error && (
+        <Alert 
+          variant="danger" 
+          className="mb-3" 
+          onClose={() => setError(null)} 
+          dismissible
+          transition
+        >
+          {error}
+        </Alert>
+      )}
       
+      {/* Mensaje de éxito */}
+      {showSuccess && (
+        <Alert 
+          variant="success" 
+          className="mb-3" 
+          onClose={() => setShowSuccess(false)} 
+          dismissible
+          transition
+        >
+          <div className="d-flex align-items-center">
+            <i className="bi bi-check-circle-fill me-2"></i>
+            <span>{successMessage}</span>
+          </div>
+        </Alert>
+      )}
+
       <Form onSubmit={handleSubmit}>
         <Form.Group className="mb-3">
           <Form.Label>Seleccionar Curso</Form.Label>

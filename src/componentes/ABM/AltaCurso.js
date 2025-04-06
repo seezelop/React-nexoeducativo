@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Button, Row, Col } from 'react-bootstrap';
+import { Form, Button, Row, Col, Alert } from 'react-bootstrap';
 import axios from 'axios';
 
 const AltaCurso = () => {
@@ -16,92 +16,83 @@ const AltaCurso = () => {
   const [profesoresList, setProfesoresList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [cantidadMaterias, setCantidadMaterias] = useState(0);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
 
   useEffect(() => {
-    let isMounted = true; // Para evitar actualizaciones en componentes desmontados
-    
     const fetchData = async () => {
       try {
-        const [materiasResponse, profesoresResponse] = await Promise.all([
-          axios.get('http://localhost:8080/api/usuario/verMaterias', { withCredentials: true }),
-          axios.get('http://localhost:8080/api/usuario/verProfesAdministrativo', { withCredentials: true })
-        ]);
-        
-        if (isMounted) {
-          setMateriasList(materiasResponse.data);
-          setProfesoresList(profesoresResponse.data);
-        }
+        const materiasResponse = await axios.get('http://localhost:8080/api/usuario/verMaterias', {
+          withCredentials: true,
+        });
+        const profesoresResponse = await axios.get('http://localhost:8080/api/usuario/verProfesAdministrativo', {
+          withCredentials: true,
+        });
+        setMateriasList(materiasResponse.data);
+        setProfesoresList(profesoresResponse.data);
       } catch (error) {
         console.error('Error al obtener datos:', error);
+        setError('Error al cargar los datos iniciales');
       }
     };
-    
     fetchData();
-    
-    return () => {
-      isMounted = false; // Limpieza al desmontar
-    };
   }, []);
 
   const handleCursoChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
       r: {
         ...prev.r,
         [name]: value,
       },
     }));
+    setError(null);
   };
 
   const handleCantidadMateriasChange = (e) => {
-    const cantidad = parseInt(e.target.value, 10) || 0;
+    const cantidad = parseInt(e.target.value, 10);
     setCantidadMaterias(cantidad);
-    
-    setFormData(prev => {
-      // Si estamos reduciendo la cantidad, cortamos el array
-      if (cantidad < prev.m.length) {
-        return {
-          ...prev,
-          m: prev.m.slice(0, cantidad)
-        };
-      }
-      // Si estamos aumentando, agregamos nuevos elementos vacíos
-      return {
-        ...prev,
-        m: [
-          ...prev.m,
-          ...Array(cantidad - prev.m.length).fill().map(() => ({
-            idMateria: null,
-            idProfesor: null,
-            dia: "",
-            horaInicio: "",
-            horaFin: "",
-          }))
-        ]
-      };
-    });
+    setFormData((prev) => ({
+      ...prev,
+      m: Array.from({ length: cantidad }, () => ({
+        idMateria: null,
+        idProfesor: null,
+        dia: "",
+        horaInicio: "",
+        horaFin: "",
+      })),
+    }));
+    setError(null);
   };
 
   const handleMateriaChange = (index, field, value) => {
-    setFormData(prev => {
-      const updatedMaterias = [...prev.m];
-      updatedMaterias[index] = {
-        ...updatedMaterias[index],
-        [field]: field.includes("id") ? (value ? Number(value) : null) : value
-      };
-      return {
-        ...prev,
-        m: updatedMaterias
-      };
-    });
+    const updatedMaterias = [...formData.m];
+    updatedMaterias[index][field] = field.includes("id") ? Number(value) || null : value;
+    setFormData((prev) => ({
+      ...prev,
+      m: updatedMaterias,
+    }));
+    setError(null);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(null);
+    setSuccess(null);
 
     if (!formData.r.numero || !formData.r.division || formData.m.length === 0) {
-      alert('Por favor, complete todos los campos.');
+      setError('Por favor, complete todos los campos.');
+      return;
+    }
+
+    // Validación adicional de horarios
+    const hasInvalidSchedule = formData.m.some(materia => 
+      !materia.idMateria || !materia.idProfesor || !materia.dia || !materia.horaInicio || !materia.horaFin
+    );
+
+    if (hasInvalidSchedule) {
+      setError('Por favor, complete todos los campos de cada materia.');
       return;
     }
 
@@ -113,7 +104,7 @@ const AltaCurso = () => {
       });
 
       if (response.status === 200) {
-        alert('Curso y materias registrados exitosamente!');
+        setSuccess('Curso y materias registrados exitosamente!');
         setFormData({
           r: {
             numero: '',
@@ -126,7 +117,29 @@ const AltaCurso = () => {
       }
     } catch (error) {
       console.error('Error al registrar el curso:', error);
-      alert('Hubo un error al registrar el curso.');
+      
+      // Manejo detallado de errores del backend
+      if (error.response) {
+        // Si el error viene como string directo (ej: "Ya existe...")
+        if (typeof error.response.data === 'string') {
+          setError(error.response.data);
+        } 
+        // Si el error viene en un objeto { message: "..." }
+        else if (error.response.data && error.response.data.message) {
+          setError(error.response.data.message);
+        }
+        // Para otros tipos de errores 400
+        else if (error.response.status === 400) {
+          setError('Error en los datos enviados al servidor');
+        }
+        else {
+          setError(`Error del servidor (${error.response.status})`);
+        }
+      } else if (error.request) {
+        setError('No se recibió respuesta del servidor');
+      } else {
+        setError('Error al configurar la solicitud');
+      }
     } finally {
       setLoading(false);
     }
@@ -134,41 +147,43 @@ const AltaCurso = () => {
 
   const renderMateriasFields = () => {
     return formData.m.map((materia, i) => (
-      <div key={`materia-${i}`} className="mb-4 p-3 border rounded">
+      <div key={i} className="mb-4 p-3 border rounded">
         <h5>Materia {i + 1}</h5>
         <Row>
           <Col md={6}>
             <Form.Group className="mb-3">
               <Form.Label>Materia</Form.Label>
-              <Form.Select
+              <Form.Control
+                as="select"
                 value={materia.idMateria || ""}
                 onChange={(e) => handleMateriaChange(i, "idMateria", e.target.value)}
                 required
               >
                 <option value="">Seleccione una materia</option>
-                {materiasList.map((materiaItem) => (
-                  <option key={`materia-${materiaItem.id}`} value={materiaItem.id}>
-                    {materiaItem.nombre}
+                {materiasList.map((m) => (
+                  <option key={m.idMateria} value={m.idMateria}>
+                    {m.nombre}
                   </option>
                 ))}
-              </Form.Select>
+              </Form.Control>
             </Form.Group>
           </Col>
           <Col md={6}>
             <Form.Group className="mb-3">
               <Form.Label>Profesor</Form.Label>
-              <Form.Select
+              <Form.Control
+                as="select"
                 value={materia.idProfesor || ""}
                 onChange={(e) => handleMateriaChange(i, "idProfesor", e.target.value)}
                 required
               >
                 <option value="">Seleccione un profesor</option>
                 {profesoresList.map((profesor) => (
-                  <option key={`profesor-${profesor.id}`} value={profesor.id}>
+                  <option key={profesor.id_usuario} value={profesor.id_usuario}>
                     {profesor.nombre} {profesor.apellido}
                   </option>
                 ))}
-              </Form.Select>
+              </Form.Control>
             </Form.Group>
           </Col>
         </Row>
@@ -176,7 +191,8 @@ const AltaCurso = () => {
           <Col md={4}>
             <Form.Group className="mb-3">
               <Form.Label>Día</Form.Label>
-              <Form.Select
+              <Form.Control
+                as="select"
                 value={materia.dia || ""}
                 onChange={(e) => handleMateriaChange(i, "dia", e.target.value)}
                 required
@@ -187,7 +203,7 @@ const AltaCurso = () => {
                 <option value="Miércoles">Miércoles</option>
                 <option value="Jueves">Jueves</option>
                 <option value="Viernes">Viernes</option>
-              </Form.Select>
+              </Form.Control>
             </Form.Group>
           </Col>
           <Col md={4}>
@@ -218,48 +234,76 @@ const AltaCurso = () => {
   };
 
   return (
-    <Form onSubmit={handleSubmit}>
-      <Form.Group className="mb-3">
-        <Form.Label>Número del Curso</Form.Label>
-        <Form.Control
-          type="number"
-          name="numero"
-          value={formData.r.numero}
-          onChange={handleCursoChange}
-          required
-        />
-      </Form.Group>
+    <div className="container mt-4">   
+      {error && (
+        <Alert variant="danger" onClose={() => setError(null)} dismissible className="mb-4">
+          {error}
+        </Alert>
+      )}
+      
+      {success && (
+        <Alert variant="success" onClose={() => setSuccess(null)} dismissible className="mb-4">
+          {success}
+        </Alert>
+      )}
 
-      <Form.Group className="mb-3">
-        <Form.Label>División</Form.Label>
-        <Form.Control
-          type="text"
-          name="division"
-          value={formData.r.division}
-          onChange={handleCursoChange}
-          maxLength="1"
-          pattern="[A-Za-z]"
-          required
-        />
-      </Form.Group>
+      <Form onSubmit={handleSubmit}>
+        <Row className="mb-4">
+          <Col md={4}>
+            <Form.Group>
+              <Form.Label>Número del Curso</Form.Label>
+              <Form.Control
+                type="number"
+                name="numero"
+                value={formData.r.numero}
+                onChange={handleCursoChange}
+                min="1"
+                required
+              />
+            </Form.Group>
+          </Col>
+          <Col md={4}>
+            <Form.Group>
+              <Form.Label>División</Form.Label>
+              <Form.Control
+                type="text"
+                name="division"
+                value={formData.r.division}
+                onChange={handleCursoChange}
+                maxLength="1"
+                pattern="[A-Za-z]"
+                required
+              />
+            </Form.Group>
+          </Col>
+          <Col md={4}>
+            <Form.Group>
+              <Form.Label>Cantidad de Materias</Form.Label>
+              <Form.Control
+                type="number"
+                min="0"
+                value={cantidadMaterias}
+                onChange={handleCantidadMateriasChange}
+                required
+              />
+            </Form.Group>
+          </Col>
+        </Row>
 
-      <Form.Group className="mb-3">
-        <Form.Label>Cantidad de Materias</Form.Label>
-        <Form.Control
-          type="number"
-          min="0"
-          value={cantidadMaterias}
-          onChange={handleCantidadMateriasChange}
-          required
-        />
-      </Form.Group>
+        {cantidadMaterias > 0 && (
+          <div className="mb-4">
+            <h4 className="mb-3">Materias del Curso</h4>
+            {renderMateriasFields()}
+          </div>
+        )}
 
-      {cantidadMaterias > 0 && renderMateriasFields()}
-
-      <Button variant="primary" type="submit" disabled={loading}>
-        {loading ? 'Registrando...' : 'Registrar Curso'}
-      </Button>
-    </Form>
+        <div className="d-flex justify-content-end">
+          <Button variant="primary" type="submit" disabled={loading} size="lg">
+            {loading ? 'Registrando...' : 'Registrar Curso'}
+          </Button>
+        </div>
+      </Form>
+    </div>
   );
 };
 
