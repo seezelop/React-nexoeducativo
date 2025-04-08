@@ -17,7 +17,6 @@ const AltaCurso = () => {
   const [loading, setLoading] = useState(false);
   const [cantidadMaterias, setCantidadMaterias] = useState(0);
   const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -79,7 +78,6 @@ const AltaCurso = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
-    setSuccess(null);
 
     if (!formData.r.numero || !formData.r.division || formData.m.length === 0) {
       setError('Por favor, complete todos los campos.');
@@ -103,8 +101,11 @@ const AltaCurso = () => {
         withCredentials: true,
       });
 
-      if (response.status === 200) {
-        setSuccess('Curso y materias registrados exitosamente!');
+      if (response.status == 201) {
+        // Mostrar alerta de JavaScript
+        alert(`¡Curso ${formData.r.numero}° "${formData.r.division}" registrado exitosamente`);
+        //console.log('estus: '+response.status)
+        // Reset form
         setFormData({
           r: {
             numero: '',
@@ -238,12 +239,6 @@ const AltaCurso = () => {
       {error && (
         <Alert variant="danger" onClose={() => setError(null)} dismissible className="mb-4">
           {error}
-        </Alert>
-      )}
-      
-      {success && (
-        <Alert variant="success" onClose={() => setSuccess(null)} dismissible className="mb-4">
-          {success}
         </Alert>
       )}
 

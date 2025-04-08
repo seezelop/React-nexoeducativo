@@ -22,7 +22,9 @@ class ModificarAlumno extends Component {
             cursos: [], // Almacena la lista de cursos
             cursoSeleccionado: '', // Almacena el curso seleccionado
             padres: [], // Almacena la lista de padres
-            padreSeleccionado: '' // Almacena el padre seleccionado
+            padreSeleccionado: '', // Almacena el padre seleccionado
+            cursoSeleccionadoNombre: 'Seleccione un curso', // Para mostrar el nombre del curso seleccionado
+            padreSeleccionadoNombre: 'Seleccione un padre' // Para mostrar el nombre del padre seleccionado
         };
     }
 
@@ -155,18 +157,12 @@ class ModificarAlumno extends Component {
                     id_usuario: parsedValue.id_usuario,
                 },
                 async () => {
-                    console.log("Estado actualizado:", {
-                        profesorSeleccionado: this.state.profesorSeleccionado,
-                        id_usuario: this.state.id_usuario,
-                    });
 
                     try {
                         const response = await axios.get(
                             `http://localhost:8080/api/usuario/getUsuario/${this.state.id_usuario}`,
                             { withCredentials: true }
                         );
-
-                        console.log("Datos obtenidos del alumno:", response.data);
 
                         const { nombre, apellido, dni, mail, telefono, activo, jornada } = response.data;
 
@@ -191,85 +187,104 @@ class ModificarAlumno extends Component {
     };
 
     // Manejar selección de curso en el Dropdown
-    handleCursoChange = (value) => {
-        this.setState({ cursoSeleccionado: value });
+    handleCursoChange = (eventKey, event) => {
+        const cursoSeleccionado = eventKey;
+        const curso = this.state.cursos.find(c => c.idCurso === cursoSeleccionado);
+        
+        if (curso) {
+            const cursoNombre = `${curso.numero} ${curso.division}`;
+            this.setState({ 
+                cursoSeleccionado: cursoSeleccionado,
+                cursoSeleccionadoNombre: cursoNombre
+            });
+        }
     };
 
     // Manejar selección de padre en el Dropdown
-    handlePadreChange = (value) => {
-        this.setState({ padreSeleccionado: value });
+    handlePadreChange = (eventKey, event) => {
+        const padre = this.state.padres.find(p => p.id === eventKey);
+        
+        if (padre) {
+            const padreNombre = `${padre.nombre} ${padre.apellido}`;
+            this.setState({ 
+                padreSeleccionado: eventKey,
+                padreSeleccionadoNombre: padreNombre
+            });
+        }
     };
 
     // Manejar envío del formulario
     handleSubmit = async (event) => {
-    event.preventDefault();
+        event.preventDefault();
 
-    const { id_usuario, nombre, apellido, dni, mail, telefono, activo, jornada, cursoSeleccionado, padreSeleccionado, valoresOriginales } = this.state;
+        const { id_usuario, nombre, apellido, dni, mail, telefono, activo, jornada, cursoSeleccionado, padreSeleccionado, valoresOriginales } = this.state;
 
-    if (!id_usuario) {
-        alert('Por favor selecciona un alumno antes de guardar los cambios.');
-        return;
-    }
-
-    // Crear un objeto con solo los valores modificados y no vacíos
-    const datosModificados = {};
-
-    // Comparar cada campo con el valor original y agregarlo si cambió y no está vacío
-    if (nombre !== valoresOriginales.nombre && nombre !== '') datosModificados.nombre = nombre;
-    if (apellido !== valoresOriginales.apellido && apellido !== '') datosModificados.apellido = apellido;
-    if (dni !== valoresOriginales.dni && dni !== '') datosModificados.dni = dni;
-    if (mail !== valoresOriginales.mail && mail !== '') datosModificados.mail = mail;
-    if (telefono !== valoresOriginales.telefono && telefono !== '') datosModificados.telefono = telefono;
-    if (jornada !== valoresOriginales.jornada && jornada !== '') datosModificados.jornada = jornada;
-
-    // Agregar curso y padre si fueron seleccionados y no están vacíos
-    if (cursoSeleccionado) datosModificados.curso = cursoSeleccionado;
-    if (padreSeleccionado) datosModificados.padre = padreSeleccionado;
-
-    // Siempre incluir el campo "activo", aunque no haya cambiado
-    datosModificados.activo = activo;
-
-    // Si no hay cambios además del campo activo, no enviamos la petición
-    if (Object.keys(datosModificados).length === 0 && datosModificados.hasOwnProperty('activo') || Object.keys(datosModificados).length === 0 && datosModificados.hasOwnProperty('activo')) {
-        alert('No hay cambios para guardar.');
-        return;
-    }
-
-    console.log('Datos a enviar:', datosModificados);
-
-    try {
-        const response = await axios.patch(
-            `http://localhost:8080/api/usuario/modificarAlumno/${id_usuario}`,
-            datosModificados,
-            { withCredentials: true }
-        );
-
-        if (response.status === 200) {
-            alert('Alumno modificado exitosamente!');
-            this.cargarProfesores();
-            this.setState({
-                profesorSeleccionado: 'Seleccione un alumno',
-                id_usuario: null,
-                nombre: '',
-                apellido: '',
-                dni: '',
-                mail: '',
-                telefono: '',
-                activo: 0,
-                jornada: '',
-                cursoSeleccionado: '',
-                padreSeleccionado: '',
-                valoresOriginales: {}
-            });
-            window.location.reload();
-        } else {
-            alert('Error al modificar el alumno');
+        if (!id_usuario) {
+            alert('Por favor selecciona un alumno antes de guardar los cambios.');
+            return;
         }
-    } catch (error) {
-        console.error('Error al modificar el alumno:', error);
-    }
-};
 
+        // Crear un objeto con solo los valores modificados y no vacíos
+        const datosModificados = {};
+
+        // Comparar cada campo con el valor original y agregarlo si cambió y no está vacío
+        if (nombre !== valoresOriginales.nombre && nombre !== '') datosModificados.nombre = nombre;
+        if (apellido !== valoresOriginales.apellido && apellido !== '') datosModificados.apellido = apellido;
+        if (dni !== valoresOriginales.dni && dni !== '') datosModificados.dni = dni;
+        if (mail !== valoresOriginales.mail && mail !== '') datosModificados.mail = mail;
+        if (telefono !== valoresOriginales.telefono && telefono !== '') datosModificados.telefono = telefono;
+        if (jornada !== valoresOriginales.jornada && jornada !== '') datosModificados.jornada = jornada;
+
+        // Agregar curso y padre si fueron seleccionados y no están vacíos
+        if (cursoSeleccionado) datosModificados.curso = cursoSeleccionado;
+        if (padreSeleccionado) datosModificados.padre = padreSeleccionado;
+
+        // Siempre incluir el campo "activo", aunque no haya cambiado
+        datosModificados.activo = activo;
+
+        // Si no hay cambios además del campo activo, no enviamos la petición
+        if (Object.keys(datosModificados).length === 0 || 
+            (Object.keys(datosModificados).length === 1 && datosModificados.hasOwnProperty('activo'))) {
+            alert('No hay cambios para guardar.');
+            return;
+        }
+
+        console.log('Datos a enviar:', datosModificados);
+
+        try {
+            const response = await axios.patch(
+                `http://localhost:8080/api/usuario/modificarAlumno/${id_usuario}`,
+                datosModificados,
+                { withCredentials: true }
+            );
+
+            if (response.status === 200) {
+                alert('Alumno modificado exitosamente!');
+                this.cargarProfesores();
+                this.setState({
+                    profesorSeleccionado: 'Seleccione un alumno',
+                    id_usuario: null,
+                    nombre: '',
+                    apellido: '',
+                    dni: '',
+                    mail: '',
+                    telefono: '',
+                    activo: 0,
+                    jornada: '',
+                    cursoSeleccionado: '',
+                    padreSeleccionado: '',
+                    cursoSeleccionadoNombre: 'Seleccione un curso',
+                    padreSeleccionadoNombre: 'Seleccione un padre',
+                    valoresOriginales: {}
+                });
+                window.location.reload();
+            } else {
+                alert('Error al modificar el alumno');
+            }
+        } catch (error) {
+            console.error('Error al modificar el alumno:', error);
+        }
+    };
 
     componentDidMount() {
         this.cargarProfesores();
@@ -278,7 +293,22 @@ class ModificarAlumno extends Component {
     }
 
     render() {
-        const { profesores, profesorSeleccionado, nombre, apellido, dni, mail, telefono, activo, jornada, errores, cursos, cursoSeleccionado, padres, padreSeleccionado } = this.state;
+        const { 
+            profesores, 
+            profesorSeleccionado, 
+            nombre, 
+            apellido, 
+            dni, 
+            mail, 
+            telefono, 
+            activo, 
+            jornada, 
+            errores, 
+            cursos, 
+            padres,
+            cursoSeleccionadoNombre,
+            padreSeleccionadoNombre
+        } = this.state;
 
         return (
             <section className="d-flex flex-column">
@@ -292,6 +322,7 @@ class ModificarAlumno extends Component {
                                     title={profesorSeleccionado}
                                     onSelect={this.handleDropdownChange}
                                     size="sm"
+                                    variant="secondary"
                                 >
                                     {profesores.map((profesor) => (
                                         <Dropdown.Item
@@ -300,7 +331,7 @@ class ModificarAlumno extends Component {
                                                 id_usuario: profesor.id_usuario,
                                                 nombre: profesor.nombre,
                                             })}
-                                            style={{ color: 'black' }} // Estilo para texto negro
+                                            style={{ color: 'black' }}
                                         >
                                             {profesor.nombre}
                                         </Dropdown.Item>
@@ -340,47 +371,57 @@ class ModificarAlumno extends Component {
                                         <Form.Check
                                             id="activo"
                                             type="checkbox"
-                                            checked={activo}
+                                            checked={activo === 1}
                                             onChange={this.handleInputChange}
                                         />
                                     </div>
 
                                     <div className="mb-3">
                                         <label htmlFor="curso" className="form-label">Curso:</label>
-                                        <DropdownButton
-                                            id="curso"
-                                            title={cursoSeleccionado || "Seleccione un curso"}
-                                            onSelect={this.handleCursoChange}
-                                            size="sm"
-                                        >
-                                            {cursos.map((curso) => (
-                                                <Dropdown.Item
-                                                    key={curso.idCurso}
-                                                    eventKey={curso.idCurso}
-                                                >
-                                                    {curso.numero} {curso.division}
-                                                </Dropdown.Item>
-                                            ))}
-                                        </DropdownButton>
+                                        <Form.Group>
+                                            <DropdownButton
+                                                id="curso-dropdown"
+                                                title={cursoSeleccionadoNombre}
+                                                onSelect={this.handleCursoChange}
+                                                variant="secondary"
+                                                className="mb-2"
+                                                style={{ width: '100%', display: 'block' }}
+                                            >
+                                                {cursos.map((curso) => (
+                                                    <Dropdown.Item
+                                                        key={curso.idCurso}
+                                                        eventKey={curso.idCurso}
+                                                        style={{ color: 'black', display: 'block' }}
+                                                    >
+                                                        {curso.numero} {curso.division}
+                                                    </Dropdown.Item>
+                                                ))}
+                                            </DropdownButton>
+                                        </Form.Group>
                                     </div>
 
                                     <div className="mb-3">
                                         <label htmlFor="padre" className="form-label">Padre:</label>
-                                        <DropdownButton
-                                            id="padre"
-                                            title={padreSeleccionado || "Seleccione un padre"}
-                                            onSelect={this.handlePadreChange}
-                                            size="sm"
-                                        >
-                                            {padres.map((padre) => (
-                                                <Dropdown.Item
-                                                    key={padre.id}
-                                                    eventKey={padre.nombre}
-                                                >
-                                                    {padre.nombre} {padre.apellido}
-                                                </Dropdown.Item>
-                                            ))}
-                                        </DropdownButton>
+                                        <Form.Group>
+                                            <DropdownButton
+                                                id="padre-dropdown"
+                                                title={padreSeleccionadoNombre}
+                                                onSelect={this.handlePadreChange}
+                                                variant="secondary"
+                                                className="mb-2"
+                                                style={{ width: '100%', display: 'block' }}
+                                            >
+                                                {padres.map((padre) => (
+                                                    <Dropdown.Item
+                                                        key={padre.id}
+                                                        eventKey={padre.id}
+                                                        style={{ color: 'black', display: 'block' }}
+                                                    >
+                                                        {padre.nombre} {padre.apellido}
+                                                    </Dropdown.Item>
+                                                ))}
+                                            </DropdownButton>
+                                        </Form.Group>
                                     </div>
 
                                     <div className="d-grid gap-2 mb-4">
