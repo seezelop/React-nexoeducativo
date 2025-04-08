@@ -33,7 +33,7 @@ class BajaAlumno extends Component {
             }));
 
             this.setState({ alumnos });
-            console.log("Alumnos cargados: ", alumnos);
+            //console.log("Alumnos cargados: ", alumnos);
 
         } catch (error) {
             console.error('Error al cargar los alumnos:', error);
@@ -51,7 +51,7 @@ class BajaAlumno extends Component {
             idUsuario: parsedValue.idUsuario
         });
 
-        console.log("ID del alumno seleccionado:", parsedValue.idUsuario);
+       // console.log("ID del alumno seleccionado:", parsedValue.idUsuario);
     };
 
     handleSubmit = async (event) => {

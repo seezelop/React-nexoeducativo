@@ -70,7 +70,7 @@ class ModificarPadre extends Component {
         // Determinar el valor adecuado según el tipo de input
         const valor = type === 'checkbox' ? (checked ? 1 : 0) : event.target.value;
 
-        console.log(`Campo ${id} cambiado a:`, valor, `Tipo: ${type}`);
+        //console.log(`Campo ${id} cambiado a:`, valor, `Tipo: ${type}`);
 
         // Validar el campo
         const error = this.validarCampo(id, valor);
@@ -81,7 +81,7 @@ class ModificarPadre extends Component {
             errores: { ...this.state.errores, [id]: error }
         }, () => {
             // Callback para verificar que el estado se actualizó correctamente
-            console.log(`Estado actualizado: ${id} =`, this.state[id]);
+            //console.log(`Estado actualizado: ${id} =`, this.state[id]);
         });
     };
 
@@ -126,7 +126,7 @@ class ModificarPadre extends Component {
                             { withCredentials: true }
                         );
 
-                        console.log("Datos obtenidos del profesor:", response.data);
+                        //console.log("Datos obtenidos del profesor:", response.data);
 
                         const { nombre, apellido, dni, mail, telefono, activo } = response.data;
 
@@ -172,7 +172,7 @@ class ModificarPadre extends Component {
             datosModificados.activo = parseInt(activo, 10); // Asegúrate de que sea un número
         }
 
-        console.log('Datos a enviar:', datosModificados);
+        //console.log('Datos a enviar:', datosModificados);
 
         try {
             const response = await axios.patch(

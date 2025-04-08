@@ -38,7 +38,7 @@ class AltaMateria extends Component {
       }
     } catch (error) {
       console.error('Error al agregar la materia:', error);
-      alert('Ocurrió un error al agregar la materia.');
+      alert('Ocurrió un error al agregar la materia.', error.data);
     }
   };
 

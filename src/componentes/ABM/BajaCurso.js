@@ -22,7 +22,7 @@ class BajaCurso extends Component {
         withCredentials: true,
       });
       this.setState({ cursos: response.data });
-      console.log('info api: '+JSON.stringify(response.data))
+      //console.log('info api: '+JSON.stringify(response.data))
     } catch (error) {
       console.error('Error al cargar los cursos:', error);
       alert('Error al cargar los cursos.');
@@ -80,6 +80,15 @@ class BajaCurso extends Component {
 
   render() {
     const { cursos,cursoSeleccionado} = this.state;
+
+    if (cursos.length === 0) {
+      return (
+        <div className="alert alert-info">
+          No hay cursos disponibles para eliminar.
+        </div>
+      );
+    }
+  
 
     return (
       <form onSubmit={this.handleSubmit}>
