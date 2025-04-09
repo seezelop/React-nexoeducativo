@@ -8,18 +8,19 @@ class ModificarPreceptor extends Component {
         this.state = {
             profesores: [],
             profesorSeleccionado: 'Seleccione un preceptor',
-            idUsuario: null,
+            preceptor: null, // Renombrado de idUsuario a preceptor
             nombre: '',
             apellido: '',
             dni: '',
             mail: '',
             telefono: '',
-            cursoSeleccionado: "", // Curso seleccionado
-            cursosDisponibles: [],  // Lista de cursos
+            curso: "", // Renombrado de cursoSeleccionado a curso
+            cursosDisponibles: [],
             activo: 0,
-            errores: {}, // Almacena los errores de validación
+            errores: {},
             rol: 'preceptor',
-            valoresOriginales: {}, // Nuevo estado para almacenar los valores originales
+            valoresOriginales: {},
+            mensajeError: '', // Para mostrar errores al modificar
         };
     }
 
@@ -38,6 +39,7 @@ class ModificarPreceptor extends Component {
                 if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{4,30}$/.test(value)) {
                     error = 'El apellido debe tener entre 4 y 30 caracteres (solo letras y espacios).';
                 }
+                break;
 
             case 'dni':
                 if (!/^\d{6,8}$/.test(value)) {
@@ -57,12 +59,11 @@ class ModificarPreceptor extends Component {
                 }
                 break;
 
-                case 'cursoSeleccionado':
-                    if (!value) {
-                        error = 'Debes seleccionar un curso.';
-                    }
-                    break;
-                
+            case 'curso':
+                if (!value) {
+                    error = 'Debes seleccionar un curso.';
+                }
+                break;
 
             default:
                 break;
@@ -92,13 +93,14 @@ class ModificarPreceptor extends Component {
             });
 
             const profesores = response.data.map((profesor) => ({
-                idUsuario: profesor.idUsuario,
+                preceptor: profesor.idUsuario, // Cambiado de idUsuario a preceptor
                 nombre: `${profesor.nombre} ${profesor.apellido} ${profesor.dni}`,
             }));
 
             this.setState({ profesores });
         } catch (error) {
             console.error('Error al cargar los preceptores:', error);
+            this.setState({ mensajeError: 'Error al cargar los preceptores. Intente nuevamente.' });
         }
     };
 
@@ -109,12 +111,13 @@ class ModificarPreceptor extends Component {
             this.setState(
                 {
                     profesorSeleccionado: parsedValue.nombre,
-                    idUsuario: parsedValue.idUsuario,
+                    preceptor: parsedValue.preceptor, // Cambiado de idUsuario a preceptor
+                    mensajeError: '', // Limpia mensajes de error previos
                 },
                 async () => {
                     try {
                         const response = await axios.get(
-                            `http://localhost:8080/api/usuario/getUsuario/${this.state.idUsuario}`,
+                            `http://localhost:8080/api/usuario/getUsuario/${this.state.preceptor}`,
                             { withCredentials: true }
                         );
 
@@ -131,11 +134,13 @@ class ModificarPreceptor extends Component {
                         });
                     } catch (error) {
                         console.error("Error al cargar los datos del preceptor:", error);
+                        this.setState({ mensajeError: 'Error al cargar los datos del preceptor. Intente nuevamente.' });
                     }
                 }
             );
         } catch (error) {
             console.error("Error al procesar el preceptor seleccionado:", error);
+            this.setState({ mensajeError: 'Error al procesar el preceptor seleccionado.' });
         }
     };
 
@@ -143,10 +148,10 @@ class ModificarPreceptor extends Component {
     handleSubmit = async (event) => {
         event.preventDefault();
     
-        const { idUsuario, valoresOriginales, nombre, apellido, dni, mail, telefono, activo, cursoSeleccionado } = this.state;
+        const { preceptor, valoresOriginales, nombre, apellido, dni, mail, telefono, activo, curso } = this.state;
     
-        if (!idUsuario) {
-            alert('Por favor selecciona un preceptor antes de guardar los cambios.');
+        if (!preceptor) {
+            this.setState({ mensajeError: 'Por favor selecciona un preceptor antes de guardar los cambios.' });
             return;
         }
     
@@ -159,34 +164,35 @@ class ModificarPreceptor extends Component {
         if (dni !== valoresOriginales.dni) datosModificados.dni = dni;
         if (mail !== valoresOriginales.mail) datosModificados.mail = mail;
         if (telefono !== valoresOriginales.telefono) datosModificados.telefono = telefono;
-        if (cursoSeleccionado) {
-            datosModificados.cursoSeleccionado = cursoSeleccionado;
-            console.log('CURSITO SELECCIONADO: '+datosModificados.cursoSeleccionado)
+        
+        // Incluir el curso seleccionado si existe
+        if (curso) {
+            datosModificados.curso = curso;
+            //console.log('CURSO SELECCIONADO: ' + datosModificados.curso);
             const asignarPreceptor = {
-                idUsuario: idUsuario,
-                cursoId: cursoSeleccionado, // Suponiendo que `cursoSeleccionado` es el ID del curso
+                preceptor: preceptor,
+                curso: curso, // Cambiado de cursoId a curso
             };
 
-            this.handleAsignarPreceptor(asignarPreceptor); // Llamar el método con los datos necesarios
+            console.log('el asignar preceptor desde handle submit: '+JSON.stringify(asignarPreceptor))
+
+            this.handleAsignarPreceptor(asignarPreceptor);
         }
-        
-    
-        // Incluir el curso seleccionado
-        if (cursoSeleccionado) datosModificados.cursoSeleccionado = cursoSeleccionado;
     
         datosModificados.activo = activo;
     
         // Si no hay cambios, mostrar un mensaje y evitar el envío
-        if (Object.keys(datosModificados).length === 0 && datosModificados.hasOwnProperty('activo') || Object.keys(datosModificados).length === 0 && datosModificados.hasOwnProperty('activo')) {
-            alert('No hay cambios para guardar.');
+        if (Object.keys(datosModificados).length === 0 || 
+            (Object.keys(datosModificados).length === 1 && datosModificados.hasOwnProperty('activo'))) {
+            this.setState({ mensajeError: 'No hay cambios para guardar.' });
             return;
         }
     
-        console.log('Datos a enviar:', datosModificados);
+       // console.log('Datos a enviar:', datosModificados);
     
         try {
             const response = await axios.patch(
-                `http://localhost:8080/api/usuario/modificarUsuario/${idUsuario}`,
+                `http://localhost:8080/api/usuario/modificarUsuario/${preceptor}`,
                 datosModificados,
                 { withCredentials: true }
             );
@@ -196,27 +202,32 @@ class ModificarPreceptor extends Component {
                 this.cargarProfesores();
                 this.setState({
                     profesorSeleccionado: 'Seleccione un preceptor',
-                    idUsuario: null,
+                    preceptor: null,
                     nombre: '',
                     apellido: '',
                     dni: '',
                     mail: '',
                     telefono: '',
                     activo: 0,
-                    cursoSeleccionado: '', // Limpiar curso seleccionado después de la modificación
+                    curso: '',
                     valoresOriginales: {},
+                    mensajeError: '',
                 });
             } else {
-                alert('Error al modificar el preceptor');
+                this.setState({ mensajeError: 'Error al modificar el preceptor: ' + response.data });
             }
         } catch (error) {
             console.error('Error al modificar el preceptor:', error);
+            this.setState({ 
+                mensajeError: 'Error al modificar el preceptor: ' + 
+                (error.response?.data || 'Ocurrió un problema en la comunicación con el servidor') 
+            });
         }
     };
     
 
     handleAsignarPreceptor = (asignarPreceptor) => {
-        console.log("datitos: " + JSON.stringify(asignarPreceptor))
+        //console.log("datitos: " + JSON.stringify(asignarPreceptor));
         // endpoint para asignar el curso a un preceptor, luego extraer el id del curso
         fetch("http://localhost:8080/api/usuario/actualizarPreceptor", {
             method: "POST",
@@ -228,13 +239,17 @@ class ModificarPreceptor extends Component {
         })
             .then((response) => {
                 if (response.ok) {
-                    alert("Preceptor dado de alta correctamente.");
-                    window.location.reload();
+                    alert("Preceptor asignado a curso correctamente.");
+                    return response.text();
+                } else {
+                    throw new Error("Error al asignar el preceptor al curso");
                 }
-                return response.text();
             })
             .then((data) => console.log("Asignación exitosa:", data))
-            .catch((error) => console.error("Error al asignar el preceptor:", error));
+            .catch((error) => {
+                console.error("Error al asignar el preceptor:", error);
+                this.setState({ mensajeError: error.message });
+            });
     }
 
     obtenerCursos = () => {
@@ -244,9 +259,10 @@ class ModificarPreceptor extends Component {
         })
           .then((response) => response.json())
           .then((data) => this.setState({ cursosDisponibles: data }))
-          .catch((error) =>
-            console.error("Error al obtener los cursos:", error)
-          );
+          .catch((error) => {
+            console.error("Error al obtener los cursos:", error);
+            this.setState({ mensajeError: 'Error al obtener los cursos disponibles.' });
+          });
       };
 
     componentDidMount() {
@@ -255,12 +271,20 @@ class ModificarPreceptor extends Component {
     }
 
     render() {
-        const { profesores, profesorSeleccionado, nombre, apellido, dni, mail, telefono, activo, errores, cursosDisponibles, cursoSeleccionado } = this.state;
+        const { profesores, profesorSeleccionado, nombre, apellido, dni, mail, telefono, activo, 
+                errores, cursosDisponibles, curso, mensajeError } = this.state;
 
         return (
             <section className="d-flex flex-column">
                 <section className="container d-flex justify-content-center align-items-center flex-grow-1">
                     <section className="col-lg-12">
+                        {/* Mostrar mensaje de error si existe */}
+                        {mensajeError && (
+                            <div className="alert alert-danger" role="alert">
+                                {mensajeError}
+                            </div>
+                        )}
+                        
                         <form onSubmit={this.handleSubmit}>
                             <div className="pb-5">
                                 <label htmlFor="dropdown-basic-button" className="form-label">Preceptor</label>
@@ -272,12 +296,12 @@ class ModificarPreceptor extends Component {
                                 >
                                     {profesores.map((profesor) => (
                                         <Dropdown.Item
-                                            key={profesor.idUsuario}
+                                            key={profesor.preceptor}
                                             eventKey={JSON.stringify({
-                                                idUsuario: profesor.idUsuario,
+                                                preceptor: profesor.preceptor,
                                                 nombre: profesor.nombre,
                                             })}
-                                            style={{ color: 'black' }} // Estilo para texto negro
+                                            style={{ color: 'black' }}
                                         >
                                             {profesor.nombre}
                                         </Dropdown.Item>
@@ -310,11 +334,11 @@ class ModificarPreceptor extends Component {
 
                                     {/* Desplegable de cursos */}
                                     <div className="mb-3">
-                                        <label htmlFor="cursoSeleccionado" className="form-label">Seleccionar Curso</label>
+                                        <label htmlFor="curso" className="form-label">Seleccionar Curso</label>
                                         <select
-                                            id="cursoSeleccionado"
-                                            className={`form-select ${errores.cursoSeleccionado ? "is-invalid" : ""}`}
-                                            value={cursoSeleccionado}
+                                            id="curso"
+                                            className={`form-select ${errores.curso ? "is-invalid" : ""}`}
+                                            value={curso}
                                             onChange={this.handleInputChange}
                                         >
                                             <option value="">Seleccione un curso</option>
@@ -324,8 +348,8 @@ class ModificarPreceptor extends Component {
                                                 </option>
                                             ))}
                                         </select>
-                                        {errores.cursoSeleccionado && (
-                                            <div className="invalid-feedback">{errores.cursoSeleccionado}</div>
+                                        {errores.curso && (
+                                            <div className="invalid-feedback">{errores.curso}</div>
                                         )}
                                     </div>
 

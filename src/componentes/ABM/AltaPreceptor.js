@@ -51,6 +51,7 @@ class AltaPreceptor extends Component {
         if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{4,30}$/.test(value)) {
             error = 'El apellido debe tener entre 4 y 30 caracteres (solo letras y espacios).';
         }
+        break;
 
       case "dni":
         if (!/^\d{6,8}$/.test(value)) {
