@@ -101,7 +101,7 @@ class ModificarAlumno extends Component {
             }));
 
             if (response.status === 200) {
-                console.log('info ', response.data)
+                //console.log('info ', response.data)
             }
 
             this.setState({ profesores });
@@ -118,10 +118,10 @@ class ModificarAlumno extends Component {
             });
 
             if (response.data && Array.isArray(response.data)) {
-                console.log("Cursos recibidos:", response.data);
+                ///console.log("Cursos recibidos:", response.data);
                 this.setState({ cursos: response.data });
             } else {
-                console.error("Formato inesperado en cursos:", response.data);
+                //console.error("Formato inesperado en cursos:", response.data);
             }
         } catch (error) {
             console.error("Error al cargar los cursos:", error);
@@ -136,10 +136,10 @@ class ModificarAlumno extends Component {
             });
 
             if (response.data && Array.isArray(response.data)) {
-                console.log("Padres recibidos:", response.data);
+                //console.log("Padres recibidos:", response.data);
                 this.setState({ padres: response.data });
             } else {
-                console.error("Formato inesperado en padres:", response.data);
+               // console.error("Formato inesperado en padres:", response.data);
             }
         } catch (error) {
             console.error("Error al cargar los padres:", error);
@@ -248,7 +248,7 @@ class ModificarAlumno extends Component {
             return;
         }
 
-        console.log('Datos a enviar:', datosModificados);
+        //console.log('Datos a enviar:', datosModificados);
 
         try {
             const response = await axios.patch(

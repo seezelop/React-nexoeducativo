@@ -194,8 +194,7 @@ class ModificarPadre extends Component {
                 alert('Error al modificar el padre');
             }
         } catch (error) {
-            alert('Error al modificar el padre:', error);
-            // console.log('Estado actual activo:', this.state.activo);
+                alert('Error al modificar el padre, dni o email ya existente en el sistema ');
         }
     };
 

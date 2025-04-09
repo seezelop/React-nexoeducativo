@@ -31,7 +31,7 @@ class BajaPreceptor extends Component {
             }));
 
             this.setState({ preceptores });
-            console.log("Preceptores cargados: ", preceptores);
+           // console.log("Preceptores cargados: ", preceptores);
 
         } catch (error) {
             console.error('Error al cargar los preceptores:', error);
@@ -49,7 +49,7 @@ class BajaPreceptor extends Component {
             idUsuario: parsedValue.idUsuario
         });
 
-        console.log("ID del preceptor seleccionado:", parsedValue.idUsuario);
+        //console.log("ID del preceptor seleccionado:", parsedValue.idUsuario);
     };
 
     handleSubmit = async (event) => {

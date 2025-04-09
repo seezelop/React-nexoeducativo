@@ -27,10 +27,9 @@ class AltaAlumno extends Component {
       .get("http://localhost:8080/api/usuario/verCursoAdministrativo", { withCredentials: true })
       .then((response) => {
         if (response.data && Array.isArray(response.data)) {
-          //console.log("Cursos recibidos:", response.data);
           this.setState({ cursos: response.data });
         } else {
-          console.error("Formato inesperado en cursos:", response.data);
+         // console.error("Formato inesperado en cursos:", response.data);
         }
       })
       .catch((error) => console.error("Error al cargar los cursos:", error));
@@ -40,7 +39,6 @@ class AltaAlumno extends Component {
       .get("http://localhost:8080/api/usuario/obtenerPadres", { withCredentials: true })
       .then((response) => {
         if (response.data && Array.isArray(response.data)) {
-          //console.log("Padres recibidos:", response.data);
           this.setState({ padres: response.data });
         } else {
           //console.error("Formato inesperado en padres:", response.data);
@@ -53,51 +51,39 @@ class AltaAlumno extends Component {
     let error = "";
 
     switch (id) {
-      case "cursoSeleccionado":
+      case "idCurso":  // Cambio de cursoSeleccionado a idCurso
         if (!value) {
           error = "Debe seleccionar un curso.";
         }
         break;
-      case "padreSeleccionado":
+      case "idPadre":  // Cambio de padreSeleccionado a idPadre
         if (!value) {
           error = "Debe seleccionar un padre.";
         }
         break;
-      default:
-        error = this.validarCampoGenerico(id, value);
-    }
-
-    return error;
-  };
-
-  validarCampoGenerico = (id, value) => {
-    let error = "";
-    switch (id) {
       case 'nombre':
         if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{3,30}$/.test(value)) {
-            error = 'El nombre debe tener entre 3 y 30 caracteres (solo letras y espacios).';
+          error = 'El nombre debe tener entre 3 y 30 caracteres (solo letras y espacios).';
         }
         break;
-
-    case 'apellido':
+      case 'apellido':
         if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{4,30}$/.test(value)) {
-            error = 'El apellido debe tener entre 4 y 30 caracteres (solo letras y espacios).';
+          error = 'El apellido debe tener entre 4 y 30 caracteres (solo letras y espacios).';
         }
         break;
-        break;
-        case "jornada":
+      case "jornada":
         if (!/^[a-zA-Z]{6,8}$/.test(value)) {
-          return "La jornada debe tener entre 6 y 8 letras.";
+          error = "La jornada debe tener entre 6 y 8 letras.";
         }
         break;
       case "dni":
         if (!/^\d{6,8}$/.test(value)) {
-          return "El DNI debe tener entre 6 y 8 dígitos.";
+          error = "El DNI debe tener entre 6 y 8 dígitos.";
         }
         break;
       case "mail":
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-          return "Formato de email inválido.";
+          error = "Formato de email inválido.";
         }
         break;
       case "clave":
@@ -106,63 +92,91 @@ class AltaAlumno extends Component {
             value
           )
         ) {
-          return "La clave debe tener entre 8 y 32 caracteres, al menos una letra mayúscula, una minúscula, un número y un carácter especial.";
+          error = "La clave debe tener entre 8 y 32 caracteres, al menos una letra mayúscula, una minúscula, un número y un carácter especial.";
         }
         break;
       case "telefono":
         if (!/^\d{7,9}$/.test(value)) {
-          return "El teléfono debe tener entre 7 y 9 dígitos.";
+          error = "El teléfono debe tener entre 7 y 9 dígitos.";
         }
         break;
       default:
         break;
     }
-    return "";
+    return error;
+  };
+
+  // Método para validar un campo y actualizar el estado de errores
+  validarYActualizarCampo = (id, value) => {
+    const error = this.validarCampo(id, value);
+    
+    this.setState(prevState => ({
+      errores: {
+        ...prevState.errores,
+        [id]: error
+      }
+    }));
+    
+    return error;
   };
 
   handleChange = (event) => {
     const { id, value } = event.target;
-    const error = this.validarCampo(id, value);
-
-    this.setState((prevState) => ({
-      [id]: value,
-      errores: { ...prevState.errores, [id]: error },
-    }));
+    
+    this.setState({ [id]: value }, () => {
+      // Validar el campo después de actualizar el estado
+      this.validarYActualizarCampo(id, value);
+    });
   };
 
   handleSubmit = (e) => {
     e.preventDefault();
 
-    const { errores, cursos, padres, ...datosUsuario } = this.state;
+    // Validar todos los campos antes de enviar
+    const { cursos, padres, errores, ...datosUsuario } = this.state;
+    let hayErrores = false;
+    let nuevosErrores = {};
 
-    const erroresPendientes = Object.keys(datosUsuario).reduce((acc, key) => {
-      const error = this.validarCampo(key, datosUsuario[key]);
+    // Validar cada campo
+    Object.keys(datosUsuario).forEach(campo => {
+      const error = this.validarCampo(campo, datosUsuario[campo]);
       if (error) {
-        acc[key] = error;
+        nuevosErrores[campo] = error;
+        hayErrores = true;
       }
-      return acc;
-    }, {});
+    });
 
-    if (Object.keys(erroresPendientes).length > 0) {
-      this.setState({ errores: erroresPendientes });
+    if (hayErrores) {
+      this.setState({ errores: nuevosErrores });
       alert("Por favor, corrija los errores antes de enviar.");
       return;
     }
 
+    // Si no hay errores, enviar los datos
     axios
       .post("http://localhost:8080/api/usuario/saveAlumno", datosUsuario, { withCredentials: true })
-      .then(() => {
+      .then((response) => {
         alert("Alumno creado correctamente.");
         window.location.reload();
       })
-      .catch((error) => console.error("Error al crear el alumno:", error));
+      .catch((error) => {
+        console.error("Error al crear el alumno:", error);
+        
+        // Manejar errores específicos del servidor
+        if (error.response && error.response.data) {
+          const mensajeError = "Error al crear el alumno: "+JSON.stringify(error.response.data);
+          alert(mensajeError);
+        } else {
+          alert("Error al crear el alumno. Por favor, intente nuevamente.");
+        }
+      });
   };
 
   render() {
     const { errores, cursos, padres } = this.state;
 
     return (
-      <form onSubmit={this.handleSubmit}>
+      <form onSubmit={this.handleSubmit} noValidate>
         {/* Campos de texto */}
         {[
           { id: "nombre", label: "Nombre", type: "text" },
@@ -200,6 +214,7 @@ class AltaAlumno extends Component {
             className={`form-select ${errores.idCurso ? "is-invalid" : ""}`}
             value={this.state.idCurso}
             onChange={this.handleChange}
+            required
           >
             <option value="">Seleccione un curso</option>
             {cursos.length > 0 ? (
@@ -225,6 +240,7 @@ class AltaAlumno extends Component {
             className={`form-select ${errores.idPadre ? "is-invalid" : ""}`}
             value={this.state.idPadre}
             onChange={this.handleChange}
+            required
           >
             <option value="">Seleccione un padre</option>
             {padres.length > 0 ? (
