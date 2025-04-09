@@ -17,7 +17,7 @@ class ModificarProfesor extends Component {
             activo: 0,
             errores: {}, // Almacena los errores de validación
             rol: 'profesor',
-            valoresOriginales:  {}, // Nuevo estado para almacenar los valores originales
+            valoresOriginales: {}, // Nuevo estado para almacenar los valores originales
         };
     }
 
@@ -27,16 +27,15 @@ class ModificarProfesor extends Component {
 
         switch (id) {
             case 'nombre':
-                if (!/^[a-zA-Z]{3,30}$/.test(value)) {
-                    error = 'El nombre debe tener entre 3 y 30 letras.';
+                if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{3,30}$/.test(value)) {
+                    error = 'El nombre debe tener entre 3 y 30 caracteres (solo letras y espacios).';
                 }
                 break;
 
             case 'apellido':
-                if (!/^[a-zA-Z]{4,30}$/.test(value)) {
-                    error = 'El apellido debe tener entre 4 y 30 letras.';
+                if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{4,30}$/.test(value)) {
+                    error = 'El apellido debe tener entre 4 y 30 caracteres (solo letras y espacios).';
                 }
-                break;
 
             case 'dni':
                 if (!/^\d{6,8}$/.test(value)) {
@@ -66,8 +65,8 @@ class ModificarProfesor extends Component {
     // Manejar cambios en los inputs y aplicar validaciones
     handleInputChange = (event) => {
         const { id, value, type, checked } = event.target;
-        const casteo= type === 'checkbox' ? (checked ? 1 : 0) : value;
-        
+        const casteo = type === 'checkbox' ? (checked ? 1 : 0) : value;
+
         const error = this.validarCampo(id, casteo);
 
         this.setState((prevState) => ({
@@ -83,7 +82,7 @@ class ModificarProfesor extends Component {
                 withCredentials: true,
             });
 
-            console.log("respuesta api: "+JSON.stringify(response.data))
+            console.log("respuesta api: " + JSON.stringify(response.data))
             const profesores = response.data.map((profesor) => ({
                 idUsuario: profesor.idUsuario,
                 nombre: `${profesor.nombre} ${profesor.apellido} ${profesor.dni}`,
@@ -109,25 +108,25 @@ class ModificarProfesor extends Component {
                         profesorSeleccionado: this.state.profesorSeleccionado,
                         idUsuario: this.state.idUsuario, // Ahora sí tendrá el valor actualizado
                     });
-    
+
                     try {
                         const response = await axios.get(
                             `http://localhost:8080/api/usuario/getUsuario/${this.state.idUsuario}`,
                             { withCredentials: true }
                         );
-    
+
                         console.log("Datos obtenidos del profesor:", response.data);
-    
+
                         const { nombre, apellido, dni, mail, telefono, activo } = response.data;
-    
+
                         this.setState({
                             nombre: nombre || '',
                             apellido: apellido || '',
                             dni: dni || '',
                             mail: mail || '',
                             telefono: telefono || '',
-                            activo: activo ? 1:0,
-                            valoresOriginales: { nombre, apellido, dni, mail, telefono, activo }, 
+                            activo: activo ? 1 : 0,
+                            valoresOriginales: { nombre, apellido, dni, mail, telefono, activo },
                         });
                     } catch (error) {
                         console.error("Error al cargar los datos del profesor:", error);
@@ -138,13 +137,13 @@ class ModificarProfesor extends Component {
             console.error("Error al procesar el profesor seleccionado:", error);
         }
     };
-    
+
 
     // Manejar envío del formulario
     handleSubmit = async (event) => {
         event.preventDefault();
 
-        const { idUsuario,valoresOriginales, nombre, apellido, dni, mail, telefono, activo } = this.state;
+        const { idUsuario, valoresOriginales, nombre, apellido, dni, mail, telefono, activo } = this.state;
 
         if (!idUsuario) {
             alert('Por favor selecciona un profesor antes de guardar los cambios.');
@@ -177,7 +176,7 @@ class ModificarProfesor extends Component {
                     mail: '',
                     telefono: '',
                     activo: 0,
-                    valoresOriginales:{}
+                    valoresOriginales: {}
                 });
                 window.location.reload(); // Refresca la página
             } else {
@@ -190,7 +189,7 @@ class ModificarProfesor extends Component {
 
     componentDidMount() {
         this.cargarProfesores();
-        
+
     }
 
     render() {
@@ -216,8 +215,8 @@ class ModificarProfesor extends Component {
                                                 idUsuario: profesor.idUsuario,
                                                 nombre: profesor.nombre,
                                             }
-                                        )}
-                                        style={{ color: 'black' }} // Estilo para texto negro
+                                            )}
+                                            style={{ color: 'black' }} // Estilo para texto negro
                                         >
                                             {profesor.nombre}
                                         </Dropdown.Item>
@@ -241,7 +240,7 @@ class ModificarProfesor extends Component {
                                                 onChange={this.handleInputChange}
                                                 className={errores[id] ? "is-invalid" : ""}
                                                 placeholder={`Ingresa ${label.toLowerCase()}`}
-                                                
+
                                             />
                                             {errores[id] && <div style={{
                                                 color: "black", fontWeight: "bold",

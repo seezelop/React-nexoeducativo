@@ -24,15 +24,15 @@ class AltaJefeColegio extends Component {
     let error = "";
 
     switch (id) {
-      case "nombre":
-        if (!/^[a-zA-Z]{3,30}$/.test(value)) {
-          error = "El nombre debe tener entre 3 y 30 letras.";
+      case 'nombre':
+        if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{3,30}$/.test(value)) {
+          error = 'El nombre debe tener entre 3 y 30 caracteres (solo letras y espacios).';
         }
         break;
 
-      case "apellido":
-        if (!/^[a-zA-Z]{4,30}$/.test(value)) {
-          error = "El apellido debe tener entre 4 y 30 letras.";
+      case 'apellido':
+        if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{4,30}$/.test(value)) {
+          error = 'El apellido debe tener entre 4 y 30 caracteres (solo letras y espacios).';
         }
         break;
 
@@ -153,11 +153,11 @@ class AltaJefeColegio extends Component {
             )}
             <form onSubmit={this.handleSubmit}>
               {[{ id: "nombre", label: "Nombre", type: "text" },
-                { id: "apellido", label: "Apellido", type: "text" },
-                { id: "dni", label: "DNI", type: "number" },
-                { id: "mail", label: "Email", type: "email" },
-                { id: "clave", label: "Clave", type: "password" },
-                { id: "telefono", label: "Teléfono", type: "number" }].map(
+              { id: "apellido", label: "Apellido", type: "text" },
+              { id: "dni", label: "DNI", type: "number" },
+              { id: "mail", label: "Email", type: "email" },
+              { id: "clave", label: "Clave", type: "password" },
+              { id: "telefono", label: "Teléfono", type: "number" }].map(
                 ({ id, label, type }) => (
                   <div className="mb-3" key={id}>
                     <label htmlFor={id} className="form-label">

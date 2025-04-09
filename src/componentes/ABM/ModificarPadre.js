@@ -27,16 +27,15 @@ class ModificarPadre extends Component {
 
         switch (id) {
             case 'nombre':
-                if (!/^[a-zA-Z]{3,30}$/.test(value)) {
-                    error = 'El nombre debe tener entre 3 y 30 letras.';
+                if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{3,30}$/.test(value)) {
+                    error = 'El nombre debe tener entre 3 y 30 caracteres (solo letras y espacios).';
                 }
                 break;
 
             case 'apellido':
-                if (!/^[a-zA-Z]{4,30}$/.test(value)) {
-                    error = 'El apellido debe tener entre 4 y 30 letras.';
+                if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{4,30}$/.test(value)) {
+                    error = 'El apellido debe tener entre 4 y 30 caracteres (solo letras y espacios).';
                 }
-                break;
 
             case 'dni':
                 if (!/^\d{6,8}$/.test(value)) {
@@ -115,11 +114,6 @@ class ModificarPadre extends Component {
                     idUsuario: parsedValue.idUsuario, // Corregido: asegurar que se use idProfesor
                 },
                 async () => {
-                    console.log("Estado actualizado:", {
-                        profesorSeleccionado: this.state.profesorSeleccionado,
-                        idUsuario: this.state.idUsuario, // Ahora sí tendrá el valor actualizado
-                    });
-
                     try {
                         const response = await axios.get(
                             `http://localhost:8080/api/usuario/getUsuario/${this.state.idUsuario}`,
@@ -200,8 +194,8 @@ class ModificarPadre extends Component {
                 alert('Error al modificar el padre');
             }
         } catch (error) {
-            console.error('Error al modificar el padre:', error);
-            console.log('Estado actual activo:', this.state.activo);
+            alert('Error al modificar el padre:', error);
+            // console.log('Estado actual activo:', this.state.activo);
         }
     };
 
@@ -217,71 +211,78 @@ class ModificarPadre extends Component {
             <section className="d-flex flex-column">
                 <section className="container d-flex justify-content-center align-items-center flex-grow-1">
                     <section className="col-lg-12">
-                        <form onSubmit={this.handleSubmit}>
-                            <div className="pb-5">
-                                <label htmlFor="dropdown-basic-button" className="form-label">Padre</label>
-                                <DropdownButton
-                                    id="dropdown-basic-button"
-                                    title={profesorSeleccionado}
-                                    onSelect={this.handleDropdownChange}
-                                    size="sm"
-                                >
-                                    {profesores.map((profesor) => (
-                                        <Dropdown.Item
-                                            key={profesor.idUsuario}
-                                            eventKey={JSON.stringify({
-                                                idUsuario: profesor.idUsuario,
-                                                nombre: profesor.nombre,
-                                            })}
-                                            style={{ color: 'black' }} // Estilo para texto negro
-                                        >
-                                            {profesor.nombre}
-                                        </Dropdown.Item>
-                                    ))}
-                                </DropdownButton>
+                        {/* Mensaje cuando no hay padres */}
+                        {profesores.length === 0 ? (
+                            <div className="alert alert-info">
+                                No hay padres registrados en el sistema. Por favor, agregue un padre antes de intentar modificar.
                             </div>
+                        ) : (
+                            <form onSubmit={this.handleSubmit}>
+                                <div className="pb-5">
+                                    <label htmlFor="dropdown-basic-button" className="form-label">Padre</label>
+                                    <DropdownButton
+                                        id="dropdown-basic-button"
+                                        title={profesorSeleccionado}
+                                        onSelect={this.handleDropdownChange}
+                                        size="sm"
+                                    >
+                                        {profesores.map((profesor) => (
+                                            <Dropdown.Item
+                                                key={profesor.idUsuario}
+                                                eventKey={JSON.stringify({
+                                                    idUsuario: profesor.idUsuario,
+                                                    nombre: profesor.nombre,
+                                                })}
+                                                style={{ color: 'black' }} // Estilo para texto negro
+                                            >
+                                                {profesor.nombre}
+                                            </Dropdown.Item>
+                                        ))}
+                                    </DropdownButton>
+                                </div>
 
-                            {profesorSeleccionado !== 'Seleccione un padre' && (
-                                <>
-                                    {[{ id: "nombre", label: "Nombre", type: "text" },
-                                    { id: "apellido", label: "Apellido", type: "text" },
-                                    { id: "dni", label: "DNI", type: "number" },
-                                    { id: "mail", label: "Email", type: "email" },
-                                    { id: "telefono", label: "Teléfono", type: "number" }].map(({ id, label, type }) => (
-                                        <div className="mb-3" key={id}>
-                                            <label htmlFor={id} className="form-label">{label}</label>
-                                            <Form.Control
-                                                id={id}
-                                                type={type}
-                                                value={this.state[id]}
+                                {profesorSeleccionado !== 'Seleccione un padre' && (
+                                    <>
+                                        {[{ id: "nombre", label: "Nombre", type: "text" },
+                                        { id: "apellido", label: "Apellido", type: "text" },
+                                        { id: "dni", label: "DNI", type: "number" },
+                                        { id: "mail", label: "Email", type: "email" },
+                                        { id: "telefono", label: "Teléfono", type: "number" }].map(({ id, label, type }) => (
+                                            <div className="mb-3" key={id}>
+                                                <label htmlFor={id} className="form-label">{label}</label>
+                                                <Form.Control
+                                                    id={id}
+                                                    type={type}
+                                                    value={this.state[id]}
+                                                    onChange={this.handleInputChange}
+                                                    className={errores[id] ? "is-invalid" : ""}
+                                                    placeholder={`Ingresa ${label.toLowerCase()}`}
+
+                                                />
+                                                {errores[id] && <div style={{
+                                                    color: "black", fontWeight: "bold",
+                                                    fontSize: "0.9rem", marginTop: "0.3rem"
+                                                }}>{errores[id]}</div>}
+                                            </div>
+                                        ))}
+
+                                        <div className="mb-3">
+                                            <label htmlFor="activo" className="form-label">Activo:</label>
+                                            <Form.Check
+                                                id="activo"
+                                                type="checkbox"
+                                                checked={Number(this.state.activo) === 1}
                                                 onChange={this.handleInputChange}
-                                                className={errores[id] ? "is-invalid" : ""}
-                                                placeholder={`Ingresa ${label.toLowerCase()}`}
-
                                             />
-                                            {errores[id] && <div style={{
-                                                color: "black", fontWeight: "bold",
-                                                fontSize: "0.9rem", marginTop: "0.3rem"
-                                            }}>{errores[id]}</div>}
                                         </div>
-                                    ))}
 
-                                    <div className="mb-3">
-                                        <label htmlFor="activo" className="form-label">Activo:</label>
-                                        <Form.Check
-                                            id="activo"
-                                            type="checkbox"
-                                            checked={Number(this.state.activo) === 1}
-                                            onChange={this.handleInputChange}
-                                        />
-                                    </div>
-
-                                    <div className="d-grid gap-2 mb-4">
-                                        <Button type="submit" className="btn btn-primary">Guardar Cambios</Button>
-                                    </div>
-                                </>
-                            )}
-                        </form>
+                                        <div className="d-grid gap-2 mb-4">
+                                            <Button type="submit" className="btn btn-primary">Guardar Cambios</Button>
+                                        </div>
+                                    </>
+                                )}
+                            </form>
+                        )}
                     </section>
                 </section>
             </section>

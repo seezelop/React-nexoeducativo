@@ -31,7 +31,7 @@ class BajaPadre extends Component {
             }));
 
             this.setState({ padres });
-            console.log("Padres cargados: ", padres);
+            //console.log("Padres cargados: ", padres);
 
         } catch (error) {
             console.error('Error al cargar los padres:', error);
@@ -49,7 +49,7 @@ class BajaPadre extends Component {
             idUsuario: parsedValue.idUsuario
         });
 
-        console.log("ID del padre seleccionado:", parsedValue.idUsuario);
+        //console.log("ID del padre seleccionado:", parsedValue.idUsuario);
     };
 
     handleSubmit = async (event) => {

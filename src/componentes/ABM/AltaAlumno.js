@@ -27,7 +27,7 @@ class AltaAlumno extends Component {
       .get("http://localhost:8080/api/usuario/verCursoAdministrativo", { withCredentials: true })
       .then((response) => {
         if (response.data && Array.isArray(response.data)) {
-          console.log("Cursos recibidos:", response.data);
+          //console.log("Cursos recibidos:", response.data);
           this.setState({ cursos: response.data });
         } else {
           console.error("Formato inesperado en cursos:", response.data);
@@ -40,10 +40,10 @@ class AltaAlumno extends Component {
       .get("http://localhost:8080/api/usuario/obtenerPadres", { withCredentials: true })
       .then((response) => {
         if (response.data && Array.isArray(response.data)) {
-          console.log("Padres recibidos:", response.data);
+          //console.log("Padres recibidos:", response.data);
           this.setState({ padres: response.data });
         } else {
-          console.error("Formato inesperado en padres:", response.data);
+          //console.error("Formato inesperado en padres:", response.data);
         }
       })
       .catch((error) => console.error("Error al cargar los padres:", error));
@@ -71,16 +71,19 @@ class AltaAlumno extends Component {
   };
 
   validarCampoGenerico = (id, value) => {
+    let error = "";
     switch (id) {
-      case "nombre":
-        if (!/^[a-zA-Z]{3,30}$/.test(value)) {
-          return "El nombre debe tener entre 3 y 30 letras.";
+      case 'nombre':
+        if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{3,30}$/.test(value)) {
+            error = 'El nombre debe tener entre 3 y 30 caracteres (solo letras y espacios).';
         }
         break;
-      case "apellido":
-        if (!/^[a-zA-Z]{4,30}$/.test(value)) {
-          return "El apellido debe tener entre 4 y 30 letras.";
+
+    case 'apellido':
+        if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{4,30}$/.test(value)) {
+            error = 'El apellido debe tener entre 4 y 30 caracteres (solo letras y espacios).';
         }
+        break;
         break;
         case "jornada":
         if (!/^[a-zA-Z]{6,8}$/.test(value)) {

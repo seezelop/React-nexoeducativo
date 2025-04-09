@@ -25,7 +25,7 @@ class AltaPreceptor extends Component {
 
   // Obtener cursos disponibles desde el backend
   obtenerCursos = () => {
-    fetch("http://localhost:8080/api/usuario/verCursoAdministrativo", {
+    fetch("http://localhost:8080/api/usuario/cursosSinPreceptor", {
       method: "GET",
       credentials: "include",
     })
@@ -41,17 +41,16 @@ class AltaPreceptor extends Component {
     let error = "";
 
     switch (id) {
-      case "nombre":
-        if (!/^[a-zA-Z]{3,30}$/.test(value)) {
-          error = "El nombre debe tener entre 3 y 30 letras.";
+      case 'nombre':
+        if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{3,30}$/.test(value)) {
+            error = 'El nombre debe tener entre 3 y 30 caracteres (solo letras y espacios).';
         }
         break;
 
-      case "apellido":
-        if (!/^[a-zA-Z]{4,30}$/.test(value)) {
-          error = "El apellido debe tener entre 4 y 30 letras.";
+    case 'apellido':
+        if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{4,30}$/.test(value)) {
+            error = 'El apellido debe tener entre 4 y 30 caracteres (solo letras y espacios).';
         }
-        break;
 
       case "dni":
         if (!/^\d{6,8}$/.test(value)) {
@@ -102,86 +101,98 @@ class AltaPreceptor extends Component {
   };
 
   // Manejar envío del formulario
-  handleSubmit = (e) => {
-    e.preventDefault();
+ handleSubmit = (e) => {
+  e.preventDefault();
 
-    const { errores, ...datosUsuario } = this.state;
+  const { errores, ...datosUsuario } = this.state;
 
-    // Validar campos
-    const erroresPendientes = Object.keys(datosUsuario).reduce((acc, key) => {
-      const error = this.validarCampo(key, datosUsuario[key]);
-      if (error) {
-        acc[key] = error;
-      }
-      return acc;
-    }, {});
-
-    if (Object.keys(erroresPendientes).length > 0) {
-      this.setState({ errores: erroresPendientes });
-      alert("Por favor, corrija los errores antes de enviar.");
-      return;
+  // Validar campos
+  const erroresPendientes = Object.keys(datosUsuario).reduce((acc, key) => {
+    const error = this.validarCampo(key, datosUsuario[key]);
+    if (error) {
+      acc[key] = error;
     }
+    return acc;
+  }, {});
 
-    // Datos a enviar
-    const datos = {
-      nombre: this.state.nombre,
-      apellido: this.state.apellido,
-      dni: this.state.dni,
-      mail: this.state.mail,
-      clave: this.state.clave,
-      telefono: this.state.telefono,
-      activo: this.state.activo,
-      rol: this.state.rol,
-    };
+  if (Object.keys(erroresPendientes).length > 0) {
+    this.setState({ errores: erroresPendientes });
+    alert("Por favor, corrija los errores antes de enviar.");
+    return;
+  }
 
-    const asignarPreceptor ={
-      curso: this.state.cursoSeleccionado, // ID del curso seleccionado
-      dni: this.state.dni
-    }
-
-    //console.log("datitos"+JSON.stringify(datos))
-
-    fetch("http://localhost:8080/api/usuario/altaUsuario", {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(datos),
-    })
-      .then((response) => {
-        if (response.ok) {
-          alert("Preceptor dado de alta correctamente.");
-          this.handleAsignarPreceptor(asignarPreceptor)//solo se asigna un curso si se dio de alta exitosamente
-          window.location.reload();
-        }
-        return response.text();
-      })
-      //.then((data) => console.log("Asignación exitosa:", data))
-      .catch((error) => console.error("Error al dar de alta preceptor:", error));
+  // Datos a enviar
+  const datos = {
+    nombre: this.state.nombre,
+    apellido: this.state.apellido,
+    dni: this.state.dni,
+    mail: this.state.mail,
+    clave: this.state.clave,
+    telefono: this.state.telefono,
+    activo: this.state.activo,
+    rol: this.state.rol,
   };
 
-  handleAsignarPreceptor = (asignarPreceptor) =>{ 
-    console.log("datitos: "+JSON.stringify(asignarPreceptor))
-    // endpoint para asignar el curso a un preceptor, luego extraer el id del curso
-    fetch("http://localhost:8080/api/usuario/asignarPreceptor", {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(asignarPreceptor),
-    })
-    .then((response) => {
-      if (response.ok) {
-        alert("Preceptor dado de alta correctamente.");
-        window.location.reload();
-      }
-      return response.text();
-    })
-    .then((data) => console.log("Asignación exitosa:", data))
-    .catch((error) => console.error("Error al asignar el preceptor:", error));
+  const asignarPreceptor = {
+    preceptor: this.state.dni,
+    curso: this.state.cursoSeleccionado
   }
+
+  fetch("http://localhost:8080/api/usuario/altaUsuario", {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(datos),
+  })
+  .then((response) => {
+    if (response.ok) {
+      alert("Preceptor dado de alta correctamente.");
+      this.handleAsignarPreceptor(asignarPreceptor);
+    } else {
+      // Extract error message from response
+      return response.text().then(errorText => {
+        throw new Error(errorText || `Error del servidor: ${response.status}`);
+      });
+    }
+  })
+  .catch((error) => {
+    console.error("Error al dar de alta preceptor:", error);
+    alert(`Error al dar de alta preceptor: ${error.message}`);
+  });
+};
+
+ handleAsignarPreceptor = (asignarPreceptor) => { 
+  //console.log("datitos: " + JSON.stringify(asignarPreceptor));
+  
+  return fetch("http://localhost:8080/api/usuario/asignarPreceptor", {
+    method: "POST",
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(asignarPreceptor),
+  })
+  .then((response) => {
+    if (response.ok) {
+      return response.text().then(data => {
+        console.log("Asignación exitosa:", data);
+        window.location.reload();
+        return data;
+      });
+    } else {
+      // Extract error message from response
+      return response.text().then(errorText => {
+        throw new Error(errorText || `Error del servidor: ${response.status}`);
+      });
+    }
+  })
+  .catch((error) => {
+    console.error("Error al asignar el preceptor:", error);
+    alert(`Error al asignar el preceptor: ${error.message}`);
+  });
+}
   
 
   render() {
