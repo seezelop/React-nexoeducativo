@@ -184,7 +184,7 @@ const ModificarCursoPreceptor = () => {
         dataToSend.materias = materiasModificadas;
       }
 
-      console.log('lo que se envia xd: '+JSON.stringify(dataToSend))
+      //console.log('lo que se envia xd: '+JSON.stringify(dataToSend))
       const response = await axios.patch(
         `http://localhost:8080/api/usuario/modificarCurso/${formData.idCurso}`,
         dataToSend,

@@ -184,8 +184,6 @@ const ModificarCurso = () => {
       if (materiasModificadas.length > 0) {
         dataToSend.materias = materiasModificadas;
       }
-
-      console.log('INFO A EDITAR: '+JSON.stringify(dataToSend))
       
       // Actualizar la información del curso (esto incluirá las materias modificadas)
       const cursoResponse = await axios.patch(
@@ -194,8 +192,10 @@ const ModificarCurso = () => {
         { withCredentials: true }
       );
 
-      if (cursoResponse.status === 200) {
-        setMensaje({ text: 'Curso modificado exitosamente!', type: 'success' });
+      //console.log('staus XD: '+cursoResponse.status)
+      if (cursoResponse.status == 200) {
+        //setMensaje({ text: 'Curso modificado exitosamente!', type: 'success' });
+        alert('Curso modificado exitosamente')
         // Actualizar la lista de cursos y materias
         const cursosActualizados = await axios.get('http://localhost:8080/api/usuario/verCursoAdministrativo', {
           withCredentials: true,
