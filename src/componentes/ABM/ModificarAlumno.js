@@ -187,28 +187,39 @@ class ModificarAlumno extends Component {
 
     // Manejar selección de curso en el Dropdown
     handleCursoChange = (eventKey, event) => {
-        const cursoSeleccionado = eventKey;
-        const curso = this.state.cursos.find(c => c.idCurso === cursoSeleccionado);
+        // Convertir eventKey a número ya que viene como string
+        const cursoSeleccionado = parseInt(eventKey, 10);
+        const idCurso = this.state.cursos.find(c => c.idCurso === cursoSeleccionado);
         
-        if (curso) {
-            const cursoNombre = `${curso.numero} ${curso.division}`;
+        if (idCurso) {
+            const cursoNombre = `${idCurso.numero} ${idCurso.division}`;
             this.setState({ 
                 cursoSeleccionado: cursoSeleccionado,
                 cursoSeleccionadoNombre: cursoNombre
+            }, () => {
+                console.log("Curso seleccionado:", this.state.cursoSeleccionado, this.state.cursoSeleccionadoNombre);
             });
+        } else {
+            console.error("No se encontró el curso con ID:", cursoSeleccionado);
         }
     };
 
     // Manejar selección de padre en el Dropdown
     handlePadreChange = (eventKey, event) => {
-        const padre = this.state.padres.find(p => p.id === eventKey);
+        // Convertir eventKey a número ya que viene como string
+        const idPadre = parseInt(eventKey, 10);
+        const padre = this.state.padres.find(p => p.id_usuario === idPadre);
         
         if (padre) {
             const padreNombre = `${padre.nombre} ${padre.apellido}`;
             this.setState({ 
-                padreSeleccionado: eventKey,
+                padreSeleccionado: idPadre,
                 padreSeleccionadoNombre: padreNombre
+            }, () => {
+                console.log("Padre seleccionado:", this.state.padreSeleccionado, this.state.padreSeleccionadoNombre);
             });
+        } else {
+            console.error("No se encontró el padre con ID:", idPadre);
         }
     };
 
@@ -235,8 +246,8 @@ class ModificarAlumno extends Component {
         if (jornada !== valoresOriginales.jornada && jornada !== '') datosModificados.jornada = jornada;
 
         // Agregar curso y padre si fueron seleccionados y no están vacíos
-        if (cursoSeleccionado) datosModificados.curso = cursoSeleccionado;
-        if (padreSeleccionado) datosModificados.padre = padreSeleccionado;
+        if (cursoSeleccionado) datosModificados.idCurso = cursoSeleccionado;
+        if (padreSeleccionado) datosModificados.idPadre = padreSeleccionado;
 
         // Siempre incluir el campo "activo", aunque no haya cambiado
         datosModificados.activo = activo;
@@ -248,7 +259,7 @@ class ModificarAlumno extends Component {
             return;
         }
 
-        //console.log('Datos a enviar:', datosModificados);
+        console.log('Datos a enviar:', datosModificados);
 
         try {
             const response = await axios.patch(
@@ -412,8 +423,8 @@ class ModificarAlumno extends Component {
                                             >
                                                 {padres.map((padre) => (
                                                     <Dropdown.Item
-                                                        key={padre.id}
-                                                        eventKey={padre.id}
+                                                        key={padre.id_usuario}
+                                                        eventKey={padre.id_usuario}
                                                         style={{ color: 'black', display: 'block' }}
                                                     >
                                                         {padre.nombre} {padre.apellido}
