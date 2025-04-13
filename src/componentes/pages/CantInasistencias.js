@@ -8,11 +8,15 @@ function CantInasistencias() {
   const [hijos, setHijos] = useState([]);  // Estado para almacenar los hijos
   const [hijoSeleccionado, setHijoSeleccionado] = useState(null);  // Estado para el hijo seleccionado
 
+  const api = axios.create({
+    baseURL: process.env.REACT_APP_API_URL,
+  });
+
   // Obtener los hijos del usuario
   useEffect(() => {
     const obtenerHijos = async () => {
       try {
-        const response = await axios.get("http://localhost:8080/api/usuario/verHijos", {
+        const response = await api.get("/api/usuario/verHijos", {
           withCredentials: true,
         });
 
@@ -32,8 +36,8 @@ function CantInasistencias() {
       if (!hijoSeleccionado) return;  // Si no hay hijo seleccionado, no hacemos la solicitud
 
       try {
-        const response = await axios.get(
-          `http://localhost:8080/api/usuario/cantInasistencias/${hijoSeleccionado}`,
+        const response = await api.get(
+          `/api/usuario/cantInasistencias/${hijoSeleccionado}`,
           { withCredentials: true }
         );
 
