@@ -1,6 +1,5 @@
 import React from 'react';
 import AltaCurso from './AltaCurso';
-import BajaCurso from './BajaCurso';
 import ModificarCursoPreceptor from './ModificarCursoPreceptor';
 import BajaCursoPreceptor from './BajaCursoPreceptor';
 

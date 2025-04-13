@@ -1,11 +1,11 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+//import { useNavigate } from 'react-router-dom';
 import AltaEscuela from './AltaEscuela';
 import BajaEscuela from './BajaEscuela';
 import ModificacionEscuela from './ModificarEscuela';
 
 function ABMEscuelas() {
-  const navigate = useNavigate(); // Hook para redirigir
+  //const navigate = useNavigate(); // Hook para redirigir
 
   return (
     <section className="d-flex flex-column min-vh-100 pt-5">

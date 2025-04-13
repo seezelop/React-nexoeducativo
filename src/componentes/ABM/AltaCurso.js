@@ -41,7 +41,7 @@ const AltaCurso = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [api]);
 
   const handleCursoChange = (e) => {
     const { name, value } = e.target;
@@ -107,7 +107,7 @@ const AltaCurso = () => {
         withCredentials: true,
       });
 
-      if (response.status == 201) {
+      if (response.status === 201) {
         // Mostrar alerta de JavaScript
         alert(`¡Curso ${formData.r.numero}° "${formData.r.division}" registrado exitosamente`);
         //console.log('estus: '+response.status)

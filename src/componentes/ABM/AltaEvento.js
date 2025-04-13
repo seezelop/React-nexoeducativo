@@ -13,8 +13,8 @@ function AltaEvento() {
   const [cursos, setCursos] = useState([]);
   const [cursoSeleccionado, setCursoSeleccionado] = useState('');
   const [cargando, setCargando] = useState(false);
-    const [mensaje, setMensaje] = useState(null);
-    const [tipoMensaje, setTipoMensaje] = useState('');
+   // const [mensaje, setMensaje] = useState(null);
+    //const [tipoMensaje, setTipoMensaje] = useState('');
   const [respuesta, setRespuesta] = useState('');
 
   // Cargar cursos al montar el componente
@@ -68,8 +68,8 @@ function AltaEvento() {
 
       const fechaObj = formatDateForBackend(fecha);
     
-      console.log('HORA que llega antes de castear '+JSON.stringify(fechaObj))
-      console.log('HORA CASTEADA A ENVIAR: '+JSON.stringify(fechaObj))
+     // console.log('HORA que llega antes de castear '+JSON.stringify(fechaObj))
+      //console.log('HORA CASTEADA A ENVIAR: '+JSON.stringify(fechaObj))
       try {
         await api.post(`/api/usuario/altaEvento/${cursoSeleccionado}`, {
           cursoSeleccionado,
