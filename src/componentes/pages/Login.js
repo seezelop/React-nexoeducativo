@@ -11,14 +11,15 @@ function Login() {
   const { setUserRole, setInfoSesion } = useContext(UserContext); // Accede a setUserRole desde el contexto
   const navigate = useNavigate();
 
-  const api = api.create({
+  const API_URL = process.env.REACT_APP_API_URL;
+  const api = axios.create({
       baseURL: process.env.REACT_APP_API_URL,
     });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const login = await fetch("http://localhost:8080/login", {
+      const login = await fetch(`${API_URL}/login`, {
         method: "POST",
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
