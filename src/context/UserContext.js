@@ -5,7 +5,9 @@ import axios from 'axios';
 
 // Creamos el contexto
 export const UserContext = createContext();
-
+const api = axios.create({
+  baseURL: process.env.REACT_APP_API_URL,
+});
 // Proveedor del contexto para envolver la aplicación
 export const UserProvider = ({ children }) => {
   const cookies = new Cookies();
@@ -20,7 +22,7 @@ export const UserProvider = ({ children }) => {
       // Puedes cargar más información sobre el usuario desde la API si lo deseas
       const fetchUserInfo = async () => {
         try {
-          const response = await axios.get('http://localhost:8080/auth/info', { withCredentials: true });
+          const response = await api.get('/auth/info', { withCredentials: true });
           setInfoSesion(response.data);
         } catch (error) {
           console.error('Error al obtener la información del usuario', error);
