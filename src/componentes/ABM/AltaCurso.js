@@ -18,13 +18,19 @@ const AltaCurso = () => {
   const [cantidadMaterias, setCantidadMaterias] = useState(0);
   const [error, setError] = useState(null);
 
+    // Crear una instancia de axios con la URL base
+  const api = axios.create({
+    baseURL: process.env.REACT_APP_API_URL,
+  });
+
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const materiasResponse = await axios.get('http://localhost:8080/api/usuario/verMaterias', {
+        const materiasResponse = await api.get('/api/usuario/verMaterias', {
           withCredentials: true,
         });
-        const profesoresResponse = await axios.get('http://localhost:8080/api/usuario/verProfesAdministrativo', {
+        const profesoresResponse = await api.get('/api/usuario/verProfesAdministrativo', {
           withCredentials: true,
         });
         setMateriasList(materiasResponse.data);
@@ -97,7 +103,7 @@ const AltaCurso = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:8080/api/usuario/saveCurso', formData, {
+      const response = await api.post('/api/usuario/saveCurso', formData, {
         withCredentials: true,
       });
 

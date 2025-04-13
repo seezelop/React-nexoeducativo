@@ -22,9 +22,12 @@ class AltaAlumno extends Component {
   }
 
   componentDidMount() {
+    // Obtener la URL base desde variable de entorno
+    const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+    
     // Cargar cursos
     axios
-      .get("http://localhost:8080/api/usuario/verCursoAdministrativo", { withCredentials: true })
+      .get(`${API_URL}/api/usuario/verCursoAdministrativo`, { withCredentials: true })
       .then((response) => {
         if (response.data && Array.isArray(response.data)) {
           this.setState({ cursos: response.data });
@@ -36,7 +39,7 @@ class AltaAlumno extends Component {
 
     // Cargar padres
     axios
-      .get("http://localhost:8080/api/usuario/obtenerPadres", { withCredentials: true })
+      .get(`${API_URL}/api/usuario/obtenerPadres`, { withCredentials: true })
       .then((response) => {
         if (response.data && Array.isArray(response.data)) {
           this.setState({ padres: response.data });
@@ -139,10 +142,12 @@ class AltaAlumno extends Component {
 
     // Validar cada campo
     Object.keys(datosUsuario).forEach(campo => {
-      const error = this.validarCampo(campo, datosUsuario[campo]);
-      if (error) {
-        nuevosErrores[campo] = error;
-        hayErrores = true;
+      if (campo !== 'activo') { // No validar el campo activo
+        const error = this.validarCampo(campo, datosUsuario[campo]);
+        if (error) {
+          nuevosErrores[campo] = error;
+          hayErrores = true;
+        }
       }
     });
 
@@ -152,9 +157,12 @@ class AltaAlumno extends Component {
       return;
     }
 
+    // Obtener la URL base desde variable de entorno
+    const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
     // Si no hay errores, enviar los datos
     axios
-      .post("http://localhost:8080/api/usuario/saveAlumno", datosUsuario, { withCredentials: true })
+      .post(`${API_URL}/api/usuario/saveAlumno`, datosUsuario, { withCredentials: true })
       .then((response) => {
         alert("Alumno creado correctamente.");
         window.location.reload();

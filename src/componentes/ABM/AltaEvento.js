@@ -2,6 +2,11 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Form } from 'react-bootstrap';
 
+// Crear una instancia de axios con la URL base
+const api = axios.create({
+  baseURL: process.env.REACT_APP_API_URL,
+});
+
 function AltaEvento() {
   const [descripcion, setDescripcion] = useState('');
   const [fecha, setFecha] = useState('');
@@ -23,7 +28,7 @@ function AltaEvento() {
       setMensaje(null);
       
       try {
-        const response = await axios.get('http://localhost:8080/api/usuario/verCursoProfesor', {
+        const response = await api.get('/api/usuario/verCursoProfesor', {
           withCredentials: true
         });
         setCursos(response.data);
@@ -66,7 +71,7 @@ function AltaEvento() {
       console.log('HORA que llega antes de castear '+JSON.stringify(fechaObj))
       console.log('HORA CASTEADA A ENVIAR: '+JSON.stringify(fechaObj))
       try {
-        await axios.post(`http://localhost:8080/api/usuario/altaEvento/${cursoSeleccionado}`, {
+        await api.post(`/api/usuario/altaEvento/${cursoSeleccionado}`, {
           cursoSeleccionado,
           descripcion,
           fecha:fechaObj,

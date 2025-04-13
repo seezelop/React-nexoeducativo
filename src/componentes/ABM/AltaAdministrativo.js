@@ -85,13 +85,15 @@ class AltaAdministrativo extends Component {
   handleSubmit = (e) => {
     e.preventDefault();
 
-    const { errores, ...datosUsuario } = this.state;
+    const { errores, showModal, ...datosUsuario } = this.state;
 
     // Verifica si hay errores
     const erroresPendientes = Object.keys(datosUsuario).reduce((acc, key) => {
-      const error = this.validarCampo(key, datosUsuario[key]);
-      if (error) {
-        acc[key] = error;
+      if (key !== 'activo' && key !== 'rol') {
+        const error = this.validarCampo(key, datosUsuario[key]);
+        if (error) {
+          acc[key] = error;
+        }
       }
       return acc;
     }, {});
@@ -102,8 +104,11 @@ class AltaAdministrativo extends Component {
       return;
     }
 
+    // Usar la variable de entorno para la URL del backend
+    const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+    
     // Enviar datos al backend
-    fetch("http://localhost:8080/api/usuario/altaUsuario", {
+    fetch(`${API_URL}/api/usuario/altaUsuario`, {
       method: "POST",
       credentials: "include",
       headers: {
@@ -116,11 +121,18 @@ class AltaAdministrativo extends Component {
           this.setState({ showModal: true });
           alert("Administrativo creado correctamente.");
           window.location.reload(); // Recarga la página
+          return response.text();
+        } else {
+          return response.text().then(text => {
+            throw new Error(text || 'Error al crear administrativo');
+          });
         }
-        return response.text();
       })
       .then((data) => console.log("Administrativo creado:", data))
-      .catch((error) => console.error("Error al crear administrativo:", error));
+      .catch((error) => {
+        console.error("Error al crear administrativo:", error);
+        alert(`Error: ${error.message}`);
+      });
   };
 
   closeModal = () => {

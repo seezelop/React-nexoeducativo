@@ -7,11 +7,14 @@ function AltaComunicacion() {
   const [cursoSeleccionado, setCursoSeleccionado] = useState('');
   const [respuesta, setRespuesta] = useState('');
 
+  // URL base obtenida de la variable de entorno
+  const API_URL = process.env.REACT_APP_API_URL;
+
   // Cargar cursos desde el backend
   useEffect(() => {
     const cargarCursos = async () => {
       try {
-        const response = await axios.get("http://localhost:8080/api/usuario/verCursoProfesor", {
+        const response = await axios.get(`${API_URL}/api/usuario/verCursoProfesor`, {
           withCredentials: true,
         });
         setCursos(response.data);
@@ -21,7 +24,7 @@ function AltaComunicacion() {
     };
 
     cargarCursos();
-  }, []);
+  }, [API_URL]);
 
   // Manejo del envío
   const manejarEnvio = async (e) => {
@@ -33,15 +36,17 @@ function AltaComunicacion() {
     }
 
     try {
-      await axios.post(`http://localhost:8080/novedades/${cursoSeleccionado}`,
+      await axios.post(
+        `${API_URL}/novedades/${cursoSeleccionado}`,
         { contenido: mensaje },
-        { withCredentials: true } 
+        { withCredentials: true }
       );
 
       setRespuesta('Mensaje enviado exitosamente.');
       setMensaje('');
       setCursoSeleccionado('');
     } catch (error) {
+      console.error("Error al enviar la comunicación:", error);
       setRespuesta('Error al enviar el mensaje.');
     }
   };
@@ -96,4 +101,3 @@ function AltaComunicacion() {
 }
 
 export default AltaComunicacion;
-

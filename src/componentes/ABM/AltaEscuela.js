@@ -2,6 +2,11 @@ import React, { Component } from 'react';
 import { DropdownButton, Dropdown } from 'react-bootstrap'; 
 import axios from 'axios';
 
+// Crear una instancia de axios con la URL base
+const api = axios.create({
+    baseURL: process.env.REACT_APP_API_URL,
+  });
+
 class AltaEscuela extends Component {
     // Se setean las propiedades que van a ser enviadas
     constructor(props) {
@@ -20,10 +25,13 @@ class AltaEscuela extends Component {
         };
     }
 
+    
+    
+    
     // Esto es para rellenar los tipos de plan
     cargarPlanes = async () => {
         try {
-            const response = await axios.get('http://localhost:8080/api/usuario/getNombrePlanes', {
+            const response = await api.get('/api/usuario/getNombrePlanes', {
                 withCredentials: true
             });
             // Pasar lista de string a objetos
@@ -42,7 +50,7 @@ class AltaEscuela extends Component {
     // Esto es para rellenar que muestre los jefes de colegio sin colegios asignados
     cargarJefeColegio = async () => {
         try {
-            const response = await axios.get('http://localhost:8080/api/usuario/getJefeColegioSinEscuela', {
+            const response = await api.get('/api/usuario/getJefeColegioSinEscuela', {
                 withCredentials: true
             });
             if (response.status === 200) {
@@ -90,7 +98,7 @@ class AltaEscuela extends Component {
 
         try {
             // Enviar los datos al backend
-            const response = await axios.post('http://localhost:8080/api/usuario/saveEscuela', {
+            const response = await api.post('/api/usuario/saveEscuela', {
                 nombre,
                 direccion,
                 activo,
