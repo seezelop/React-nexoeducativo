@@ -7,10 +7,14 @@ function VerNovedades() {
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
 
+  const api = axios.create({
+      baseURL: process.env.REACT_APP_API_URL,
+    });
+
   useEffect(() => {
     const cargarNovedades = async () => {
       try {
-        const response = await axios.get("http://localhost:8080/verNovedades", {
+        const response = await api.get("/verNovedades", {
           withCredentials: true,
         });
 

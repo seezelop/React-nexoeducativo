@@ -11,6 +11,10 @@ function Login() {
   const { setUserRole, setInfoSesion } = useContext(UserContext); // Accede a setUserRole desde el contexto
   const navigate = useNavigate();
 
+  const api = api.create({
+      baseURL: process.env.REACT_APP_API_URL,
+    });
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -27,11 +31,11 @@ function Login() {
       });
 
       if (login.ok) {
-        const response = await axios.get('http://localhost:8080/api/usuario/getRolUsuarioLogueado', {
+        const response = await api.get('/api/usuario/getRolUsuarioLogueado', {
           withCredentials: true
         });
 
-        const response2 = await axios.get('http://localhost:8080/auth/info', {
+        const response2 = await api.get('/auth/info', {
           withCredentials: true
         });
 

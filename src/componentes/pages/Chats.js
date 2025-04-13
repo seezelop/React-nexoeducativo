@@ -8,10 +8,14 @@ const Chats = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
+  const api = axios.create({
+    baseURL: process.env.REACT_APP_API_URL,
+  });
+
   useEffect(() => {
     const fetchUsuarios = async () => {
       try {
-        const response = await axios.get("http://localhost:8080/chatIndividual", {
+        const response = await api.get("/chatIndividual", {
           withCredentials: true,
         });
 

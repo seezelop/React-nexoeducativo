@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 
+const API_URL = process.env.REACT_APP_API_URL;
 class Contacto extends Component {
     constructor(props) {
         super(props);
@@ -40,7 +41,7 @@ Institución: ${formData.institucion}
 Comentarios: ${formData.comentarios}`
         };
         
-        console.log("Enviando datos al backend:", formContactoDTO);
+        //console.log("Enviando datos al backend:", formContactoDTO);
 
         this.setState({ 
             isLoading: true,
@@ -48,7 +49,7 @@ Comentarios: ${formData.comentarios}`
             successMessage: "" 
         });
 
-        fetch("http://localhost:8080/formContacto", {  
+        fetch(`${API_URL}/formContacto`, {  
             method: "POST",
             headers: {
                 "Content-Type": "application/json"

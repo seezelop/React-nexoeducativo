@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useSearchParams } from "react-router-dom";
 
+//OJO CON ESTE ARCHIVO
+
 function RealizarPago() {
   const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
@@ -10,12 +12,16 @@ function RealizarPago() {
   const [pagosAlDia, setPagosAlDia] = useState(false);
   const [verificando, setVerificando] = useState(true);
 
+  const api = axios.create({
+      baseURL: process.env.REACT_APP_API_URL,
+    });
+    
   useEffect(() => {
     const verificarEstadoPagos = async () => {
       setVerificando(true);
       try {
         // Verificar si el padre ya está al día con los pagos
-        const pagosResponse = await axios.get("http://localhost:8080/api/usuario/siPago", {
+        const pagosResponse = await axios.get("/api/usuario/siPago", {
           withCredentials: true,
         });
         
@@ -50,7 +56,7 @@ function RealizarPago() {
 
     const fetchPrecio = async () => {
       try {
-        const response = await axios.get("http://localhost:8080/api/usuario/obtenerInfoCuota", {
+        const response = await axios.get("/api/usuario/obtenerInfoCuota", {
           withCredentials: true,
         });
         setPrecio(response.data);
@@ -70,7 +76,7 @@ function RealizarPago() {
 
     setLoading(true);
     try {
-      const response = await axios.post("http://localhost:5000/crear-preferencia", {
+      const response = await axios.post("/crear-preferencia", {
         items: [{ title: "Cuota Escolar", quantity: 1, unit_price: precio }],
         platform: "web" // Asegurar que use las URLs web
       });

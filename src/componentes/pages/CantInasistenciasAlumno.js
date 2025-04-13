@@ -6,10 +6,14 @@ function CantInasistenciasAlumno() {
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
 
+  const api = axios.create({
+    baseURL: process.env.REACT_APP_API_URL,
+  });
+
   useEffect(() => {
     const obtenerInasistencias = async () => {
       try {
-        const response = await axios.get("http://localhost:8080/api/usuario/cantInasistenciasAlumno", {
+        const response = await api.get("/api/usuario/cantInasistenciasAlumno", {
           withCredentials: true,
         });
 

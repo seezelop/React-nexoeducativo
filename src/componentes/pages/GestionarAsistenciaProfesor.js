@@ -19,12 +19,16 @@ const GestionarAsistenciaProfesor = () => {
   const [profesorSeleccionado, setProfesorSeleccionado] = useState('');
   const [planValido, setPlanValido] = useState(null); // null: no verificado, true: válido, false: no válido
 
+  const api = axios.create({
+    baseURL: process.env.REACT_APP_API_URL,
+  });
+
   // Verificar el plan al cargar el componente
   useEffect(() => {
     const verificarPlan = async () => {
       setLoading(prev => ({ ...prev, general: true }));
       try {
-        const response = await axios.get('http://localhost:8080/api/usuario/getPlanEscuela', { 
+        const response = await api.get('/api/usuario/getPlanEscuela', { 
           withCredentials: true 
         });
         setPlanValido(response.data === 2);
@@ -52,7 +56,7 @@ const GestionarAsistenciaProfesor = () => {
   const obtenerProfesores = async () => {
     setLoading(prev => ({ ...prev, profesores: true }));
     try {
-      const response = await axios.get('http://localhost:8080/api/usuario/verProfesAdministrativo', { 
+      const response = await api.get('/api/usuario/verProfesAdministrativo', { 
         withCredentials: true 
       });
       setProfesores(response.data);
@@ -73,7 +77,7 @@ const GestionarAsistenciaProfesor = () => {
   const obtenerFechasAsistencias = async () => {
     setLoading(prev => ({ ...prev, asistencias: true }));
     try {
-      const response = await axios.get('http://localhost:8080/api/usuario/obtenerAsistenciaProfe', { 
+      const response = await api.get('/api/usuario/obtenerAsistenciaProfe', { 
         withCredentials: true 
       });
       
@@ -142,7 +146,7 @@ const GestionarAsistenciaProfesor = () => {
         })),
       };
       
-      await axios.post('http://localhost:8080/api/usuario/tomarAsistenciaProfesor', data, { 
+      await api.post('/api/usuario/tomarAsistenciaProfesor', data, { 
         withCredentials: true 
       });
 
@@ -180,8 +184,8 @@ const GestionarAsistenciaProfesor = () => {
         retiroAntes: asistencia[profesorSeleccionado].retiroAntes,
       }];
       
-      await axios.patch(
-        `http://localhost:8080/api/usuario/editarAsistenciaProfe?fecha=${fechaSeleccionada}`, 
+      await api.patch(
+        `/api/usuario/editarAsistenciaProfe?fecha=${fechaSeleccionada}`, 
         dataToSend, 
         { withCredentials: true }
       );

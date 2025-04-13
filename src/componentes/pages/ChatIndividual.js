@@ -14,11 +14,15 @@ const ChatIndividual = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+   const api = axios.create({
+      baseURL: process.env.REACT_APP_API_URL,
+    });
+
   // Obtener usuario logueado
   useEffect(() => {
     const fetchUserEmail = async () => {
       try {
-        const response = await axios.get(
+        const response = await api.get(
           "http://localhost:8080/api/usuario/usuarioLogueado",
           { withCredentials: true }
         );
@@ -39,8 +43,8 @@ const ChatIndividual = () => {
     const fetchMensajes = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(
-          `http://localhost:8080/obtenerMensajesEntreUsuarios/${mailDestinatario}`,
+        const response = await api.get(
+          `/obtenerMensajesEntreUsuarios/${mailDestinatario}`,
           { withCredentials: true }
         );
         
@@ -80,15 +84,15 @@ const ChatIndividual = () => {
 
     try {
       setLoading(true);
-      await axios.post(
-        "http://localhost:8080/nuevoMensaje",
+      await api.post(
+        "/nuevoMensaje",
         { contenido: mensaje, destinatario: mailDestinatario },
         { withCredentials: true, headers: { "Content-Type": "application/json" } }
       );
 
       // Recargar mensajes
-      const response = await axios.get(
-        `http://localhost:8080/obtenerMensajesEntreUsuarios/${mailDestinatario}`,
+      const response = await api.get(
+        `/obtenerMensajesEntreUsuarios/${mailDestinatario}`,
         { withCredentials: true }
       );
       setMensajes(response.status === 204 ? [] : response.data);
@@ -109,8 +113,8 @@ const ChatIndividual = () => {
 
     try {
       setLoading(true);
-      await axios.patch(
-        `http://localhost:8080/editarMensajePrivado/${id}`,
+      await api.patch(
+        `/editarMensajePrivado/${id}`,
         nuevoContenido,
         { withCredentials: true, headers: { "Content-Type": "text/plain" } }
       );
@@ -132,8 +136,8 @@ const ChatIndividual = () => {
 
     try {
       setLoading(true);
-      await axios.delete(
-        `http://localhost:8080/borrarMensaje/${id}`,
+      await api.delete(
+        `/borrarMensaje/${id}`,
         { withCredentials: true }
       );
 

@@ -9,10 +9,14 @@ function InformacionCurso() {
   const [loading, setLoading] = useState(false); // Estado de carga
   const navigate = useNavigate();
 
+  const api = axios.create({
+      baseURL: process.env.REACT_APP_API_URL,
+    });
+
   useEffect(() => {
     const obtenerHijos = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/api/usuario/verHijos', { withCredentials: true });
+        const response = await api.get('/api/usuario/verHijos', { withCredentials: true });
         setHijos(response.data);
       } catch (error) {
         console.error('Error al obtener la lista de hijos:', error);
@@ -31,7 +35,7 @@ function InformacionCurso() {
     const obtenerInfoCurso = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`http://localhost:8080/api/usuario/verInfoHijo/${hijoSeleccionado}`, { withCredentials: true });
+        const response = await api.get(`/api/usuario/verInfoHijo/${hijoSeleccionado}`, { withCredentials: true });
         setInfoCurso(response.data);
       } catch (error) {
         console.error('Error al obtener la información del curso:', error);

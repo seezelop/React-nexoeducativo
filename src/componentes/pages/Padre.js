@@ -8,6 +8,10 @@ function Padre() {
   const [precio, setPrecio] = useState(null);
   const navigate = useNavigate();
 
+  const api = axios.create({
+      baseURL: process.env.REACT_APP_API_URL,
+    });
+
   useEffect(() => {
     const status = searchParams.get("status");
     setEstadoPago(status || ''); // Siempre actualiza el estado
@@ -19,7 +23,7 @@ function Padre() {
 
   const obtenerPrecioYGenerarComprobante = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/api/usuario/obtenerInfoCuota", {
+      const response = await api.get("/api/usuario/obtenerInfoCuota", {
         withCredentials: true,
       });
       
@@ -34,8 +38,8 @@ function Padre() {
 
   const generarComprobante = async (importe) => {
     try {
-      await axios.post(
-        "http://localhost:8080/api/usuario/generarComprobante",
+      await api.post(
+        "/api/usuario/generarComprobante",
         { importe },
         {
           headers: { "Content-Type": "application/json" },

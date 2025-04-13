@@ -10,6 +10,10 @@ const SeleccionarProfePremium = () => {
   const [infoProfesor, setInfoProfesor] = useState(null);
   const [rol, setRol] = useState("profesor");
 
+  const api = axios.create({
+      baseURL: process.env.REACT_APP_API_URL,
+    });
+
   // Cargar profesores al montar el componente
   useEffect(() => {
     cargarProfesores();
@@ -18,7 +22,7 @@ const SeleccionarProfePremium = () => {
   const cargarProfesores = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`http://localhost:8080/api/usuario/getUsuarios/${rol}`, {
+      const response = await api.get(`/api/usuario/getUsuarios/${rol}`, {
         withCredentials: true,
       });
 
@@ -42,7 +46,7 @@ const SeleccionarProfePremium = () => {
     if (idUsuario) {
       setLoading(true);
       try {
-        const response = await axios.get(`http://localhost:8080/api/usuario/verInfoProfe/${idUsuario}`, {
+        const response = await api.get(`/api/usuario/verInfoProfe/${idUsuario}`, {
           withCredentials: true,
         });
 

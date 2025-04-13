@@ -13,11 +13,15 @@ const GestionarAsistenciaAlumnos = () => {
   const [loading, setLoading] = useState(false);
   const [mensaje, setMensaje] = useState({ text: '', type: '' });
 
+   const api = axios.create({
+      baseURL: process.env.REACT_APP_API_URL,
+    });
+
   // Cargar los cursos al iniciar el componente
   useEffect(() => {
     const fetchCursos = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/api/usuario/verCursoPreceptor', {
+        const response = await api.get('/api/usuario/verCursoPreceptor', {
           withCredentials: true,
         });
         setCursos(response.data);
@@ -44,7 +48,7 @@ const GestionarAsistenciaAlumnos = () => {
 
     setLoading(true);
     try {
-      const response = await axios.get(`http://localhost:8080/api/usuario/verAlumnosCurso/${cursoId}`, {
+      const response = await api.get(`/api/usuario/verAlumnosCurso/${cursoId}`, {
         withCredentials: true,
       });
 
@@ -73,8 +77,8 @@ const GestionarAsistenciaAlumnos = () => {
     if (!cursoId) return;
 
     try {
-      const response = await axios.get(
-        `http://localhost:8080/api/usuario/obtenerAsistencia/${cursoId}`,
+      const response = await api.get(
+        `/api/usuario/obtenerAsistencia/${cursoId}`,
         { withCredentials: true }
       );
 
@@ -112,8 +116,8 @@ const GestionarAsistenciaAlumnos = () => {
 
     setLoading(true);
     try {
-      const response = await axios.post(
-        `http://localhost:8080/api/usuario/tomarAsistencia/${cursoSeleccionado}`,
+      const response = await api.post(
+        `/usuario/tomarAsistencia/${cursoSeleccionado}`,
         { alumnosCurso: asistencia },
         { withCredentials: true }
       );
@@ -158,8 +162,8 @@ const GestionarAsistenciaAlumnos = () => {
         ...asistencia[alumnoIndex]
       }];
 
-      const response = await axios.patch(
-        `http://localhost:8080/api/usuario/editarAsistencia/${cursoSeleccionado}?fecha=${fechaSeleccionada}`,
+      const response = await api.patch(
+        `/usuario/editarAsistencia/${cursoSeleccionado}?fecha=${fechaSeleccionada}`,
         asistenciaAlumno,
         { withCredentials: true }
       );

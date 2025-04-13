@@ -4,6 +4,8 @@ const GestionesPago = () => {
   const [infoPago, setInfoPago] = useState("");
   const [mensaje, setMensaje] = useState("");
 
+  const API_URL = process.env.REACT_APP_API_URL;
+
   // Maneja cambios en el textarea
   const handleChange = (e) => {
     setInfoPago(e.target.value);
@@ -11,7 +13,7 @@ const GestionesPago = () => {
 
   // Maneja la solicitud HTTP - simplificado solo para subir
   const handleSubmit = async () => {
-    const endpoint = "http://localhost:8080/api/usuario/subirInfoPago";
+    const endpoint = `${API_URL}/api/usuario/subirInfoPago`;
 
     // Validación de longitud del texto
     if (infoPago.length < 10 || infoPago.length > 255) {

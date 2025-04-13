@@ -9,10 +9,13 @@ const RenovarMembresia = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  const api = axios.create({
+    baseURL: process.env.REACT_APP_API_URL,
+  });
   useEffect(() => {
     const fetchPlanes = async () => {
       try {
-        const response = await axios.get("http://localhost:8080/api/usuario/getInfoPlanes", {
+        const response = await api.get("/api/usuario/getInfoPlanes", {
           withCredentials: true,
         });
         setPlanes(response.data);
@@ -32,8 +35,8 @@ const RenovarMembresia = () => {
     
     setLoading(true);
     try {
-      const response = await axios.post(
-        "http://localhost:8080/api/usuario/renovarMembresia", 
+      const response = await api.post(
+        "/api/usuario/renovarMembresia", 
         { 
           idPlan: renovar ? parseInt(selectedPlan) : 0, 
           renovo: renovar 

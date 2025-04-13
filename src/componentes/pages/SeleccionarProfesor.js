@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import { Dropdown, DropdownButton, Form, Button } from 'react-bootstrap';
 import axios from 'axios';
 
+const api = axios.create({
+    baseURL: process.env.REACT_APP_API_URL,
+  });
 class SeleccionarProfesor extends Component {
     constructor(props) {
         super(props);
@@ -18,7 +21,7 @@ class SeleccionarProfesor extends Component {
     // Cargar la lista de profesores
     cargarProfesores = async () => {
         try {
-            const response = await axios.get('http://localhost:8080/api/profesor/getProfesores', {
+            const response = await api.get('/api/profesor/getProfesores', {
                 withCredentials: true,
             });
 
@@ -57,7 +60,7 @@ class SeleccionarProfesor extends Component {
         event.preventDefault();
         const { idProfesor, nombre, apellido, idRol } = this.state;
 
-        console.log('Datos del profesor seleccionado:', { idProfesor, nombre, apellido, idRol });
+        //console.log('Datos del profesor seleccionado:', { idProfesor, nombre, apellido, idRol });
         alert('Profesor seleccionado con éxito!');
     };
 

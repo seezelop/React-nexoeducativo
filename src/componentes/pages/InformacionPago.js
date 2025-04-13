@@ -7,10 +7,13 @@ const InformacionPago = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null); 
 
+  const api = axios.create({
+      baseURL: process.env.REACT_APP_API_URL,
+    });
   // Función para obtener la información de pago
   const obtenerInfoPago = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/verInfoPago", {
+      const response = await api.get("/verInfoPago", {
         withCredentials: true, 
       });
 

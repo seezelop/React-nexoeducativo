@@ -8,11 +8,15 @@ function InformacionCursoAlumno() {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
+  const api = axios.create({
+      baseURL: process.env.REACT_APP_API_URL,
+    });
+
   useEffect(() => {
     const obtenerInfoCurso = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`http://localhost:8080/api/usuario/verInfoAlumno`, { withCredentials: true });
+        const response = await api.get(`/api/usuario/verInfoAlumno`, { withCredentials: true });
         setInfoCurso(response.data); // Guardamos la información correctamente
       } catch (error) {
         console.error('Error al obtener la información del alumno:', error);

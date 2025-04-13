@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+const API_URL = process.env.REACT_APP_API_URL;
 const FormularioCuota = () => {
     const [formData, setFormData] = useState({
         monto: "",
@@ -22,8 +23,8 @@ const FormularioCuota = () => {
             return;
         }
 
-        console.log('LO QUE SE ENVIA COMO JORNADA: ' + formData.jornada);
-        const url = "http://localhost:8080/api/usuario/altaCuota"; // Ajusta la URL
+        //console.log('LO QUE SE ENVIA COMO JORNADA: ' + formData.jornada);
+        const url = `${API_URL}/api/usuario/altaCuota`; // Ajusta la URL
 
         try {
             const response = await fetch(url, {
@@ -59,8 +60,8 @@ const FormularioCuota = () => {
             return;
         }
 
-        console.log('MODIFICANDO CUOTA PARA JORNADA: ' + formData.jornada);
-        const url = `http://localhost:8080/api/usuario/modificarCuota/${formData.jornada}`;
+        //console.log('MODIFICANDO CUOTA PARA JORNADA: ' + formData.jornada);
+        const url = `${API_URL}/api/usuario/modificarCuota/${formData.jornada}`;
 
         try {
             const response = await fetch(url, {

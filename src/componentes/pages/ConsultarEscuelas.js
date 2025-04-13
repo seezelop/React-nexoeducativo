@@ -4,11 +4,14 @@ import axios from 'axios';
 const ConsultarEscuelas = () => {
   const [escuelas, setEscuelas] = useState([]);
 
+  const api = axios.create({
+    baseURL: process.env.REACT_APP_API_URL,
+  });
+
   // Función para obtener las escuelas
   const obtenerEscuelas = async () => {
-  
     try {
-      const response = await axios.get('http://localhost:8080/api/usuario/getEscuelas', {
+      const response = await api.get('/api/usuario/getEscuelas', {
         withCredentials: true
       });
       

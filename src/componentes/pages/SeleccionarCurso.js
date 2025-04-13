@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import { Dropdown, DropdownButton, Form, ListGroup } from 'react-bootstrap';
 import axios from 'axios';
 
+const api = axios.create({
+    baseURL: process.env.REACT_APP_API_URL,
+  });
 class SeleccionarCurso extends Component {
     constructor(props) {
         super(props);
@@ -20,7 +23,7 @@ class SeleccionarCurso extends Component {
 
     cargarCursos = async () => {
         try {
-            const response = await axios.get('http://localhost:8080/api/usuario/verCursos', {
+            const response = await api.get('/api/usuario/verCursos', {
                 withCredentials: true,
             });
 
@@ -40,7 +43,7 @@ class SeleccionarCurso extends Component {
 
     obtenerInfo = async (idCurso) => {
         try {
-            const response = await axios.get(`http://localhost:8080/api/usuario/selectCurso/${idCurso}`, {
+            const response = await api.get(`/api/usuario/selectCurso/${idCurso}`, {
                 withCredentials: true,
             });
 
