@@ -2,6 +2,10 @@ import React, { Component } from 'react';
 import { Form, Button, Alert, Spinner } from 'react-bootstrap';
 import axios from 'axios';
 
+const api = axios.create({
+  baseURL: process.env.REACT_APP_API_URL,
+});
+
 class BajaCursoPreceptor extends Component {
   constructor(props) {
     super(props);
@@ -21,7 +25,7 @@ class BajaCursoPreceptor extends Component {
   cargarCursos = async () => {
     this.setState({ loading: true, error: null });
     try {
-      const response = await axios.get('http://localhost:8080/api/usuario/verCursoPreceptor', {
+      const response = await api.get('/api/usuario/verCursoPreceptor', {
         withCredentials: true,
       });
       this.setState({ 
@@ -58,7 +62,7 @@ class BajaCursoPreceptor extends Component {
     if (confirmar) {
       this.setState({ loading: true, error: null });
       try {
-        await axios.delete(`http://localhost:8080/api/usuario/borrarCurso/${cursoSeleccionado}`, {
+        await api.delete(`/api/usuario/borrarCurso/${cursoSeleccionado}`, {
           withCredentials: true,
         });
         

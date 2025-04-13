@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-
+const API_URL = process.env.REACT_APP_API_URL;
 class AltaProfesor extends Component {
   constructor(props) {
     super(props);
@@ -101,7 +101,7 @@ class AltaProfesor extends Component {
     }
 
     // Enviar datos al backend
-    fetch("http://localhost:8080/api/usuario/altaUsuario", {
+    fetch(`${API_URL}/api/usuario/altaUsuario`, {
       method: "POST",
       credentials: "include",
       headers: {

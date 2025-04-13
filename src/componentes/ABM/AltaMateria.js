@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import axios from 'axios';
 
+const api = axios.create({
+  baseURL: process.env.REACT_APP_API_URL,
+});
 class AltaMateria extends Component {
   constructor(props) {
     super(props);
@@ -21,8 +24,8 @@ class AltaMateria extends Component {
     const { nombre } = this.state;
 
     try {
-      const response = await axios.post(
-        'http://localhost:8080/api/usuario/saveMateria',
+      const response = await api.post(
+        '/api/usuario/saveMateria',
         { nombre }, // Enviar solo el nombre
         {
           headers: { 'Content-Type': 'application/json' },

@@ -2,6 +2,10 @@ import React, { Component } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import axios from 'axios';
 
+const api = axios.create({
+  baseURL: process.env.REACT_APP_API_URL,
+});
+
 class BajaCurso extends Component {
   constructor(props) {
     super(props);
@@ -18,7 +22,7 @@ class BajaCurso extends Component {
   // Cargar cursos desde el endpoint
   cargarCursos = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/usuario/verCursoAdministrativo', {
+      const response = await api.get('/api/usuario/verCursoAdministrativo', {
         withCredentials: true,
       });
       this.setState({ cursos: response.data });
@@ -53,7 +57,7 @@ class BajaCurso extends Component {
   if (confirmar) {
     try {
       // Llamada a la API para eliminar el curso
-      await axios.delete(`http://localhost:8080/api/usuario/borrarCurso/${cursoSeleccionado}`, {
+      await api.delete(`/api/usuario/borrarCurso/${cursoSeleccionado}`, {
         withCredentials: true,
       });
       

@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-
+const API_URL = process.env.REACT_APP_API_URL;
 class AltaPreceptor extends Component {
   constructor(props) {
     super(props);
@@ -25,7 +25,7 @@ class AltaPreceptor extends Component {
 
   // Obtener cursos disponibles desde el backend
   obtenerCursos = () => {
-    fetch("http://localhost:8080/api/usuario/cursosSinPreceptor", {
+    fetch(`${API_URL}/api/usuario/cursosSinPreceptor`, {
       method: "GET",
       credentials: "include",
     })
@@ -139,7 +139,7 @@ class AltaPreceptor extends Component {
     curso: this.state.cursoSeleccionado
   }
 
-  fetch("http://localhost:8080/api/usuario/altaUsuario", {
+  fetch(`${API_URL}/api/usuario/altaUsuario`, {
     method: "POST",
     credentials: "include",
     headers: {
@@ -167,7 +167,7 @@ class AltaPreceptor extends Component {
  handleAsignarPreceptor = (asignarPreceptor) => { 
   //console.log("datitos: " + JSON.stringify(asignarPreceptor));
   
-  return fetch("http://localhost:8080/api/usuario/asignarPreceptor", {
+  return fetch(`${API_URL}/api/usuario/asignarPreceptor`, {
     method: "POST",
     credentials: "include",
     headers: {

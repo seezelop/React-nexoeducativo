@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Form, Button, Alert, Spinner, Card, ListGroup } from 'react-bootstrap';
+const api = axios.create({
+  baseURL: process.env.REACT_APP_API_URL,
+});
 
 function BajaEvento() {
   // Estados
@@ -33,7 +36,7 @@ function BajaEvento() {
     setMensaje(null);
 
     try {
-      const response = await axios.get('http://localhost:8080/api/usuario/verCursoProfesor', {
+      const response = await axios.get('/api/usuario/verCursoProfesor', {
         withCredentials: true
       });
       setCursos(response.data);
@@ -52,7 +55,7 @@ function BajaEvento() {
     setMensaje(null);
 
     try {
-      const response = await axios.get(`http://localhost:8080/api/usuario/verEventos/${idCurso}`, {
+      const response = await axios.get(`/api/usuario/verEventos/${idCurso}`, {
         withCredentials: true
       });
       setEventos(response.data);
@@ -85,7 +88,7 @@ function BajaEvento() {
       setMensaje(null);
 
       try {
-        await axios.delete(`http://localhost:8080/api/usuario/borrarEvento/${eventoSeleccionado}`, {
+        await axios.delete(`/api/usuario/borrarEvento/${eventoSeleccionado}`, {
           withCredentials: true
         });
 

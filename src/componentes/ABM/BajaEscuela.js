@@ -2,6 +2,10 @@ import React, { Component } from 'react';
 import { Dropdown, DropdownButton, Button, Modal } from 'react-bootstrap';
 import axios from 'axios';
 
+const api = axios.create({
+    baseURL: process.env.REACT_APP_API_URL,
+  });
+
 class BajaEscuela extends Component {
     constructor(props) {
         super(props);
@@ -19,7 +23,7 @@ class BajaEscuela extends Component {
     // Cargar escuelas desde la API
     cargarEscuelas = async () => {
         try {
-            const response = await axios.get('http://localhost:8080/api/usuario/getEscuelas', {
+            const response = await api.get('/api/usuario/getEscuelas', {
                 withCredentials: true
             });
             const escuelas = response.data.map(jefe => ({
@@ -44,14 +48,14 @@ class BajaEscuela extends Component {
             escuelaSeleccionada: parsedValue.nombre,
             id_escuela: parsedValue.id_escuela
         });
-        console.log("ID de la escuela seleccionada:", parsedValue.id_escuela);
+        //console.log("ID de la escuela seleccionada:", parsedValue.id_escuela);
     };
 
     // Manejar envío del formulario
     handleSubmit = async (event) => {
         event.preventDefault();
         try {
-            const response = await axios.delete(`http://localhost:8080/api/usuario/borrarEscuela/${this.state.id_escuela}`, {
+            const response = await api.delete(`/api/usuario/borrarEscuela/${this.state.id_escuela}`, {
                 withCredentials: true
             });
 

@@ -2,6 +2,10 @@ import React, { Component } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import axios from 'axios';
 
+const api = axios.create({
+  baseURL: process.env.REACT_APP_API_URL,
+});
+
 class BajaMateria extends Component {
   constructor(props) {
     super(props);
@@ -20,7 +24,7 @@ class BajaMateria extends Component {
   // Cargar cursos desde el endpoint
   cargarCursos = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/usuario/verCursoAdministrativo', {
+      const response = await api.get('/api/usuario/verCursoAdministrativo', {
         withCredentials: true,
       });
       this.setState({ cursos: response.data });
@@ -33,7 +37,7 @@ class BajaMateria extends Component {
   // Cargar materias según el curso seleccionado
   cargarMaterias = async (cursoId) => {
     try {
-      const response = await axios.get(`http://localhost:8080/api/usuario/verMaterias/${cursoId}`, {
+      const response = await api.get(`/api/usuario/verMaterias/${cursoId}`, {
         withCredentials: true,
       });
       this.setState({ materias: response.data });
@@ -72,7 +76,7 @@ class BajaMateria extends Component {
     }
 
     try {
-      await axios.delete('http://localhost:8080/api/usuario/borrarMateria', {
+      await api.delete('/api/usuario/borrarMateria', {
         data: { idMateria: materiaSeleccionada },
         headers: { 'Content-Type': 'application/json' },
         withCredentials: true,

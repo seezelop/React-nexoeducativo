@@ -11,6 +11,10 @@ function AltaMaterial() {
   const [descripcion, setDescripcion] = useState("");
   const [urlArchivo, setUrlArchivo] = useState(null);
 
+  const api = axios.create({
+    baseURL: process.env.REACT_APP_API_URL,
+  });
+
   // Cargar los cursos del profesor al montar el componente
   useEffect(() => {
     //console.log("Componente AltaTarea montado, cargando cursos...");
@@ -20,7 +24,7 @@ function AltaMaterial() {
   const cargarCursos = async () => {
     try {
       //console.log("Haciendo petición a la API para cargar cursos...");
-      const response = await axios.get("http://localhost:8080/api/usuario/verCursoProfesor", {
+      const response = await api.get("/api/usuario/verCursoProfesor", {
         withCredentials: true,
       });
      // console.log("Respuesta de cursos recibida:", response.data);
@@ -33,7 +37,7 @@ function AltaMaterial() {
   const cargarMaterias = async (cursoId) => {
     try {
      // console.log(`Cargando materias para el curso ID: ${cursoId}...`);
-      const response = await axios.get(`http://localhost:8080/api/usuario/selecMateriaProfesor/${cursoId}`, {
+      const response = await api.get(`/api/usuario/selecMateriaProfesor/${cursoId}`, {
         withCredentials: true,
       });
      // console.log("Respuesta de materias recibida:", response.data);
@@ -86,8 +90,8 @@ function AltaMaterial() {
     }
 
     try {
-      await axios.post(
-        `http://localhost:8080/api/usuario/altaMaterial`,
+      await api.post(
+        `/api/usuario/altaMaterial`,
         formData,
         {
           withCredentials: true,

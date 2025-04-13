@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
+const api = axios.create({
+  baseURL: process.env.REACT_APP_API_URL,
+});
+
 function BajaMaterial() {
   const [cursos, setCursos] = useState([]);
   const [cursoSeleccionado, setCursoSeleccionado] = useState("");
@@ -16,8 +20,8 @@ function BajaMaterial() {
 
   const cargarCursos = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:8080/api/usuario/verCursoProfesor",
+      const response = await api.get(
+        "/api/usuario/verCursoProfesor",
         { withCredentials: true }
       );
       setCursos(response.data);
@@ -29,8 +33,8 @@ function BajaMaterial() {
   const cargarMaterias = async (cursoId) => {
     if (!cursoId) return;
     try {
-      const response = await axios.get(
-        `http://localhost:8080/api/usuario/selecMateriaProfesor/${cursoId}`,
+      const response = await api.get(
+        `/api/usuario/selecMateriaProfesor/${cursoId}`,
         { withCredentials: true }
       );
       setMaterias(response.data);
@@ -43,8 +47,8 @@ function BajaMaterial() {
   const cargarTareas = async (materiaId) => {
     if (!materiaId) return;
     try {
-      const response = await axios.get(
-        `http://localhost:8080/api/usuario/selecMaterialProfesor?cursoIdCurso=${cursoSeleccionado}&materiaIdMateria=${materiaId}`,
+      const response = await api.get(
+        `/api/usuario/selecMaterialProfesor?cursoIdCurso=${cursoSeleccionado}&materiaIdMateria=${materiaId}`,
         { withCredentials: true }
       );
       setMateriales(response.data);
@@ -61,11 +65,11 @@ function BajaMaterial() {
       return;
     }
 
-    console.log('ID A ENVIAR: '+materialSeleccionado)
+    //console.log('ID A ENVIAR: '+materialSeleccionado)
 
     try {
-      await axios.delete(
-        `http://localhost:8080/api/usuario/borrarMaterial/${materialSeleccionado}`,
+      await api.delete(
+        `/api/usuario/borrarMaterial/${materialSeleccionado}`,
         { withCredentials: true }
       );
       setRespuesta("Material eliminado correctamente.");
