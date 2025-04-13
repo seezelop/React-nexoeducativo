@@ -31,7 +31,7 @@ function VerNovedades() {
     };
 
     cargarNovedades();
-  }, []);
+  }, [api]);
 
   return (
     <Container className="mt-4">
