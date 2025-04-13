@@ -2,6 +2,11 @@ import React, { Component } from 'react';
 import { Dropdown, DropdownButton, Button, Form } from 'react-bootstrap';
 import axios from 'axios';
 
+// Crear una instancia de axios con la URL base
+const api = axios.create({
+    baseURL: process.env.REACT_APP_API_URL,
+  });
+
 class ModificarAdministrativo extends Component {
     constructor(props) {
         super(props);
@@ -84,7 +89,7 @@ class ModificarAdministrativo extends Component {
     // Cargar la lista de administrativos
     cargarAdministrativos = async () => {
         try {
-            const response = await axios.get(`http://localhost:8080/api/usuario/getUsuarios/administrativo`, {
+            const response = await api.get(`/api/usuario/getUsuarios/administrativo`, {
                 withCredentials: true,
             });
 
@@ -108,7 +113,7 @@ class ModificarAdministrativo extends Component {
         });
 
         try {
-            const response = await axios.get(`http://localhost:8080/api/usuario/getUsuario/${parsedValue.idAdministrativo}`, {
+            const response = await api.get(`/api/usuario/getUsuario/${parsedValue.idAdministrativo}`, {
                 withCredentials: true,
             });
 
@@ -144,8 +149,8 @@ class ModificarAdministrativo extends Component {
 
         //console.log('datos a enviar: '+JSON.stringify(datosModificados))
         try {
-            const response = await axios.patch(
-                `http://localhost:8080/api/usuario/modificarUsuario/${idAdministrativo}`,
+            const response = await api.patch(
+                `/api/usuario/modificarUsuario/${idAdministrativo}`,
                 datosModificados,
                 { withCredentials: true }
             );

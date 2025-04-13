@@ -3,6 +3,11 @@ import React, { Component } from 'react';
 import { Dropdown, DropdownButton, Button, Modal } from 'react-bootstrap';
 import axios from 'axios';
 
+// Crear una instancia de axios con la URL base
+const api = axios.create({
+    baseURL: process.env.REACT_APP_API_URL,
+  });
+
 class BajaUsuario extends Component {
     constructor(props) {
         super(props);
@@ -23,7 +28,7 @@ class BajaUsuario extends Component {
      //esto es para rellenar el dropdown con los jefe colegios
      cargarUsuarios = async () => {
         try {
-            const response = await axios.get(`http://localhost:8080/api/usuario/getUsuariosSuperAdmin/${this.state.rol}`, {
+            const response = await api.get(`/api/usuario/getUsuariosSuperAdmin/${this.state.rol}`, {
                 withCredentials: true
               });
             //pasar lista de string a objetos
@@ -59,7 +64,7 @@ class BajaUsuario extends Component {
         try {
             // Enviar los datos al backend
            // const { id_escuela } = this.state;
-           const response = await axios.delete(`http://localhost:8080/api/usuario/borrarUsuario/${this.state.idUsuario}`,{
+           const response = await api.delete(`/api/usuario/borrarUsuario/${this.state.idUsuario}`,{
             withCredentials: true
         });
 

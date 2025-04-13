@@ -2,6 +2,11 @@ import React, { Component } from 'react';
 import { Dropdown, DropdownButton, Button, Form } from 'react-bootstrap';
 import axios from 'axios';
 
+// Crear una instancia de axios con la URL base
+const api = axios.create({
+    baseURL: process.env.REACT_APP_API_URL,
+  });
+
 class ModificarPreceptor extends Component {
     constructor(props) {
         super(props);
@@ -88,7 +93,7 @@ class ModificarPreceptor extends Component {
     // Cargar la lista de preceptores
     cargarProfesores = async () => {
         try {
-            const response = await axios.get(`http://localhost:8080/api/usuario/getUsuarios/preceptor`, {
+            const response = await api.get(`/api/usuario/getUsuarios/preceptor`, {
                 withCredentials: true,
             });
 
@@ -116,8 +121,8 @@ class ModificarPreceptor extends Component {
                 },
                 async () => {
                     try {
-                        const response = await axios.get(
-                            `http://localhost:8080/api/usuario/getUsuario/${this.state.preceptor}`,
+                        const response = await api.get(
+                            `/api/usuario/getUsuario/${this.state.preceptor}`,
                             { withCredentials: true }
                         );
 
@@ -191,8 +196,8 @@ class ModificarPreceptor extends Component {
        // console.log('Datos a enviar:', datosModificados);
     
         try {
-            const response = await axios.patch(
-                `http://localhost:8080/api/usuario/modificarUsuario/${preceptor}`,
+            const response = await api.patch(
+                `/api/usuario/modificarUsuario/${preceptor}`,
                 datosModificados,
                 { withCredentials: true }
             );

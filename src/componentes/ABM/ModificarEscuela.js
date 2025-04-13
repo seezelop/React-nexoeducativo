@@ -2,6 +2,11 @@ import React, { Component } from 'react';
 import { Dropdown, DropdownButton, Button, Form, Alert } from 'react-bootstrap';
 import axios from 'axios';
 
+// Crear una instancia de axios con la URL base
+const api = axios.create({
+  baseURL: process.env.REACT_APP_API_URL,
+});
+
 class ModificarEscuela extends Component {
   constructor(props) {
     super(props);
@@ -26,7 +31,7 @@ class ModificarEscuela extends Component {
 
   cargarEscuelas = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/usuario/getEscuelas', {
+      const response = await api.get('/api/usuario/getEscuelas', {
         withCredentials: true,
       });
       const escuelas = response.data.map((escuela) => ({
@@ -108,8 +113,8 @@ class ModificarEscuela extends Component {
     try {
       this.setState({ loading: true, error: null, success: null });
 
-      const response = await axios.patch(
-        `http://localhost:8080/api/usuario/modificarEscuela/${id_escuela}`,
+      const response = await api.patch(
+        `/api/usuario/modificarEscuela/${id_escuela}`,
         datos,
         { 
           withCredentials: true,

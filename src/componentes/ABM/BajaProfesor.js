@@ -2,6 +2,12 @@ import React, { Component } from 'react';
 import { Dropdown, DropdownButton, Button, Modal } from 'react-bootstrap';
 import axios from 'axios';
 
+
+// Crear una instancia de axios con la URL base
+const api = axios.create({
+    baseURL: process.env.REACT_APP_API_URL,
+  });
+
 class BajaProfesor extends Component {
     constructor(props) {
         super(props);
@@ -21,7 +27,7 @@ class BajaProfesor extends Component {
     // Cargar lista de profesores
     cargarProfesores = async () => {
         try {
-            const response = await axios.get(`http://localhost:8080/api/usuario/getUsuarios/${this.state.rol}`, {
+            const response = await api.get(`/api/usuario/getUsuarios/${this.state.rol}`, {
                 withCredentials: true
             });
 
@@ -55,7 +61,7 @@ class BajaProfesor extends Component {
     handleSubmit = async (event) => {
         event.preventDefault();
         try {
-            const response = await axios.delete(`http://localhost:8080/api/usuario/borrarUsuario/${this.state.idUsuario}`, {
+            const response = await api.delete(`/api/usuario/borrarUsuario/${this.state.idUsuario}`, {
                 withCredentials: true
             });
 

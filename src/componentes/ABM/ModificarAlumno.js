@@ -2,6 +2,11 @@ import React, { Component } from 'react';
 import { Dropdown, DropdownButton, Button, Form } from 'react-bootstrap';
 import axios from 'axios';
 
+// Crear una instancia de axios con la URL base
+const api = axios.create({
+    baseURL: process.env.REACT_APP_API_URL,
+  });
+
 class ModificarAlumno extends Component {
     constructor(props) {
         super(props);
@@ -91,7 +96,7 @@ class ModificarAlumno extends Component {
     // Cargar la lista de profesores
     cargarProfesores = async () => {
         try {
-            const response = await axios.get(`http://localhost:8080/api/usuario/verAlumnos`, {
+            const response = await api.get(`/api/usuario/verAlumnos`, {
                 withCredentials: true,
             });
 
@@ -113,7 +118,7 @@ class ModificarAlumno extends Component {
     // Cargar la lista de cursos
     cargarCursos = async () => {
         try {
-            const response = await axios.get("http://localhost:8080/api/usuario/verCursoAdministrativo", {
+            const response = await api.get("/api/usuario/verCursoAdministrativo", {
                 withCredentials: true,
             });
 
@@ -131,7 +136,7 @@ class ModificarAlumno extends Component {
     // Cargar la lista de padres
     cargarPadres = async () => {
         try {
-            const response = await axios.get("http://localhost:8080/api/usuario/obtenerPadres", {
+            const response = await api.get("/api/usuario/obtenerPadres", {
                 withCredentials: true,
             });
 
@@ -158,8 +163,8 @@ class ModificarAlumno extends Component {
                 async () => {
 
                     try {
-                        const response = await axios.get(
-                            `http://localhost:8080/api/usuario/getUsuario/${this.state.id_usuario}`,
+                        const response = await api.get(
+                            `/api/usuario/getUsuario/${this.state.id_usuario}`,
                             { withCredentials: true }
                         );
 
@@ -262,8 +267,8 @@ class ModificarAlumno extends Component {
         console.log('Datos a enviar:', datosModificados);
 
         try {
-            const response = await axios.patch(
-                `http://localhost:8080/api/usuario/modificarAlumno/${id_usuario}`,
+            const response = await api.patch(
+                `/api/usuario/modificarAlumno/${id_usuario}`,
                 datosModificados,
                 { withCredentials: true }
             );

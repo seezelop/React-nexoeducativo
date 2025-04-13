@@ -2,6 +2,11 @@ import React, { useState, useEffect } from "react";
 import { Form, Button } from "react-bootstrap";
 import axios from "axios";
 
+// Crear una instancia de axios con la URL base
+const api = axios.create({
+  baseURL: process.env.REACT_APP_API_URL,
+});
+
 function ModificarNota() {
   const [cursos, setCursos] = useState([]);
   const [cursoSeleccionado, setCursoSeleccionado] = useState("");
@@ -20,8 +25,8 @@ function ModificarNota() {
 
   const cargarCursos = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:8080/api/usuario/verCursoProfesor",
+      const response = await api.get(
+        "/api/usuario/verCursoProfesor",
         { withCredentials: true }
       );
       setCursos(response.data);
@@ -34,8 +39,8 @@ function ModificarNota() {
     if (!cursoId) return;
     
     try {
-      const response = await axios.get(
-        `http://localhost:8080/api/usuario/selecMateriaProfesor/${cursoId}`,
+      const response = await api.get(
+        `/api/usuario/selecMateriaProfesor/${cursoId}`,
         { withCredentials: true }
       );
       setMaterias(response.data);
@@ -50,8 +55,8 @@ function ModificarNota() {
 
     try {
       //console.log("Cargando tareas para materia:", materiaId);
-      const response = await axios.get(
-        `http://localhost:8080/api/usuario/obtenerTareas?cursoIdCurso=${cursoSeleccionado}&idMateria=${materiaId}`,
+      const response = await api.get(
+        `/api/usuario/obtenerTareas?cursoIdCurso=${cursoSeleccionado}&idMateria=${materiaId}`,
         { withCredentials: true }
       );
       setTareas(response.data);
@@ -67,8 +72,8 @@ function ModificarNota() {
 
     try {
       //console.log("Cargando tareas para materia:", materiaId);
-      const response = await axios.get(
-        `http://localhost:8080/api/usuario/verAlumnosCurso/${cursoId}`,
+      const response = await api.get(
+        `/api/usuario/verAlumnosCurso/${cursoId}`,
         { withCredentials: true }
       );
       console.log(response.data)
@@ -133,8 +138,8 @@ function ModificarNota() {
     console.log('lo que se envia al backend '+tarea.idAlumno)
 
     try {
-      await axios.patch(
-        `http://localhost:8080/api/usuario/modificarTarea/${idTarea}`,
+      await api.patch(
+        `/api/usuario/modificarTarea/${idTarea}`,
         formData,
         {
           withCredentials: true,

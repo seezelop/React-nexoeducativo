@@ -2,6 +2,11 @@ import React, { Component } from 'react';
 import { Form, Button } from 'react-bootstrap';
 import axios from 'axios';
 
+// Crear una instancia de axios con la URL base
+const api = axios.create({
+  baseURL: process.env.REACT_APP_API_URL,
+});
+
 class ModificarMateria extends Component {
   constructor(props) {
     super(props);
@@ -20,7 +25,7 @@ class ModificarMateria extends Component {
   // Cargar materias según el curso seleccionado
   cargarMaterias = async () => {
     try {
-      const response = await axios.get(`http://localhost:8080/api/usuario/verMaterias`, {
+      const response = await api.get(`/api/usuario/verMaterias`, {
         withCredentials: true,
       });
       this.setState({ materias: response.data });
@@ -63,8 +68,8 @@ class ModificarMateria extends Component {
     }
 
     try {      
-      await axios.patch(
-        `http://localhost:8080/api/usuario/modificarMateria/${idMateria}`, 
+      await api.patch(
+        `/api/usuario/modificarMateria/${idMateria}`, 
         { nombre: materiaEnviar }, // Solo el cuerpo JSON
         { headers: { 'Content-Type': 'application/json' }, withCredentials: true } // Opciones de la petición
       );

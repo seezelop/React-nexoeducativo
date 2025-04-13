@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from "axios";
 
+// Crear una instancia de axios con la URL base
+const api = axios.create({
+  baseURL: process.env.REACT_APP_API_URL,
+});
+
 function BajaTarea() {
   const [cursos, setCursos] = useState([]);
   const [cursoSeleccionado, setCursoSeleccionado] = useState("");
@@ -18,7 +23,7 @@ function BajaTarea() {
   const cargarCursos = async () => {
     try {
       //console.log("Haciendo petición a la API para cargar cursos...");
-      const response = await axios.get("http://localhost:8080/api/usuario/verCursoProfesor", {
+      const response = await api.get("/api/usuario/verCursoProfesor", {
         withCredentials: true,
       });
      // console.log("Respuesta de cursos recibida:", response.data);
@@ -31,7 +36,7 @@ function BajaTarea() {
   const cargarMaterias = async (cursoId) => {
     try {
      // console.log(`Cargando materias para el curso ID: ${cursoId}...`);
-      const response = await axios.get(`http://localhost:8080/api/usuario/selecMateriaProfesor/${cursoId}`, {
+      const response = await api.get(`/api/usuario/selecMateriaProfesor/${cursoId}`, {
         withCredentials: true,
       });
      // console.log("Respuesta de materias recibida:", response.data);
@@ -64,8 +69,8 @@ function BajaTarea() {
     }
 
     try {
-      await axios.delete(
-        `http://localhost:8080/api/usuario/borrarTarea`,
+      await api.delete(
+        `/api/usuario/borrarTarea`,
        // formData,
         {
           withCredentials: true

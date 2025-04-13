@@ -13,14 +13,19 @@ function ModificarTarea() {
   const [calificacion, setCalificacion] = useState("");
   const [archivo, setArchivo] = useState(null);
 
+  // Crear una instancia de axios con la URL base
+const api = axios.create({
+  baseURL: process.env.REACT_APP_API_URL,
+});
+
   useEffect(() => {
     cargarCursos();
   }, []);
 
   const cargarCursos = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:8080/api/usuario/verCursoProfesor",
+      const response = await api.get(
+        "/api/usuario/verCursoProfesor",
         { withCredentials: true }
       );
       setCursos(response.data);
@@ -33,8 +38,8 @@ function ModificarTarea() {
     if (!cursoId) return;
     
     try {
-      const response = await axios.get(
-        `http://localhost:8080/api/usuario/selecMateriaProfesor/${cursoId}`,
+      const response = await api.get(
+        `/api/usuario/selecMateriaProfesor/${cursoId}`,
         { withCredentials: true }
       );
       setMaterias(response.data);
@@ -49,8 +54,8 @@ function ModificarTarea() {
 
     try {
       //console.log("Cargando tareas para materia:", materiaId);
-      const response = await axios.get(
-        `http://localhost:8080/api/usuario/obtenerTareas?cursoIdCurso=${cursoSeleccionado}&idMateria=${materiaId}`,
+      const response = await api.get(
+        `/api/usuario/obtenerTareas?cursoIdCurso=${cursoSeleccionado}&idMateria=${materiaId}`,
         { withCredentials: true }
       );
       setTareas(response.data);
@@ -116,8 +121,8 @@ function ModificarTarea() {
     }
 
     try {
-      await axios.patch(
-        `http://localhost:8080/api/usuario/modificarTarea/${idTarea}`,
+      await api.patch(
+        `/api/usuario/modificarTarea/${idTarea}`,
         formData,
         {
           withCredentials: true,

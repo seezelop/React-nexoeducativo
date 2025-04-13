@@ -2,6 +2,11 @@ import React, { Component } from 'react';
 import { Dropdown, DropdownButton, Button, Form, Alert, Spinner } from 'react-bootstrap';
 import axios from 'axios';
 
+// Crear una instancia de axios con la URL base
+const api = axios.create({
+  baseURL: process.env.REACT_APP_API_URL,
+});
+
 class ModificarJefeColegio extends Component {
   constructor(props) {
     super(props);
@@ -77,8 +82,8 @@ class ModificarJefeColegio extends Component {
 
   cargarJefes = async () => {
     try {
-      const response = await axios.get(
-        `http://localhost:8080/api/usuario/getUsuariosSuperAdmin/${this.state.rol}`,
+      const response = await api.get(
+        `/api/usuario/getUsuariosSuperAdmin/${this.state.rol}`,
         { withCredentials: true }
       );
 
@@ -153,8 +158,8 @@ class ModificarJefeColegio extends Component {
         if (datos[key] === '') delete datos[key];
       });
 
-      const response = await axios.patch(
-        `http://localhost:8080/api/usuario/modificarUsuario/${idUsuario}`,
+      const response = await api.patch(
+        `/api/usuario/modificarUsuario/${idUsuario}`,
         datos,
         { 
           withCredentials: true,

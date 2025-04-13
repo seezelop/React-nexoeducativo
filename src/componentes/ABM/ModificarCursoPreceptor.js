@@ -2,6 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Form, Button, Row, Col, Table, Alert, Spinner } from 'react-bootstrap';
 import axios from 'axios';
 
+// Crear una instancia de axios con la URL base
+const api = axios.create({
+  baseURL: process.env.REACT_APP_API_URL,
+});
+
 const ModificarCursoPreceptor = () => {
   const [cursos, setCursos] = useState([]);
   const [materias, setMaterias] = useState([]);
@@ -29,7 +34,7 @@ const ModificarCursoPreceptor = () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await axios.get('http://localhost:8080/api/usuario/verCursoPreceptor', {
+        const response = await api.get('/api/usuario/verCursoPreceptor', {
           withCredentials: true,
         });
         setCursos(response.data);
@@ -47,7 +52,7 @@ const ModificarCursoPreceptor = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get(`http://localhost:8080/api/usuario/infoMateriasActualizarCurso/${idCurso}`, {
+      const response = await api.get(`/api/usuario/infoMateriasActualizarCurso/${idCurso}`, {
         withCredentials: true,
       });
 
@@ -185,8 +190,8 @@ const ModificarCursoPreceptor = () => {
       }
 
       //console.log('lo que se envia xd: '+JSON.stringify(dataToSend))
-      const response = await axios.patch(
-        `http://localhost:8080/api/usuario/modificarCurso/${formData.idCurso}`,
+      const response = await api.patch(
+        `/api/usuario/modificarCurso/${formData.idCurso}`,
         dataToSend,
         { withCredentials: true }
       );

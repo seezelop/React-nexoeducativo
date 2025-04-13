@@ -2,6 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Form, Button, Row, Col, Table } from 'react-bootstrap';
 import axios from 'axios';
 
+// Crear una instancia de axios con la URL base
+const api = axios.create({
+  baseURL: process.env.REACT_APP_API_URL,
+});
+
 const ModificarCurso = () => {
   const [cursos, setCursos] = useState([]);
   const [materias, setMaterias] = useState([]);
@@ -25,7 +30,7 @@ const ModificarCurso = () => {
   useEffect(() => {
     const fetchCursos = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/api/usuario/verCursoAdministrativo', {
+        const response = await api.get('/api/usuario/verCursoAdministrativo', {
           withCredentials: true,
         });
         setCursos(response.data);
@@ -39,7 +44,7 @@ const ModificarCurso = () => {
 
   const obtenerInfoMaterias = async (idCurso) => {
     try {
-      const response = await axios.get(`http://localhost:8080/api/usuario/infoMateriasActualizarCurso/${idCurso}`, {
+      const response = await api.get(`/api/usuario/infoMateriasActualizarCurso/${idCurso}`, {
         withCredentials: true,
       });
 
@@ -186,8 +191,8 @@ const ModificarCurso = () => {
       }
       
       // Actualizar la información del curso (esto incluirá las materias modificadas)
-      const cursoResponse = await axios.patch(
-        `http://localhost:8080/api/usuario/modificarCurso/${formData.idCurso}`,
+      const cursoResponse = await api.patch(
+        `/api/usuario/modificarCurso/${formData.idCurso}`,
         dataToSend,
         { withCredentials: true }
       );
@@ -197,7 +202,7 @@ const ModificarCurso = () => {
         //setMensaje({ text: 'Curso modificado exitosamente!', type: 'success' });
         alert('Curso modificado exitosamente')
         // Actualizar la lista de cursos y materias
-        const cursosActualizados = await axios.get('http://localhost:8080/api/usuario/verCursoAdministrativo', {
+        const cursosActualizados = await api.get('/api/usuario/verCursoAdministrativo', {
           withCredentials: true,
         });
         setCursos(cursosActualizados.data);

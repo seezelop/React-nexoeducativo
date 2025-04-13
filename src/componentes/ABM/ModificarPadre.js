@@ -2,6 +2,11 @@ import React, { Component } from 'react';
 import { Dropdown, DropdownButton, Button, Form } from 'react-bootstrap';
 import axios from 'axios';
 
+// Crear una instancia de axios con la URL base
+const api = axios.create({
+    baseURL: process.env.REACT_APP_API_URL,
+  });
+
 class ModificarPadre extends Component {
     constructor(props) {
         super(props);
@@ -88,7 +93,7 @@ class ModificarPadre extends Component {
     // Cargar la lista de profesores
     cargarProfesores = async () => {
         try {
-            const response = await axios.get(`http://localhost:8080/api/usuario/getUsuarios/padre`, {
+            const response = await api.get(`/api/usuario/getUsuarios/padre`, {
                 withCredentials: true,
             });
 
@@ -115,8 +120,8 @@ class ModificarPadre extends Component {
                 },
                 async () => {
                     try {
-                        const response = await axios.get(
-                            `http://localhost:8080/api/usuario/getUsuario/${this.state.idUsuario}`,
+                        const response = await api.get(
+                            `/api/usuario/getUsuario/${this.state.idUsuario}`,
                             { withCredentials: true }
                         );
 
@@ -169,8 +174,8 @@ class ModificarPadre extends Component {
         //console.log('Datos a enviar:', datosModificados);
 
         try {
-            const response = await axios.patch(
-                `http://localhost:8080/api/usuario/modificarUsuario/${idUsuario}`,
+            const response = await api.patch(
+                `/api/usuario/modificarUsuario/${idUsuario}`,
                 datosModificados,
                 { withCredentials: true }
             );

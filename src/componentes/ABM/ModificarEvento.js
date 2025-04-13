@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
+// Crear una instancia de axios con la URL base
+const api = axios.create({
+  baseURL: process.env.REACT_APP_API_URL,
+});
+
 function ModificarEvento() {
   const [descripcion, setDescripcion] = useState("");
   const [fecha, setFecha] = useState("");
@@ -16,7 +21,7 @@ function ModificarEvento() {
 
   const cargarCursos = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/api/usuario/verCursoProfesor", {
+      const response = await api.get("/api/usuario/verCursoProfesor", {
         withCredentials: true,
       });
       setCursos(response.data);
@@ -27,7 +32,7 @@ function ModificarEvento() {
 
   const cargarEventos = async (cursoId) => {
     try {
-      const response = await axios.get(`http://localhost:8080/api/usuario/verEventos/${cursoId}`, {
+      const response = await api.get(`/api/usuario/verEventos/${cursoId}`, {
         withCredentials: true,
       });
       setEventos(response.data);
@@ -99,8 +104,8 @@ function ModificarEvento() {
     console.log("Sending data to backend:", JSON.stringify(eventoData));
 
     try {
-      const response = await axios.patch(
-        "http://localhost:8080/api/usuario/modificarEvento",
+      const response = await api.patch(
+        "/api/usuario/modificarEvento",
         eventoData,
         {
           withCredentials: true,
