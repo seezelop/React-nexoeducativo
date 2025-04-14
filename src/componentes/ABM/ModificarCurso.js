@@ -11,7 +11,7 @@ const ModificarCurso = () => {
   const [cursos, setCursos] = useState([]);
   const [materias, setMaterias] = useState([]);
   const [materiasOriginales, setMateriasOriginales] = useState([]);
-  const [mensaje, setMensaje] = useState({ text: '', type: '' });
+  const [setMensaje] = useState({ text: '', type: '' });
   const [formData, setFormData] = useState({
     idCurso: '',
     numero: '',
@@ -198,7 +198,7 @@ const ModificarCurso = () => {
       );
 
       //console.log('staus XD: '+cursoResponse.status)
-      if (cursoResponse.status == 200) {
+      if (cursoResponse.status === 200) {
         //setMensaje({ text: 'Curso modificado exitosamente!', type: 'success' });
         alert('Curso modificado exitosamente')
         // Actualizar la lista de cursos y materias

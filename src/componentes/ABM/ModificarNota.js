@@ -15,7 +15,7 @@ function ModificarNota() {
   const [tareas, setTareas] = useState([]);
   const [idTarea, setIdTarea] = useState("");
   const [alumnos, setAlumnos] = useState([]);
-  const [id_usuario, setIdUsuario] = useState("");
+  //const [id_usuario, setIdUsuario] = useState("");
   const [alumnoSeleccionado, setAlumnoSeleccionado] = useState("");
   const [calificacion, setCalificacion] = useState("");
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import { Form } from 'react-bootstrap';
 
@@ -17,8 +17,8 @@ function AltaEvento() {
   const [tipoMensaje, setTipoMensaje] = useState('');
   const [respuesta, setRespuesta] = useState('');
 
-  // Función para cargar los cursos del profesor
-  const cargarCursos = async () => {
+  // Función para cargar los cursos del profesor - envuelta en useCallback
+  const cargarCursos = useCallback(async () => {
     setCargando(true);
     setMensaje(null);
     
@@ -34,12 +34,12 @@ function AltaEvento() {
       setTipoMensaje('danger');
       setCargando(false);
     }
-  };
+  }, []);  // Sin dependencias porque no usa valores externos
 
   // Cargar cursos al montar el componente
   useEffect(() => {
     cargarCursos();
-  }, [cargarCursos]); // Agregar cargarCursos como dependencia
+  }, [cargarCursos]); // Ahora cargarCursos es estable gracias a useCallback
 
   const formatDateForBackend = (dateString) => {
     if (!dateString) return undefined;

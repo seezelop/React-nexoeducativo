@@ -15,7 +15,7 @@ function ModificarMaterial() {
   const [materiales, setMateriales] = useState([]);
   const [idTarea, setIdTarea] = useState("");
   const [descripcion, setDescripcion] = useState("");
-  const [calificacion, setCalificacion] = useState("");
+  const [setCalificacion] = useState("");
   const [archivo, setArchivo] = useState(null);
 
   useEffect(() => {

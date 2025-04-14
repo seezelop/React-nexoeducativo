@@ -11,8 +11,8 @@ function BajaTarea() {
   const [cursoSeleccionado, setCursoSeleccionado] = useState("");
   const [materias, setMaterias] = useState([]);
   const [materiaSeleccionada, setMateriaSeleccionada] = useState("");
-  const [tareaSeleccionada, setTareaSeleccionada] = useState("");
-  const [tareas, setTareas] = useState(null);
+  //const [tareaSeleccionada, setTareaSeleccionada] = useState("");
+  //const [tareas, setTareas] = useState(null);
 
   // Cargar los cursos del profesor al montar el componente
   useEffect(() => {
@@ -71,7 +71,7 @@ function BajaTarea() {
     try {
       await api.delete(
         `/api/usuario/borrarTarea`,
-       // formData,
+        formData,
         {
           withCredentials: true
         }

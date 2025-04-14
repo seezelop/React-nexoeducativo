@@ -226,11 +226,6 @@ class ModificarJefeColegio extends Component {
     const { 
       jefesColegio, 
       jefeSeleccionado, 
-      nombre, 
-      apellido, 
-      dni, 
-      mail, 
-      telefono, 
       activo, 
       errores,
       error,

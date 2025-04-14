@@ -36,7 +36,7 @@ function BajaEvento() {
     setMensaje(null);
 
     try {
-      const response = await axios.get('/api/usuario/verCursoProfesor', {
+      const response = await api.get('/api/usuario/verCursoProfesor', {
         withCredentials: true
       });
       setCursos(response.data);
@@ -55,7 +55,7 @@ function BajaEvento() {
     setMensaje(null);
 
     try {
-      const response = await axios.get(`/api/usuario/verEventos/${idCurso}`, {
+      const response = await api.get(`/api/usuario/verEventos/${idCurso}`, {
         withCredentials: true
       });
       setEventos(response.data);
@@ -78,7 +78,7 @@ function BajaEvento() {
 
     // Obtener información del evento seleccionado para la confirmación
     const eventoAEliminar = eventos.find(evento => evento.idEvento.toString() === eventoSeleccionado.toString());
-    const nombreEvento = eventoAEliminar ? eventoAEliminar.nombre || `ID: ${eventoSeleccionado}` : `ID: ${eventoSeleccionado}`;
+    //const nombreEvento = eventoAEliminar ? eventoAEliminar.nombre || `ID: ${eventoSeleccionado}` : `ID: ${eventoSeleccionado}`;
 
     // Confirmación antes de eliminar
     const confirmar = window.confirm(`¿Está seguro que desea eliminar el evento? Esta acción no se puede deshacer.`);
@@ -88,7 +88,7 @@ function BajaEvento() {
       setMensaje(null);
 
       try {
-        await axios.delete(`/api/usuario/borrarEvento/${eventoSeleccionado}`, {
+        await api.delete(`/api/usuario/borrarEvento/${eventoSeleccionado}`, {
           withCredentials: true
         });
 

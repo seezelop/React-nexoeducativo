@@ -40,6 +40,7 @@ class ModificarAdministrativo extends Component {
         if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]{4,30}$/.test(value)) {
             error = 'El apellido debe tener entre 4 y 30 caracteres (solo letras y espacios).';
         }
+        break;
 
             case 'dni':
                 if (!/^\d{6,8}$/.test(value)) {
@@ -182,7 +183,7 @@ class ModificarAdministrativo extends Component {
     }
 
     render() {
-        const { administrativos, administrativoSeleccionado, nombre, apellido, dni, mail, telefono, activo, errores } = this.state;
+        const { administrativos, administrativoSeleccionado, activo, errores } = this.state;
 
         return (
             <section className="d-flex flex-column">

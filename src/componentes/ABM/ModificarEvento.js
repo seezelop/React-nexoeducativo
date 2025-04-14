@@ -101,7 +101,7 @@ function ModificarEvento() {
     );
     
     // Log the final payload for debugging
-    console.log("Sending data to backend:", JSON.stringify(eventoData));
+    //console.log("Sending data to backend:", JSON.stringify(eventoData));
 
     try {
       const response = await api.patch(
@@ -115,10 +115,12 @@ function ModificarEvento() {
         }
       );
 
-      setRespuesta('Evento editado exitosamente.');
-      setDescripcion('');
-      setFecha('');
-      setEventoSeleccionado('');
+      if(response.status===200){
+        setRespuesta('Evento editado exitosamente.');
+        setDescripcion('');
+        setFecha('');
+        setEventoSeleccionado('');
+      }
       
       // Refresh events list
       if (cursoSeleccionado) {

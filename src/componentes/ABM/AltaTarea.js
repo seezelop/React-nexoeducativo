@@ -1,5 +1,6 @@
+
 import React, { useState, useEffect } from "react";
-import { Form, Button, Row, Col } from 'react-bootstrap';
+import { Form, Button} from 'react-bootstrap';
 import axios from "axios";
 
 function AltaTarea() {
@@ -18,21 +19,21 @@ function AltaTarea() {
   // Cargar los cursos del profesor al montar el componente
   useEffect(() => {
     //console.log("Componente AltaTarea montado, cargando cursos...");
+    const cargarCursos = async () => {
+      try {
+        //console.log("Haciendo petición a la API para cargar cursos...");
+        const response = await api.get("/api/usuario/verCursoProfesor", {
+          withCredentials: true,
+        });
+        // console.log("Respuesta de cursos recibida:", response.data);
+        setCursos(response.data);
+      } catch (error) {
+        console.error("Error al cargar los cursos:", error);
+      }
+    };
+    
     cargarCursos();
-  }, []);
-
-  const cargarCursos = async () => {
-    try {
-      //console.log("Haciendo petición a la API para cargar cursos...");
-      const response = await api.get("/api/usuario/verCursoProfesor", {
-        withCredentials: true,
-      });
-     // console.log("Respuesta de cursos recibida:", response.data);
-      setCursos(response.data);
-    } catch (error) {
-      console.error("Error al cargar los cursos:", error);
-    }
-  };
+  }, [api]);
 
   const cargarMaterias = async (cursoId) => {
     try {
@@ -120,72 +121,72 @@ function AltaTarea() {
 
   return (
     <form onSubmit={handleSubmit}>
-  {/* Desplegable de Cursos */}
-  <div className="mb-3">
-    <label htmlFor="cursoSeleccionado" className="form-label">Seleccionar Curso:</label>
-    <select
-      id="cursoSeleccionado"
-      className="form-control"
-      value={cursoSeleccionado}
-      onChange={handleCursoChange}
-      style={selectStyle}
-      required
-    >
-      <option value="" style={optionStyle}>Seleccione un curso</option>
-      {cursos.map((curso) => (
-        <option key={curso.idCurso} value={curso.idCurso}>
-          {curso.numero + " " + curso.division}
-        </option>
-      ))}
-    </select>
-  </div>
+      {/* Desplegable de Cursos */}
+      <div className="mb-3">
+        <label htmlFor="cursoSeleccionado" className="form-label">Seleccionar Curso:</label>
+        <select
+          id="cursoSeleccionado"
+          className="form-control"
+          value={cursoSeleccionado}
+          onChange={handleCursoChange}
+          style={selectStyle}
+          required
+        >
+          <option value="" style={optionStyle}>Seleccione un curso</option>
+          {cursos.map((curso) => (
+            <option key={curso.idCurso} value={curso.idCurso}>
+              {curso.numero + " " + curso.division}
+            </option>
+          ))}
+        </select>
+      </div>
 
-  {/* Desplegable de Materias */}
-  <div className="mb-3">
-    <label htmlFor="materiaSeleccionada" className="form-label">Seleccionar Materia:</label>
-    <select
-      id="materiaSeleccionada"
-       className="form-control"
-      value={materiaSeleccionada}
-      onChange={(e) => setMateriaSeleccionada(e.target.value)}
-      required
-      style={selectStyle} 
-      disabled={!cursoSeleccionado}
-    >
-      <option value="">Seleccione una materia</option>
-      {materias.map((materia) => (
-        <option key={materia.idMateria} value={materia.idMateria}>
-          {materia.nombre}
-        </option>
-      ))}
-    </select>
-  </div>
+      {/* Desplegable de Materias */}
+      <div className="mb-3">
+        <label htmlFor="materiaSeleccionada" className="form-label">Seleccionar Materia:</label>
+        <select
+          id="materiaSeleccionada"
+          className="form-control"
+          value={materiaSeleccionada}
+          onChange={(e) => setMateriaSeleccionada(e.target.value)}
+          required
+          style={selectStyle} 
+          disabled={!cursoSeleccionado}
+        >
+          <option value="">Seleccione una materia</option>
+          {materias.map((materia) => (
+            <option key={materia.idMateria} value={materia.idMateria}>
+              {materia.nombre}
+            </option>
+          ))}
+        </select>
+      </div>
 
-  {/* Descripción */}
-  <div className="mb-3">
-    <label htmlFor="descripcion" className="form-label">Descripción</label>
-    <Form.Control
-      as="textarea"
-      id="descripcion"
-      rows="3"
-      value={descripcion}
-      onChange={(e) => setDescripcion(e.target.value)}
-      required
-    />
-  </div>
+      {/* Descripción */}
+      <div className="mb-3">
+        <label htmlFor="descripcion" className="form-label">Descripción</label>
+        <Form.Control
+          as="textarea"
+          id="descripcion"
+          rows="3"
+          value={descripcion}
+          onChange={(e) => setDescripcion(e.target.value)}
+          required
+        />
+      </div>
 
-  {/* Subir Archivo */}
-  <div className="mb-3">
-    <label htmlFor="archivo" className="form-label">Subir Archivo (opcional)</label>
-    <Form.Control
-      type="file"
-      id="archivo"
-      onChange={handleFileChange}
-    />
-  </div>
+      {/* Subir Archivo */}
+      <div className="mb-3">
+        <label htmlFor="archivo" className="form-label">Subir Archivo (opcional)</label>
+        <Form.Control
+          type="file"
+          id="archivo"
+          onChange={handleFileChange}
+        />
+      </div>
 
-  <Button type="submit" variant="success">Crear Tarea</Button>
-</form>
+      <Button type="submit" variant="success">Crear Tarea</Button>
+    </form>
   );
 }
 

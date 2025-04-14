@@ -276,7 +276,7 @@ class ModificarPreceptor extends Component {
     }
 
     render() {
-        const { profesores, profesorSeleccionado, nombre, apellido, dni, mail, telefono, activo, 
+        const { profesores, profesorSeleccionado, activo, 
                 errores, cursosDisponibles, curso, mensajeError } = this.state;
 
         return (
