@@ -9,11 +9,12 @@ const RenovarMembresia = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const api = axios.create({
-    baseURL: process.env.REACT_APP_API_URL,
-  });
   useEffect(() => {
     const fetchPlanes = async () => {
+      const api = axios.create({
+        baseURL: process.env.REACT_APP_API_URL,
+      });
+      
       try {
         const response = await api.get("/api/usuario/getInfoPlanes", {
           withCredentials: true,
@@ -25,7 +26,7 @@ const RenovarMembresia = () => {
       }
     };
     fetchPlanes();
-  }, []);
+  }, []); // Se mantiene vacío porque 'api' no es necesario en las dependencias
 
   const handleRenovacion = async (renovar) => {
     if (!selectedPlan && renovar) {
@@ -35,6 +36,9 @@ const RenovarMembresia = () => {
     
     setLoading(true);
     try {
+      const api = axios.create({
+        baseURL: process.env.REACT_APP_API_URL,
+      });
       const response = await api.post(
         "/api/usuario/renovarMembresia", 
         { 

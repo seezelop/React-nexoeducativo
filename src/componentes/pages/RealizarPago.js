@@ -2,8 +2,6 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useSearchParams } from "react-router-dom";
 
-//OJO CON ESTE ARCHIVO
-
 function RealizarPago() {
   const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
@@ -12,10 +10,11 @@ function RealizarPago() {
   const [pagosAlDia, setPagosAlDia] = useState(false);
   const [verificando, setVerificando] = useState(true);
 
-  const api = axios.create({
-      baseURL: process.env.REACT_APP_API_URL,
-    });
-    
+  // Eliminamos la variable 'api' que no está en uso
+  // const api = axios.create({
+  //   baseURL: process.env.REACT_APP_API_URL,
+  // });
+
   useEffect(() => {
     const verificarEstadoPagos = async () => {
       setVerificando(true);
@@ -145,8 +144,6 @@ function RealizarPago() {
       </div>
     </section>
   );
-  
-  
 }
 
 export default RealizarPago;

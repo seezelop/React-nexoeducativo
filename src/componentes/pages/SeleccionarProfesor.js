@@ -4,7 +4,8 @@ import axios from 'axios';
 
 const api = axios.create({
     baseURL: process.env.REACT_APP_API_URL,
-  });
+});
+
 class SeleccionarProfesor extends Component {
     constructor(props) {
         super(props);
@@ -60,7 +61,9 @@ class SeleccionarProfesor extends Component {
         event.preventDefault();
         const { idProfesor, nombre, apellido, idRol } = this.state;
 
-        //console.log('Datos del profesor seleccionado:', { idProfesor, nombre, apellido, idRol });
+        // Aquí puedes hacer lo que quieras con estos valores (ej. enviarlos a una API)
+        console.log('Datos del profesor seleccionado:', { idProfesor, nombre, apellido, idRol });
+
         alert('Profesor seleccionado con éxito!');
     };
 

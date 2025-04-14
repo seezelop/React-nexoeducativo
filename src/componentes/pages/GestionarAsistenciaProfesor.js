@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Table, Alert, Spinner, Container, Button, Form, Card, Row, Col } from 'react-bootstrap';
 import axios from 'axios';
 
@@ -41,7 +41,7 @@ const GestionarAsistenciaProfesor = () => {
     };
 
     verificarPlan();
-  }, []);
+  }, [api]);
 
   // Cargar datos si el plan es válido
   useEffect(() => {
@@ -51,9 +51,9 @@ const GestionarAsistenciaProfesor = () => {
         obtenerFechasAsistencias();
       }
     }
-  }, [planValido, activeTab]);
+  }, [planValido, activeTab, obtenerProfesores, obtenerFechasAsistencias]);
 
-  const obtenerProfesores = async () => {
+  const obtenerProfesores = useCallback(async () => {
     setLoading(prev => ({ ...prev, profesores: true }));
     try {
       const response = await api.get('/api/usuario/verProfesAdministrativo', { 
@@ -72,9 +72,9 @@ const GestionarAsistenciaProfesor = () => {
     } finally {
       setLoading(prev => ({ ...prev, profesores: false }));
     }
-  };
+  }, [api]);
 
-  const obtenerFechasAsistencias = async () => {
+  const obtenerFechasAsistencias = useCallback(async () => {
     setLoading(prev => ({ ...prev, asistencias: true }));
     try {
       const response = await api.get('/api/usuario/obtenerAsistenciaProfe', { 
@@ -91,7 +91,7 @@ const GestionarAsistenciaProfesor = () => {
     } finally {
       setLoading(prev => ({ ...prev, asistencias: false }));
     }
-  };
+  }, [api]);
 
   const obtenerAsistenciasPorFecha = async (fecha) => {
     setLoading(prev => ({ ...prev, asistencias: true }));
@@ -311,10 +311,7 @@ const GestionarAsistenciaProfesor = () => {
                           type="checkbox"
                           checked={asistencia[profesor.id_usuario]?.mediaFalta === 1}
                           onChange={() => handleCheckboxChange(profesor.id_usuario, 'mediaFalta')}
-                          disabled={
-                            asistencia[profesor.id_usuario]?.asistio === 1 || 
-                            asistencia[profesor.id_usuario]?.retiroAntes === 1
-                          }
+                          disabled={asistencia[profesor.id_usuario]?.asistio === 1}
                         />
                       </td>
                       <td>
@@ -322,10 +319,7 @@ const GestionarAsistenciaProfesor = () => {
                           type="checkbox"
                           checked={asistencia[profesor.id_usuario]?.retiroAntes === 1}
                           onChange={() => handleCheckboxChange(profesor.id_usuario, 'retiroAntes')}
-                          disabled={
-                            asistencia[profesor.id_usuario]?.asistio === 1 || 
-                            asistencia[profesor.id_usuario]?.mediaFalta === 1
-                          }
+                          disabled={asistencia[profesor.id_usuario]?.asistio === 1}
                         />
                       </td>
                     </tr>
@@ -333,15 +327,14 @@ const GestionarAsistenciaProfesor = () => {
                 </tbody>
               </Table>
             ) : (
-              !loading.profesores && <Alert variant="warning">No hay profesores disponibles</Alert>
+              <p>No se encontraron profesores.</p>
             )}
-
             <Button 
-              className="mt-3" 
+              variant="success" 
               onClick={enviarAsistencia} 
-              disabled={loading.guardando || profesores.length === 0}
+              disabled={loading.guardando}
             >
-              {loading.guardando ? 'Procesando...' : 'Registrar Asistencia'}
+              {loading.guardando ? 'Guardando...' : 'Registrar Asistencia'}
             </Button>
           </Card.Body>
         </Card>
@@ -351,36 +344,32 @@ const GestionarAsistenciaProfesor = () => {
         <Card className="mb-4">
           <Card.Body>
             <h2 className="mb-3">Modificar Asistencia</h2>
-            
-            <Row className="mb-4">
-              <Col md={6}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Seleccionar Fecha</Form.Label>
-                  <Form.Control
-                    as="select"
-                    value={fechaSeleccionada}
-                    onChange={handleFechaChange}
-                    className="form-select"
-                    disabled={loading.asistencias}
-                  >
-                    <option value="">Seleccione una fecha</option>
-                    {fechasAsistencias.map((asistencia, index) => (
-                      <option key={index} value={asistencia.fecha}>
-                        {asistencia.fecha}
-                      </option>
-                    ))}
-                  </Form.Control>
-                </Form.Group>
-              </Col>
-              <Col md={6}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Seleccionar Profesor</Form.Label>
-                  <Form.Control
-                    as="select"
+            <Form.Group controlId="formFecha">
+              <Form.Label>Fecha</Form.Label>
+              <Form.Control 
+                as="select" 
+                value={fechaSeleccionada}
+                onChange={handleFechaChange}
+                disabled={loading.asistencias}
+              >
+                <option value="">Seleccione una fecha</option>
+                {fechasAsistencias.map((fecha) => (
+                  <option key={fecha.fecha} value={fecha.fecha}>
+                    {fecha.fecha}
+                  </option>
+                ))}
+              </Form.Control>
+            </Form.Group>
+
+            {fechaSeleccionada && (
+              <>
+                <Form.Group controlId="formProfesor">
+                  <Form.Label>Profesor</Form.Label>
+                  <Form.Control 
+                    as="select" 
                     value={profesorSeleccionado}
                     onChange={handleProfesorChange}
-                    disabled={!fechaSeleccionada || loading.asistencias}
-                    className="form-select"
+                    disabled={loading.asistencias}
                   >
                     <option value="">Seleccione un profesor</option>
                     {profesores.map((profesor) => (
@@ -390,79 +379,55 @@ const GestionarAsistenciaProfesor = () => {
                     ))}
                   </Form.Control>
                 </Form.Group>
-              </Col>
-            </Row>
 
-            {fechaSeleccionada && profesorSeleccionado && (
-              <>
-                <h4 className="mt-4">Modificar Asistencia del Profesor</h4>
-                <Table striped bordered hover>
-                  <thead>
-                    <tr>
-                      <th>Profesor</th>
-                      <th>Presente</th>
-                      <th>Media Falta</th>
-                      <th>Retiro Anticipado</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {(() => {
-                      const profesorData = getProfesorSeleccionadoData();
-                      if (!profesorData) return null;
-                      
-                      return (
-                        <tr key={profesorData.profesor.id_usuario}>
-                          <td>
-                            {profesorData.profesor.nombreCompleto || 
-                              `${profesorData.profesor.nombre} ${profesorData.profesor.apellido}`}
-                          </td>
+                {profesorSeleccionado && (
+                  <>
+                    <Table striped bordered hover className="mt-4">
+                      <thead>
+                        <tr>
+                          <th>Nombre</th>
+                          <th>Asistió</th>
+                          <th>Media Falta</th>
+                          <th>Retiro Antes</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>{getProfesorSeleccionadoData()?.profesor.nombreCompleto || 'N/A'}</td>
                           <td>
                             <Form.Check
                               type="checkbox"
-                              checked={profesorData.asistencia?.asistio === 1}
-                              onChange={() => handleCheckboxChange(profesorData.profesor.id_usuario, 'asistio')}
-                              disabled={
-                                profesorData.asistencia?.mediaFalta === 1 || 
-                                profesorData.asistencia?.retiroAntes === 1
-                              }
+                              checked={asistencia[profesorSeleccionado]?.asistio === 1}
+                              onChange={() => handleCheckboxChange(profesorSeleccionado, 'asistio')}
                             />
                           </td>
                           <td>
                             <Form.Check
                               type="checkbox"
-                              checked={profesorData.asistencia?.mediaFalta === 1}
-                              onChange={() => handleCheckboxChange(profesorData.profesor.id_usuario, 'mediaFalta')}
-                              disabled={
-                                profesorData.asistencia?.asistio === 1 || 
-                                profesorData.asistencia?.retiroAntes === 1
-                              }
+                              checked={asistencia[profesorSeleccionado]?.mediaFalta === 1}
+                              onChange={() => handleCheckboxChange(profesorSeleccionado, 'mediaFalta')}
                             />
                           </td>
                           <td>
                             <Form.Check
                               type="checkbox"
-                              checked={profesorData.asistencia?.retiroAntes === 1}
-                              onChange={() => handleCheckboxChange(profesorData.profesor.id_usuario, 'retiroAntes')}
-                              disabled={
-                                profesorData.asistencia?.asistio === 1 || 
-                                profesorData.asistencia?.mediaFalta === 1
-                              }
+                              checked={asistencia[profesorSeleccionado]?.retiroAntes === 1}
+                              onChange={() => handleCheckboxChange(profesorSeleccionado, 'retiroAntes')}
                             />
                           </td>
                         </tr>
-                      );
-                    })()}
-                  </tbody>
-                </Table>
+                      </tbody>
+                    </Table>
 
-                <Button
-                  variant="warning"
-                  onClick={editarAsistencia}
-                  disabled={loading.guardando || !fechaSeleccionada || !profesorSeleccionado}
-                  className="mt-3"
-                >
-                  {loading.guardando ? 'Editando...' : 'Editar Asistencia'}
-                </Button>
+                    <Button 
+                      variant="success" 
+                      onClick={editarAsistencia} 
+                      disabled={loading.guardando}
+                    >
+                      {loading.guardando ? 'Guardando...' : 'Guardar Cambios'}
+                    </Button>
+                  </>
+                )}
               </>
             )}
           </Card.Body>

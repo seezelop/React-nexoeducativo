@@ -1,33 +1,31 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
+// ✅ Instancia de axios fuera del componente
+const api = axios.create({
+  baseURL: process.env.REACT_APP_API_URL,
+});
+
 const ConsultarEscuelas = () => {
   const [escuelas, setEscuelas] = useState([]);
 
-  const api = axios.create({
-    baseURL: process.env.REACT_APP_API_URL,
-  });
-
-  // Función para obtener las escuelas
-  const obtenerEscuelas = async () => {
-    try {
-      const response = await api.get('/api/usuario/getEscuelas', {
-        withCredentials: true
-      });
-      
-      if (response.status === 200) {
-        setEscuelas(response.data); // Actualiza el estado con las escuelas
-      }
-    } catch (error) {
-      console.error('Error al obtener las escuelas', error);
-    }
-  };
-
-  // Llama a la función al montar el componente
   useEffect(() => {
-    obtenerEscuelas();
-    
-  }, []);
+    const obtenerEscuelas = async () => {
+      try {
+        const response = await api.get('/api/usuario/getEscuelas', {
+          withCredentials: true
+        });
+
+        if (response.status === 200) {
+          setEscuelas(response.data);
+        }
+      } catch (error) {
+        console.error('Error al obtener las escuelas', error);
+      }
+    };
+
+    obtenerEscuelas(); // 👈 Llamada dentro del useEffect
+  }, []); // ✅ Ya no hay advertencia de dependencias
 
   return (
     <section className="d-flex flex-column min-vh-100">

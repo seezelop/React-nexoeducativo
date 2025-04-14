@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import axios from "axios";
 
 function Padre() {
   const [searchParams] = useSearchParams();
   const [estadoPago, setEstadoPago] = useState('');
-  const [precio, setPrecio] = useState(null);
-  const navigate = useNavigate();
-
+  // Eliminar 'precio' y 'navigate' si no los vas a usar
   const api = axios.create({
       baseURL: process.env.REACT_APP_API_URL,
     });
@@ -19,7 +17,7 @@ function Padre() {
     if (status === "approved") {
       obtenerPrecioYGenerarComprobante();
     }
-  }, [searchParams]); // Se ejecuta con cada cambio en la URL
+  }, [searchParams]); // Dependencia actualizada para que se ejecute con cada cambio en la URL
 
   const obtenerPrecioYGenerarComprobante = async () => {
     try {
@@ -27,9 +25,8 @@ function Padre() {
         withCredentials: true,
       });
       
-      setPrecio(response.data);
       if (response.data) {
-        generarComprobante(response.data);
+        generarComprobante(response.data); // Se pasa el precio para generar el comprobante
       }
     } catch (error) {
       console.error("Error al obtener la información:", error);

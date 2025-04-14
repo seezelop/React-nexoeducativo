@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -13,6 +13,7 @@ function InformacionCurso() {
       baseURL: process.env.REACT_APP_API_URL,
     });
 
+  // useEffect para obtener la lista de hijos
   useEffect(() => {
     const obtenerHijos = async () => {
       try {
@@ -24,8 +25,9 @@ function InformacionCurso() {
       }
     };
     obtenerHijos();
-  }, []);
+  }, [api]); // Añadido 'api' como dependencia
 
+  // useEffect para obtener la información del curso del hijo seleccionado
   useEffect(() => {
     if (!hijoSeleccionado) {
       setInfoCurso(null);
@@ -45,7 +47,7 @@ function InformacionCurso() {
       }
     };
     obtenerInfoCurso();
-  }, [hijoSeleccionado]);
+  }, [hijoSeleccionado, api]); // Añadido 'api' como dependencia
 
   return (
     <section className="d-flex flex-column min-vh-100">

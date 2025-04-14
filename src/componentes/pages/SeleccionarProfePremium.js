@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Alert, Spinner, Container, Button, Form, Card, Row, Col } from 'react-bootstrap';
+import { Alert, Spinner, Container, Form, Card, Row, Col } from 'react-bootstrap';
 import axios from 'axios';
 
 const SeleccionarProfePremium = () => {
@@ -8,36 +8,35 @@ const SeleccionarProfePremium = () => {
   const [error, setError] = useState(null);
   const [profesorSeleccionado, setProfesorSeleccionado] = useState('');
   const [infoProfesor, setInfoProfesor] = useState(null);
-  const [rol, setRol] = useState("profesor");
 
   const api = axios.create({
-      baseURL: process.env.REACT_APP_API_URL,
-    });
+    baseURL: process.env.REACT_APP_API_URL,
+  });
 
   // Cargar profesores al montar el componente
   useEffect(() => {
+    const cargarProfesores = async () => {
+      setLoading(true);
+      try {
+        const response = await api.get(`/api/usuario/getUsuarios/profesor`, {
+          withCredentials: true,
+        });
+
+        const profesores = response.data.map((profesor) => ({
+          idProfesor: profesor.idUsuario,
+          nombre: `${profesor.nombre} ${profesor.apellido}`,
+        }));
+
+        setProfesores(profesores);
+      } catch (error) {
+        setError('Error al cargar los profesores: ' + (error.response?.data || error.message));
+      } finally {
+        setLoading(false);
+      }
+    };
+
     cargarProfesores();
-  }, []);
-
-  const cargarProfesores = async () => {
-    setLoading(true);
-    try {
-      const response = await api.get(`/api/usuario/getUsuarios/${rol}`, {
-        withCredentials: true,
-      });
-
-      const profesores = response.data.map((profesor) => ({
-        idProfesor: profesor.idUsuario,
-        nombre: `${profesor.nombre} ${profesor.apellido}`
-      }));
-
-      setProfesores(profesores);
-    } catch (error) {
-      setError('Error al cargar los profesores: ' + (error.response?.data || error.message));
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, []); // No es necesario agregar 'cargarProfesores' a las dependencias
 
   const handleProfesorChange = async (e) => {
     const idUsuario = e.target.value;

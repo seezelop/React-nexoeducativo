@@ -8,9 +8,9 @@ const InformacionPago = () => {
   const [error, setError] = useState(null); 
 
   const api = axios.create({
-      baseURL: process.env.REACT_APP_API_URL,
-    });
-  // Función para obtener la información de pago
+    baseURL: process.env.REACT_APP_API_URL,
+  });
+
   const obtenerInfoPago = async () => {
     try {
       const response = await api.get("/verInfoPago", {
@@ -19,17 +19,15 @@ const InformacionPago = () => {
 
       setInfoPago(response.data);
     } catch (err) {
-      // Manejar errores
       setError("Error al obtener la información de pago: " + (err.response?.data || err.message));
     } finally {
-      // Finalizar la carga
       setLoading(false);
     }
   };
 
   useEffect(() => {
     obtenerInfoPago();
-  }, []);
+  }, [obtenerInfoPago]); // Agregamos 'obtenerInfoPago' como dependencia
 
   if (loading) {
     return (

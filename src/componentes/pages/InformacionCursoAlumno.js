@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 function InformacionCursoAlumno() {
   const [infoCurso, setInfoCurso] = useState(null); // Información del curso del alumno
   const [loading, setLoading] = useState(false); // Estado de carga
   const [error, setError] = useState(null);
-  const navigate = useNavigate();
 
   const api = axios.create({
-      baseURL: process.env.REACT_APP_API_URL,
-    });
+    baseURL: process.env.REACT_APP_API_URL,
+  });
 
   useEffect(() => {
     const obtenerInfoCurso = async () => {
@@ -26,13 +24,13 @@ function InformacionCursoAlumno() {
       }
     };
     obtenerInfoCurso();
-  }, []);
+  }, [api]); // Añadido 'api' como dependencia
 
   return (
     <section className="d-flex flex-column min-vh-100 text-white pt-5">
       <div className="container flex-grow-1">
         <h1 className="mb-4">Información del Curso</h1>
-        
+
         {loading && <p>Cargando información...</p>}
         {error && <p className="text-danger">{error}</p>}
 

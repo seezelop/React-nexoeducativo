@@ -4,6 +4,11 @@ import axios from "axios";
 import { Container, Card, Form, Button, Alert, Spinner } from "react-bootstrap";
 import { FaEdit, FaTrash, FaCheck, FaTimes, FaPaperPlane } from "react-icons/fa";
 
+// ✅ Instancia axios fuera del componente
+const api = axios.create({
+  baseURL: process.env.REACT_APP_API_URL,
+});
+
 const ChatIndividual = () => {
   const { mail: mailDestinatario } = useParams();
   const [mensajes, setMensajes] = useState([]);
@@ -14,16 +19,12 @@ const ChatIndividual = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-   const api = axios.create({
-      baseURL: process.env.REACT_APP_API_URL,
-    });
-
   // Obtener usuario logueado
   useEffect(() => {
     const fetchUserEmail = async () => {
       try {
         const response = await api.get(
-          "http://localhost:8080/api/usuario/usuarioLogueado",
+          "/api/usuario/usuarioLogueado",
           { withCredentials: true }
         );
         setUserEmail(response.data);
@@ -47,7 +48,6 @@ const ChatIndividual = () => {
           `/obtenerMensajesEntreUsuarios/${mailDestinatario}`,
           { withCredentials: true }
         );
-        
         const data = response.status === 204 ? [] : response.data;
         console.log("Mensajes recibidos:", JSON.stringify(data));
         setMensajes(data);
@@ -63,15 +63,7 @@ const ChatIndividual = () => {
   }, [userEmail, mailDestinatario]);
 
   const esMensajePropio = (mensaje) => {
-    // mail = remitente, mail2 = destinatario
-    console.log('info mensjae.mail'+JSON.stringify(mensaje.mail))
-    console.log('info user mail; '+userEmail)
     const esPropio = mensaje.mail === userEmail;
-    console.log(`Verificando mensaje ${mensaje.idMensaje}:`, {
-      remitente: mensaje.mail,
-      userEmail,
-      esPropio
-    });
     return esPropio;
   };
 
@@ -90,7 +82,6 @@ const ChatIndividual = () => {
         { withCredentials: true, headers: { "Content-Type": "application/json" } }
       );
 
-      // Recargar mensajes
       const response = await api.get(
         `/obtenerMensajesEntreUsuarios/${mailDestinatario}`,
         { withCredentials: true }
@@ -119,7 +110,7 @@ const ChatIndividual = () => {
         { withCredentials: true, headers: { "Content-Type": "text/plain" } }
       );
 
-      setMensajes(mensajes.map(msg => 
+      setMensajes(mensajes.map(msg =>
         msg.idMensaje === id ? { ...msg, contenido: nuevoContenido } : msg
       ));
       setEditandoId(null);

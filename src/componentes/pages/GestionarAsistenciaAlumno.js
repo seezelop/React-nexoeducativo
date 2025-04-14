@@ -2,6 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Form, Button, Row, Col, Table, Card, Alert } from 'react-bootstrap';
 import axios from 'axios';
 
+// Mover la instancia de axios fuera del componente
+const api = axios.create({
+  baseURL: process.env.REACT_APP_API_URL,
+});
+
 const GestionarAsistenciaAlumnos = () => {
   const [cursos, setCursos] = useState([]);
   const [cursoSeleccionado, setCursoSeleccionado] = useState('');
@@ -12,10 +17,6 @@ const GestionarAsistenciaAlumnos = () => {
   const [fechaSeleccionada, setFechaSeleccionada] = useState('');
   const [loading, setLoading] = useState(false);
   const [mensaje, setMensaje] = useState({ text: '', type: '' });
-
-   const api = axios.create({
-      baseURL: process.env.REACT_APP_API_URL,
-    });
 
   // Cargar los cursos al iniciar el componente
   useEffect(() => {
@@ -40,7 +41,7 @@ const GestionarAsistenciaAlumnos = () => {
     };
 
     fetchCursos();
-  }, []);
+  }, []); // Ya no necesitas incluir 'api' como dependencia aquí
 
   // Obtener los alumnos del curso seleccionado
   const fetchAlumnos = async (cursoId) => {
@@ -298,7 +299,7 @@ const GestionarAsistenciaAlumnos = () => {
                   </tbody>
                 </Table>
                 <Button type="submit" variant="primary" disabled={loading}>
-                  {loading ? 'Guardando...' : 'Guardar Asistencia'}
+                  {loading ? 'Registrando...' : 'Registrar Asistencia'}
                 </Button>
               </>
             )}
@@ -306,127 +307,120 @@ const GestionarAsistenciaAlumnos = () => {
         </Card.Body>
       </Card>
 
-      <Card>
+      <Card className="mt-4">
         <Card.Body>
           <h4>Modificar Asistencia</h4>
-          <Row>
-            <Col md={4}>
-              <Form.Group>
-                <Form.Label>Curso</Form.Label>
-                <Form.Control
-                  as="select"
-                  value={cursoSeleccionado}
-                  onChange={handleCursoChangeModificar}
-                  disabled={loading}
-                >
-                  <option value="">Seleccione un curso</option>
-                  {cursos.map(curso => (
-                    <option key={curso.idCurso} value={curso.idCurso}>
-                      {curso.numero}° {curso.division}
-                    </option>
-                  ))}
-                </Form.Control>
-              </Form.Group>
-            </Col>
-            <Col md={4}>
-              <Form.Group>
-                <Form.Label>Fecha</Form.Label>
-                <Form.Control
-                  as="select"
-                  value={fechaSeleccionada}
-                  onChange={handleFechaChange}
-                  disabled={!cursoSeleccionado || loading}
-                >
-                  <option value="">Seleccione una fecha</option>
-                  {fechasAsistencias.map((asistencia, index) => (
-                    <option key={index} value={asistencia.fecha}>
-                      {new Date(asistencia.fecha).toLocaleDateString('es-AR')}
-                    </option>
-                  ))}
-                </Form.Control>
-              </Form.Group>
-            </Col>
-            <Col md={4}>
-              <Form.Group>
-                <Form.Label>Alumno</Form.Label>
-                <Form.Control
-                  as="select"
-                  value={alumnoSeleccionado}
-                  onChange={handleAlumnoChange}
-                  disabled={!cursoSeleccionado || loading}
-                >
-                  <option value="">Seleccione un alumno</option>
-                  {alumnos.map(alumno => (
-                    <option key={alumno.id_usuario} value={alumno.id_usuario}>
-                      {alumno.nombre} {alumno.apellido}
-                    </option>
-                  ))}
-                </Form.Control>
-              </Form.Group>
-            </Col>
-          </Row>
+          <Form>
+            <Row>
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label>Seleccionar Curso</Form.Label>
+                  <Form.Control
+                    as="select"
+                    value={cursoSeleccionado}
+                    onChange={handleCursoChangeModificar}
+                    disabled={loading}
+                  >
+                    <option value="">Seleccione un curso</option>
+                    {cursos.length > 0 ? (
+                      cursos.map(curso => (
+                        <option key={curso.idCurso} value={curso.idCurso}>
+                          {curso.numero}° {curso.division}
+                        </option>
+                      ))
+                    ) : (
+                      <option disabled>No hay cursos disponibles</option>
+                    )}
+                  </Form.Control>
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label>Seleccionar Fecha</Form.Label>
+                  <Form.Control
+                    as="select"
+                    value={fechaSeleccionada}
+                    onChange={handleFechaChange}
+                    disabled={loading || !fechasAsistencias.length}
+                  >
+                    <option value="">Seleccione una fecha</option>
+                    {fechasAsistencias.map(fecha => (
+                      <option key={fecha.id} value={fecha.fecha}>
+                        {fecha.fecha}
+                      </option>
+                    ))}
+                  </Form.Control>
+                </Form.Group>
+              </Col>
+            </Row>
 
-          {alumnoSeleccionado && (
-            <div className="mt-4">
-              <h5>Modificar Asistencia para {alumnoActual.nombre} {alumnoActual.apellido}</h5>
-              <Table striped bordered hover>
-                <thead>
-                  <tr>
-                    <th>Presente</th>
-                    <th>Media Falta</th>
-                    <th>Retiro Anticipado</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>
-                      <Form.Check
-                        type="checkbox"
-                        checked={asistenciaActual.asistio === 1}
-                        onChange={(e) => {
-                          const index = alumnos.findIndex(a => a.id_usuario === parseInt(alumnoSeleccionado));
-                          if (index !== -1) {
-                            handleAsistenciaChange(index, 'asistio', e.target.checked ? 1 : 0);
-                          }
-                        }}
-                      />
-                    </td>
-                    <td>
-                      <Form.Check
-                        type="checkbox"
-                        checked={asistenciaActual.mediaFalta === 1}
-                        onChange={(e) => {
-                          const index = alumnos.findIndex(a => a.id_usuario === parseInt(alumnoSeleccionado));
-                          if (index !== -1) {
-                            handleAsistenciaChange(index, 'mediaFalta', e.target.checked ? 1 : 0);
-                          }
-                        }}
-                      />
-                    </td>
-                    <td>
-                      <Form.Check
-                        type="checkbox"
-                        checked={asistenciaActual.retiroAntes === 1}
-                        onChange={(e) => {
-                          const index = alumnos.findIndex(a => a.id_usuario === parseInt(alumnoSeleccionado));
-                          if (index !== -1) {
-                            handleAsistenciaChange(index, 'retiroAntes', e.target.checked ? 1 : 0);
-                          }
-                        }}
-                      />
-                    </td>
-                  </tr>
-                </tbody>
-              </Table>
-              <Button
-                variant="warning"
-                onClick={handleEditarAsistencia}
-                disabled={loading || !fechaSeleccionada}
-              >
-                {loading ? 'Guardando...' : 'Guardar Cambios'}
-              </Button>
-            </div>
-          )}
+            <Row>
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label>Seleccionar Alumno</Form.Label>
+                  <Form.Control
+                    as="select"
+                    value={alumnoSeleccionado}
+                    onChange={handleAlumnoChange}
+                    disabled={loading || !alumnos.length}
+                  >
+                    <option value="">Seleccione un alumno</option>
+                    {alumnos.map((alumno) => (
+                      <option key={alumno.id_usuario} value={alumno.id_usuario}>
+                        {alumno.nombre} {alumno.apellido}
+                      </option>
+                    ))}
+                  </Form.Control>
+                </Form.Group>
+              </Col>
+            </Row>
+
+            {alumnoSeleccionado && (
+              <div className="mt-3">
+                <h5>{alumnoActual.nombre} {alumnoActual.apellido}</h5>
+                <div>
+                  <Form.Check
+                    type="checkbox"
+                    label="Asistió"
+                    checked={asistenciaActual.asistio === 1}
+                    onChange={(e) => handleAsistenciaChange(
+                      alumnos.findIndex(a => a.id_usuario === parseInt(alumnoSeleccionado)),
+                      'asistio',
+                      e.target.checked ? 1 : 0
+                    )}
+                  />
+                </div>
+                <div>
+                  <Form.Check
+                    type="checkbox"
+                    label="Media Falta"
+                    checked={asistenciaActual.mediaFalta === 1}
+                    onChange={(e) => handleAsistenciaChange(
+                      alumnos.findIndex(a => a.id_usuario === parseInt(alumnoSeleccionado)),
+                      'mediaFalta',
+                      e.target.checked ? 1 : 0
+                    )}
+                  />
+                </div>
+                <div>
+                  <Form.Check
+                    type="checkbox"
+                    label="Retiro Anticipado"
+                    checked={asistenciaActual.retiroAntes === 1}
+                    onChange={(e) => handleAsistenciaChange(
+                      alumnos.findIndex(a => a.id_usuario === parseInt(alumnoSeleccionado)),
+                      'retiroAntes',
+                      e.target.checked ? 1 : 0
+                    )}
+                  />
+                </div>
+              </div>
+            )}
+
+            <Button variant="primary" onClick={handleEditarAsistencia} disabled={loading}>
+              {loading ? 'Editando...' : 'Editar Asistencia'}
+            </Button>
+          </Form>
         </Card.Body>
       </Card>
     </div>
