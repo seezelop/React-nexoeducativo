@@ -9,19 +9,6 @@ function Padre() {
   const api = axios.create({
       baseURL: process.env.REACT_APP_API_URL,
     });
-    const obtenerPrecioYGenerarComprobante = useCallback(async () => {
-      try {
-        const response = await api.get("/api/usuario/obtenerInfoCuota", {
-          withCredentials: true,
-        });
-        
-        if (response.data) {
-          generarComprobante(response.data); // Se pasa el precio para generar el comprobante
-        }
-      } catch (error) {
-        console.error("Error al obtener la información:", error);
-      }
-    },[api]);
 
     const generarComprobante = useCallback(async (importe) => {
       try {
@@ -37,6 +24,19 @@ function Padre() {
         console.error("Error al generar comprobante:", error);
       }
     },[api]);
+    const obtenerPrecioYGenerarComprobante = useCallback(async () => {
+      try {
+        const response = await api.get("/api/usuario/obtenerInfoCuota", {
+          withCredentials: true,
+        });
+        
+        if (response.data) {
+          generarComprobante(response.data); // Se pasa el precio para generar el comprobante
+        }
+      } catch (error) {
+        console.error("Error al obtener la información:", error);
+      }
+    },[api, generarComprobante]);
 
   useEffect(() => {
     const status = searchParams.get("status");

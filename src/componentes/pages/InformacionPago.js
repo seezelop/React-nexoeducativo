@@ -23,7 +23,7 @@ const InformacionPago = () => {
     } finally {
       setLoading(false);
     }
-  },[]);
+  },[api]);
 
   useEffect(() => {
     obtenerInfoPago();
