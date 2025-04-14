@@ -71,7 +71,7 @@ function BajaTarea() {
     try {
       await api.delete(
         `/api/usuario/borrarTarea`,
-        formData,
+        //formData,
         {
           withCredentials: true
         }
