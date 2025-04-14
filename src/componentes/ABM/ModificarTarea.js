@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Form, Button } from "react-bootstrap";
 import axios from "axios";
 
@@ -18,21 +18,23 @@ const api = axios.create({
   baseURL: process.env.REACT_APP_API_URL,
 });
 
+const cargarCursos = useCallback(async () => {
+  try {
+    const response = await api.get(
+      "/api/usuario/verCursoProfesor",
+      { withCredentials: true }
+    );
+    setCursos(response.data);
+  } catch (error) {
+    console.error("Error al cargar los cursos:", error);
+  }
+},[]);
+
+
   useEffect(() => {
     cargarCursos();
-  }, []);
+  }, [cargarCursos]);
 
-  const cargarCursos = async () => {
-    try {
-      const response = await api.get(
-        "/api/usuario/verCursoProfesor",
-        { withCredentials: true }
-      );
-      setCursos(response.data);
-    } catch (error) {
-      console.error("Error al cargar los cursos:", error);
-    }
-  };
 
   const cargarMaterias = async (cursoId) => {
     if (!cursoId) return;

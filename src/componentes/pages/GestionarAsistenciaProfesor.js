@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Table, Alert, Spinner, Container, Button, Form, Card, Row, Col } from 'react-bootstrap';
+import { Table, Alert, Spinner, Container, Button, Form, Card} from 'react-bootstrap';
 import axios from 'axios';
 
 const GestionarAsistenciaProfesor = () => {
@@ -43,16 +43,6 @@ const GestionarAsistenciaProfesor = () => {
     verificarPlan();
   }, [api]);
 
-  // Cargar datos si el plan es válido
-  useEffect(() => {
-    if (planValido === true) {
-      obtenerProfesores();
-      if (activeTab === 'modificar') {
-        obtenerFechasAsistencias();
-      }
-    }
-  }, [planValido, activeTab, obtenerProfesores, obtenerFechasAsistencias]);
-
   const obtenerProfesores = useCallback(async () => {
     setLoading(prev => ({ ...prev, profesores: true }));
     try {
@@ -92,6 +82,16 @@ const GestionarAsistenciaProfesor = () => {
       setLoading(prev => ({ ...prev, asistencias: false }));
     }
   }, [api]);
+
+  // Cargar datos si el plan es válido
+  useEffect(() => {
+    if (planValido === true) {
+      obtenerProfesores();
+      if (activeTab === 'modificar') {
+        obtenerFechasAsistencias();
+      }
+    }
+  }, [planValido, activeTab, obtenerProfesores, obtenerFechasAsistencias]);
 
   const obtenerAsistenciasPorFecha = async (fecha) => {
     setLoading(prev => ({ ...prev, asistencias: true }));

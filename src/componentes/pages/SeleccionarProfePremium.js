@@ -36,7 +36,7 @@ const SeleccionarProfePremium = () => {
     };
 
     cargarProfesores();
-  }, []); // No es necesario agregar 'cargarProfesores' a las dependencias
+  }, [api]); 
 
   const handleProfesorChange = async (e) => {
     const idUsuario = e.target.value;

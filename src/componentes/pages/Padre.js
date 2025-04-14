@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import axios from "axios";
 
@@ -9,6 +9,34 @@ function Padre() {
   const api = axios.create({
       baseURL: process.env.REACT_APP_API_URL,
     });
+    const obtenerPrecioYGenerarComprobante = useCallback(async () => {
+      try {
+        const response = await api.get("/api/usuario/obtenerInfoCuota", {
+          withCredentials: true,
+        });
+        
+        if (response.data) {
+          generarComprobante(response.data); // Se pasa el precio para generar el comprobante
+        }
+      } catch (error) {
+        console.error("Error al obtener la información:", error);
+      }
+    },[api]);
+
+    const generarComprobante = useCallback(async (importe) => {
+      try {
+        await api.post(
+          "/api/usuario/generarComprobante",
+          { importe },
+          {
+            headers: { "Content-Type": "application/json" },
+            withCredentials: true,
+          }
+        );
+      } catch (error) {
+        console.error("Error al generar comprobante:", error);
+      }
+    },[api]);
 
   useEffect(() => {
     const status = searchParams.get("status");
@@ -17,36 +45,7 @@ function Padre() {
     if (status === "approved") {
       obtenerPrecioYGenerarComprobante();
     }
-  }, [searchParams]); // Dependencia actualizada para que se ejecute con cada cambio en la URL
-
-  const obtenerPrecioYGenerarComprobante = async () => {
-    try {
-      const response = await api.get("/api/usuario/obtenerInfoCuota", {
-        withCredentials: true,
-      });
-      
-      if (response.data) {
-        generarComprobante(response.data); // Se pasa el precio para generar el comprobante
-      }
-    } catch (error) {
-      console.error("Error al obtener la información:", error);
-    }
-  };
-
-  const generarComprobante = async (importe) => {
-    try {
-      await api.post(
-        "/api/usuario/generarComprobante",
-        { importe },
-        {
-          headers: { "Content-Type": "application/json" },
-          withCredentials: true,
-        }
-      );
-    } catch (error) {
-      console.error("Error al generar comprobante:", error);
-    }
-  };
+  }, [searchParams, obtenerPrecioYGenerarComprobante]); // Dependencia actualizada para que se ejecute con cada cambio en la URL
 
   return (
     <section className="d-flex flex-column min-vh-100 pt-5">

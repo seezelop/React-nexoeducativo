@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Container, Card, Spinner, Alert } from "react-bootstrap";
 import axios from "axios";
 
@@ -11,7 +11,7 @@ const InformacionPago = () => {
     baseURL: process.env.REACT_APP_API_URL,
   });
 
-  const obtenerInfoPago = async () => {
+  const obtenerInfoPago = useCallback(async () => {
     try {
       const response = await api.get("/verInfoPago", {
         withCredentials: true, 
@@ -23,7 +23,7 @@ const InformacionPago = () => {
     } finally {
       setLoading(false);
     }
-  };
+  },[]);
 
   useEffect(() => {
     obtenerInfoPago();

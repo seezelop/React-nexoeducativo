@@ -77,7 +77,7 @@ function BajaEvento() {
     }
 
     // Obtener información del evento seleccionado para la confirmación
-    const eventoAEliminar = eventos.find(evento => evento.idEvento.toString() === eventoSeleccionado.toString());
+    //const eventoAEliminar = eventos.find(evento => evento.idEvento.toString() === eventoSeleccionado.toString());
     //const nombreEvento = eventoAEliminar ? eventoAEliminar.nombre || `ID: ${eventoSeleccionado}` : `ID: ${eventoSeleccionado}`;
 
     // Confirmación antes de eliminar
