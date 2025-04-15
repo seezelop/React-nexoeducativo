@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 
+const api = axios.create({
+    baseURL: process.env.REACT_APP_API_URL,
+  });
 class FormEditarSuperAdmin extends Component {
     constructor(props) {
         super(props);
@@ -23,11 +26,12 @@ class FormEditarSuperAdmin extends Component {
     componentDidMount() {
         this.obtenerIdUsuario();
     }
+    
 
     obtenerIdUsuario = async () => {
         try {
-            const response = await axios.get(
-                "http://localhost:8080/api/usuario/usuarioLogueado2",
+            const response = await api.get(
+                "/api/usuario/usuarioLogueado2",
                 { withCredentials: true }
             );
             this.setState({ idUsuario: response.data });
