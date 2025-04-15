@@ -45,6 +45,7 @@ function Login() {
           setUserRole(userRole);
           //setInfoSesion(response.data); // Guarda la información para mostrarla más tarde
           //console.log("Rol obtenido: " + userRole);
+          console.log('INFO DE AQUI: '+JSON.stringify(response2.data))
          setInfoSesion(response2.data) //aca se guarda el nombre y apellido del usuario para despues mostrarlo
 
           const usuarioCookie = new Cookies();
