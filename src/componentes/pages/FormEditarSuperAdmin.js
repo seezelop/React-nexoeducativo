@@ -27,10 +27,11 @@ class FormEditarSuperAdmin extends Component {
     obtenerIdUsuario = async () => {
         try {
             const response = await axios.get(
-                "http://localhost:8080/api/usuario/usuarioLogueado",
+                "http://localhost:8080/api/usuario/usuarioLogueado2",
                 { withCredentials: true }
             );
             this.setState({ idUsuario: response.data });
+            console.log('info: '+response.data)
             
         } catch (error) {
             console.error("Error al obtener ID del usuario:", error);

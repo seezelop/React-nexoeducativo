@@ -36,13 +36,13 @@ function Login() {
           withCredentials: true
         });
 
-        console.log('INFO DE AQUI: '+JSON.stringify(response.data))
+        //console.log('INFO DE AQUI: '+JSON.stringify(response.data))
 
         const response2 = await api.get('/auth/info', {
           withCredentials: true
         });
 
-        console.log('INFO DE AQUI 2: '+JSON.stringify(response2.data))
+        //console.log('INFO DE AQUI 2: '+JSON.stringify(response2.data))
 
         if (response.status === 200) {
           const userRole = response.data.split(': ')[1]; // Obtén el nombre del rol del usuario
