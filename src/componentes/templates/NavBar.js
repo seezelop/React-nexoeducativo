@@ -17,10 +17,14 @@ const Header = () => {
   const navigate = useNavigate();
   const cookies = new Cookies();
 
+  const api = axios.create({
+    baseURL: process.env.REACT_APP_API_URL,
+  });
+
   const handleLogout = async () => {
     try {
       // Opcional: Llama a una API para cerrar sesión en el backend
-      await axios.post("http://localhost:8080/logout", {}, { withCredentials: true });
+      await api.post("/logout", {}, { withCredentials: true });
 
       // Limpia el contexto del usuario
       setUserRole(null);
