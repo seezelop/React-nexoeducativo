@@ -4,46 +4,73 @@ import axios from 'axios';
 
 const SeleccionarProfePremium = () => {
   const [profesores, setProfesores] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState({
+    general: false,
+    profesores: false,
+    info: false
+  });
   const [error, setError] = useState(null);
   const [profesorSeleccionado, setProfesorSeleccionado] = useState('');
   const [infoProfesor, setInfoProfesor] = useState(null);
+  const [planValido, setPlanValido] = useState(null); // null: no verificado, true: válido, false: no válido
 
   const api = axios.create({
     baseURL: process.env.REACT_APP_API_URL,
   });
 
-  // Cargar profesores al montar el componente
+  // Verificar el plan al cargar el componente
   useEffect(() => {
-    const cargarProfesores = async () => {
-      setLoading(true);
+    const verificarPlan = async () => {
+      setLoading(prev => ({ ...prev, general: true }));
       try {
-        const response = await api.get(`/api/usuario/getUsuarios/profesor`, {
-          withCredentials: true,
+        const response = await api.get('/api/usuario/getPlanEscuela', {
+          withCredentials: true
         });
-
-        const profesores = response.data.map((profesor) => ({
-          idProfesor: profesor.idUsuario,
-          nombre: `${profesor.nombre} ${profesor.apellido}`,
-        }));
-
-        setProfesores(profesores);
-      } catch (error) {
-        setError('Error al cargar los profesores: ' + (error.response?.data || error.message));
+        setPlanValido(response.data === 2);
+      } catch (err) {
+        setError('Error al verificar el plan de la escuela: ' + (err.response?.data || err.message));
+        setPlanValido(false);
       } finally {
-        setLoading(false);
+        setLoading(prev => ({ ...prev, general: false }));
       }
     };
 
-    cargarProfesores();
-  }, [api]); 
+    verificarPlan();
+  }, [api]);
+
+  // Cargar profesores solo si el plan es válido
+  useEffect(() => {
+    if (planValido) {
+      const cargarProfesores = async () => {
+        setLoading(prev => ({ ...prev, profesores: true }));
+        try {
+          const response = await api.get(`/api/usuario/getUsuarios/profesor`, {
+            withCredentials: true,
+          });
+
+          const profesores = response.data.map((profesor) => ({
+            idProfesor: profesor.idUsuario,
+            nombre: `${profesor.nombre} ${profesor.apellido}`,
+          }));
+
+          setProfesores(profesores);
+        } catch (error) {
+          setError('Error al cargar los profesores: ' + (error.response?.data || error.message));
+        } finally {
+          setLoading(prev => ({ ...prev, profesores: false }));
+        }
+      };
+
+      cargarProfesores();
+    }
+  }, [api, planValido]); 
 
   const handleProfesorChange = async (e) => {
     const idUsuario = e.target.value;
     setProfesorSeleccionado(idUsuario);
 
     if (idUsuario) {
-      setLoading(true);
+      setLoading(prev => ({ ...prev, info: true }));
       try {
         const response = await api.get(`/api/usuario/verInfoProfe/${idUsuario}`, {
           withCredentials: true,
@@ -54,19 +81,41 @@ const SeleccionarProfePremium = () => {
         setError('Error al cargar la información del profesor: ' + (error.response?.data || error.message));
         setInfoProfesor(null);
       } finally {
-        setLoading(false);
+        setLoading(prev => ({ ...prev, info: false }));
       }
     } else {
       setInfoProfesor(null);
     }
   };
 
+  // Si el plan no es válido, mostrar mensaje de plan requerido
+  if (planValido === false) {
+    return (
+      <Container className="mt-4">
+        <Alert variant="warning">
+          Esta función requiere un plan premium. Por favor, actualice su plan para acceder a esta característica.
+        </Alert>
+      </Container>
+    );
+  }
+
+  // Si aún está verificando el plan, mostrar cargando
+  if (planValido === null) {
+    return (
+      <Container className="mt-4 text-center">
+        <Spinner animation="border" />
+        <p className="text-white">Verificando plan...</p>
+      </Container>
+    );
+  }
+
+  // Si el plan es válido, mostrar el componente completo
   return (
     <Container className="mt-4 d-flex flex-column min-vh-100">
       <div className="flex-grow-1">
         <h1 className="text-center text-white mb-4">Información del Profesor</h1>
 
-        {loading && <Spinner animation="border" />}
+        {loading.profesores && <div className="text-center"><Spinner animation="border" /></div>}
         {error && <Alert variant="danger">{error}</Alert>}
 
         <Card>
@@ -75,7 +124,12 @@ const SeleccionarProfePremium = () => {
               <Col>
                 <Form.Group>
                   <Form.Label>Seleccione un profesor</Form.Label>
-                  <Form.Control as="select" value={profesorSeleccionado} onChange={handleProfesorChange}>
+                  <Form.Control 
+                    as="select" 
+                    value={profesorSeleccionado} 
+                    onChange={handleProfesorChange}
+                    disabled={loading.profesores}
+                  >
                     <option value="">Seleccione un profesor</option>
                     {profesores.map((profesor) => (
                       <option key={profesor.idProfesor} value={profesor.idProfesor}>
@@ -89,7 +143,9 @@ const SeleccionarProfePremium = () => {
           </Card.Body>
         </Card>
 
-        {infoProfesor && (
+        {loading.info && <div className="text-center mt-3"><Spinner animation="border" /></div>}
+
+        {infoProfesor && !loading.info && (
           <Card className="mt-4">
             <Card.Body>
               <h4>Información del Profesor Seleccionado</h4>
