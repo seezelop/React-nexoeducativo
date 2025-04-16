@@ -88,7 +88,7 @@ class ModificarProfesor extends Component {
                 withCredentials: true,
             });
 
-            console.log("respuesta api: " + JSON.stringify(response.data))
+            //console.log("respuesta api: " + JSON.stringify(response.data))
             const profesores = response.data.map((profesor) => ({
                 idUsuario: profesor.idUsuario,
                 nombre: `${profesor.nombre} ${profesor.apellido} ${profesor.dni}`,

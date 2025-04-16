@@ -118,7 +118,7 @@ class AltaPadre extends Component {
         }
         return response.text();
       })
-      .then((data) => console.log("User created:", data))
+      //.then((data) => console.log("Usuario creado:"))
       .catch((error) => console.error("Error creating user:", error));
   };
 

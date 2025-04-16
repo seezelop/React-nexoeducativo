@@ -59,7 +59,7 @@ class BajaEscuela extends Component {
                 withCredentials: true
             });
 
-            console.log("Respuesta del servidor: ", response);
+            //console.log("Respuesta del servidor: ", response);
 
             alert(`La escuela "${this.state.escuelaSeleccionada}" fue eliminada exitosamente.`);
 

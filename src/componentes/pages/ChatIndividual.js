@@ -28,7 +28,7 @@ const ChatIndividual = () => {
           { withCredentials: true }
         );
         setUserEmail(response.data);
-        console.log("Usuario logueado:", response.data);
+        //console.log("Usuario logueado:", response.data);
       } catch (err) {
         console.error("Error al obtener usuario:", err);
         setError("No se pudo cargar la información del usuario");
@@ -49,7 +49,7 @@ const ChatIndividual = () => {
           { withCredentials: true }
         );
         const data = response.status === 204 ? [] : response.data;
-        console.log("Mensajes recibidos:", JSON.stringify(data));
+       // console.log("Mensajes recibidos:", JSON.stringify(data));
         setMensajes(data);
       } catch (err) {
         console.error("Error al cargar mensajes:", err);

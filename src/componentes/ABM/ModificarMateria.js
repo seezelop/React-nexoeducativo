@@ -29,7 +29,7 @@ class ModificarMateria extends Component {
         withCredentials: true,
       });
       this.setState({ materias: response.data });
-      console.log ('cargar materias: '+response.data)
+      //console.log ('cargar materias: '+response.data)
     } catch (error) {
       console.error('Error al cargar las materias:', error);
       alert('Error al cargar las materias.');

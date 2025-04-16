@@ -35,7 +35,7 @@ class FormEditarSuperAdmin extends Component {
                 { withCredentials: true }
             );
             this.setState({ idUsuario: response.data });
-            console.log('info: '+response.data)
+            //console.log('info: '+response.data)
             
         } catch (error) {
             console.error("Error al obtener ID del usuario:", error);

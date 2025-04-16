@@ -37,7 +37,7 @@ class BajaProfesor extends Component {
             }));
 
             this.setState({ profesores });
-            console.log("Profesores cargados: ", profesores);
+            //console.log("Profesores cargados: ", profesores);
 
         } catch (error) {
             console.error('Error al cargar los profesores:', error);
