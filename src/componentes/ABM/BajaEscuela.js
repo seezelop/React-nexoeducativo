@@ -31,10 +31,7 @@ class BajaEscuela extends Component {
                 nombre: `${jefe.nombre} ${jefe.direccion}`
             }));
 
-            if(response.status===200){
-                this.setState({escuelas})
-            }
-           // this.setState({ escuelas });
+            this.setState({ escuelas });
         } catch (error) {
             console.error('Error al cargar las escuelas:', error);
         }
@@ -64,7 +61,8 @@ class BajaEscuela extends Component {
 
             //console.log("Respuesta del servidor: ", response);
 
-            alert(`La escuela "${this.state.escuelaSeleccionada}" fue eliminada exitosamente.`);
+            if(response.status===200){
+                alert(`La escuela "${this.state.escuelaSeleccionada}" fue eliminada exitosamente.`);}
 
             // Refrescar la página
             window.location.reload();
