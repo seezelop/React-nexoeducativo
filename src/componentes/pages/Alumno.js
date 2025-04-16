@@ -3,15 +3,6 @@ import { useNavigate } from 'react-router-dom';
 
 function Alumno() {
   const navigate = useNavigate();
-
-  const irAInformacionCurso = () => {
-    navigate('/InformacionCursoAlumno');
-  };
-
-  const irAInasistencias = () => {
-    navigate('/cantInasistenciasAlumno');
-  };
-
   return (
     <section className="d-flex flex-column min-vh-100 text-white pt-5">
       <div className="container flex-grow-1">
