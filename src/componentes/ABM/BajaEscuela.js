@@ -31,7 +31,10 @@ class BajaEscuela extends Component {
                 nombre: `${jefe.nombre} ${jefe.direccion}`
             }));
 
-            this.setState({ escuelas });
+            if(response.status===200){
+                this.setState({escuelas})
+            }
+           // this.setState({ escuelas });
         } catch (error) {
             console.error('Error al cargar las escuelas:', error);
         }
