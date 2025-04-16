@@ -57,7 +57,7 @@ function AltaMaterial() {
     
     if (cursoId) {
       cargarMaterias(cursoId);
-      console.log('curso seleccionado: '+cursoId)
+      //console.log('curso seleccionado: '+cursoId)
     } else {
       setMaterias([]);
     }
@@ -185,6 +185,7 @@ function AltaMaterial() {
           type="file"
           id="urlArchivo"
           onChange={handleFileChange}
+          required
         />
       </div>
 

@@ -257,18 +257,6 @@ class ModificarPreceptor extends Component {
             });
     }
 
-    obtenerCursos = () => {
-        fetch("http://localhost:8080/api/usuario/verCursoAdministrativo", {
-          method: "GET",
-          credentials: "include",
-        })
-          .then((response) => response.json())
-          .then((data) => this.setState({ cursosDisponibles: data }))
-          .catch((error) => {
-            console.error("Error al obtener los cursos:", error);
-            this.setState({ mensajeError: 'Error al obtener los cursos disponibles.' });
-          });
-      };
 
     componentDidMount() {
         this.cargarProfesores();

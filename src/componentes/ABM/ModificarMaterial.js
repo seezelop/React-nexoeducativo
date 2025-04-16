@@ -15,7 +15,7 @@ function ModificarMaterial() {
   const [materiales, setMateriales] = useState([]);
   const [idTarea, setIdTarea] = useState("");
   const [descripcion, setDescripcion] = useState("");
-  const [setCalificacion] = useState("");
+  //const [setCalificacion] = useState("");
   const [archivo, setArchivo] = useState(null);
 
   useEffect(() => {
@@ -134,7 +134,7 @@ function ModificarMaterial() {
       setDescripcion("");
       setArchivo(null);
       setIdTarea("");
-      setCalificacion("");
+      //setCalificacion("");
     } catch (error) {
       console.error("Error al modificar la material:", error);
       alert(`Error al modificar la material: ${error.response?.data?.message || error.message}`);

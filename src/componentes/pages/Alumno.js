@@ -17,15 +17,6 @@ function Alumno() {
       <div className="container flex-grow-1">
         <h1 className="mb-4">Bienvenido Alumno</h1>
         <p className="mb-5">Consulta el progreso académico y la asistencia en esta sección.</p>
-
-        <div className="d-flex flex-wrap justify-content-center gap-3">
-          <button className="btn btn-primary" onClick={irAInformacionCurso}>
-            Información del Curso
-          </button>
-          <button className="btn btn-secondary" onClick={irAInasistencias}>
-            Inasistencias
-          </button>
-        </div>
       </div>
     </section>
   );
