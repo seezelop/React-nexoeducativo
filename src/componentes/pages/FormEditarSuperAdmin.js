@@ -38,7 +38,7 @@ class FormEditarSuperAdmin extends Component {
             //console.log('info: '+response.data)
             
         } catch (error) {
-            console.error("Error al obtener ID del usuario:", error);
+            //console.error("Error al obtener ID del usuario:", error);
             this.setState({ 
                 error: "Error al obtener datos del usuario" 
             });

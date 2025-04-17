@@ -7,6 +7,7 @@ const api = axios.create({
     baseURL: process.env.REACT_APP_API_URL,
   });
 
+  const API_URL = process.env.REACT_APP_API_URL;
 class ModificarPreceptor extends Component {
     constructor(props) {
         super(props);
@@ -256,6 +257,20 @@ class ModificarPreceptor extends Component {
                 this.setState({ mensajeError: error.message });
             });
     }
+
+   
+    obtenerCursos = () => {
+        fetch(`${API_URL}/api/usuario/verCursoAdministrativo`, {
+          method: "GET",
+          credentials: "include",
+        })
+          .then((response) => response.json())
+          .then((data) => this.setState({ cursosDisponibles: data }))
+          .catch((error) => {
+            console.error("Error al obtener los cursos:", error);
+            this.setState({ mensajeError: 'Error al obtener los cursos disponibles.' });
+          });
+      };
 
 
     componentDidMount() {
