@@ -166,7 +166,7 @@ const GestionarAsistenciaAlumnos = () => {
       }];
 
       const response = await api.patch(
-        `/usuario/editarAsistencia/${cursoSeleccionado}?fecha=${fechaSeleccionada}`,
+        `api/usuario/editarAsistencia/${cursoSeleccionado}?fecha=${fechaSeleccionada}`,
         asistenciaAlumno,
         { withCredentials: true }
       );
