@@ -20,7 +20,7 @@ const AlumnoNavigation = () => {
         </Link>
       </li>
       <li className="nav-item me-3">
-        <Link className="nav-link active" to="/cantInasistenciasAlumno">
+        <Link className="nav-link active" to="/cantInasistencias">
           Cantidad de faltas
         </Link>
       </li>
