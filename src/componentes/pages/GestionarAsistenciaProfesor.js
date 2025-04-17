@@ -42,8 +42,7 @@ const GestionarAsistenciaProfesor = () => {
     };
 
     verificarPlan();
-  }, []); // Remove api from dependency array as it shouldn't change
-
+  }, [api]);
   const obtenerProfesores = useCallback(async () => {
     setLoading(prev => ({ ...prev, profesores: true }));
     try {
@@ -63,7 +62,7 @@ const GestionarAsistenciaProfesor = () => {
     } finally {
       setLoading(prev => ({ ...prev, profesores: false }));
     }
-  }, []); // Remove api from dependency array
+  }, [api]); 
 
   const obtenerFechasAsistencias = useCallback(async () => {
     setLoading(prev => ({ ...prev, asistencias: true }));
@@ -82,7 +81,7 @@ const GestionarAsistenciaProfesor = () => {
     } finally {
       setLoading(prev => ({ ...prev, asistencias: false }));
     }
-  }, []); // Remove api from dependency array
+  }, [api]); // Remove api from dependency array
 
   // Cargar profesores si el plan es válido
   useEffect(() => {
