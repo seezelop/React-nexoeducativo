@@ -65,7 +65,7 @@ function RealizarPago() {
     };
 
     verificarEstadoPagos();
-  }, [searchParams]);
+  }, [searchParams, api]);
 
   const redirigirAMercadoPago = async () => {
     if (!precio || precio <= 0) {
