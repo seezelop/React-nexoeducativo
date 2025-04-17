@@ -116,7 +116,7 @@ class FormEditarSuperAdmin extends Component {
             if (clave) usuarioModificado.clave = clave;
             usuarioModificado.activo = activo;
 
-            const respuesta = await axios.patch(
+            const respuesta = await api.patch(
                 `http://localhost:8080/api/usuario/modificarUsuario/${idUsuario}`,
                 usuarioModificado,
                 { withCredentials: true }
