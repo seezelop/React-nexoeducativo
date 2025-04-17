@@ -19,6 +19,7 @@ const GestionarAsistenciaProfesor = () => {
   const [profesorSeleccionado, setProfesorSeleccionado] = useState('');
   const [planValido, setPlanValido] = useState(null); // null: no verificado, true: válido, false: no válido
 
+  // Create API instance once, outside of any effect or callback
   const api = axios.create({
     baseURL: process.env.REACT_APP_API_URL,
   });
@@ -41,7 +42,7 @@ const GestionarAsistenciaProfesor = () => {
     };
 
     verificarPlan();
-  }, [api]);
+  }, []); // Remove api from dependency array as it shouldn't change
 
   const obtenerProfesores = useCallback(async () => {
     setLoading(prev => ({ ...prev, profesores: true }));
@@ -62,7 +63,7 @@ const GestionarAsistenciaProfesor = () => {
     } finally {
       setLoading(prev => ({ ...prev, profesores: false }));
     }
-  }, [api]);
+  }, []); // Remove api from dependency array
 
   const obtenerFechasAsistencias = useCallback(async () => {
     setLoading(prev => ({ ...prev, asistencias: true }));
@@ -81,7 +82,7 @@ const GestionarAsistenciaProfesor = () => {
     } finally {
       setLoading(prev => ({ ...prev, asistencias: false }));
     }
-  }, [api]);
+  }, []); // Remove api from dependency array
 
   // Cargar profesores si el plan es válido
   useEffect(() => {
@@ -208,6 +209,9 @@ const GestionarAsistenciaProfesor = () => {
       );
 
       setMensaje('Asistencia editada correctamente');
+      
+      // Refresh attendance data after successful edit
+      obtenerFechasAsistencias();
     } catch (err) {
       setMensaje('Error al editar la asistencia: ' + (JSON.stringify(err.response?.data) || err.message));
     } finally {
@@ -380,7 +384,7 @@ const GestionarAsistenciaProfesor = () => {
 
             {fechaSeleccionada && (
               <>
-                <Form.Group controlId="formProfesor">
+                <Form.Group controlId="formProfesor" className="mt-3">
                   <Form.Label>Profesor</Form.Label>
                   <Form.Control 
                     as="select" 
@@ -416,6 +420,10 @@ const GestionarAsistenciaProfesor = () => {
                               type="checkbox"
                               checked={asistencia[profesorSeleccionado]?.asistio === 1}
                               onChange={() => handleCheckboxChange(profesorSeleccionado, 'asistio')}
+                              disabled={
+                                asistencia[profesorSeleccionado]?.mediaFalta === 1 || 
+                                asistencia[profesorSeleccionado]?.retiroAntes === 1
+                              }
                             />
                           </td>
                           <td>
@@ -423,6 +431,7 @@ const GestionarAsistenciaProfesor = () => {
                               type="checkbox"
                               checked={asistencia[profesorSeleccionado]?.mediaFalta === 1}
                               onChange={() => handleCheckboxChange(profesorSeleccionado, 'mediaFalta')}
+                              disabled={asistencia[profesorSeleccionado]?.asistio === 1}
                             />
                           </td>
                           <td>
@@ -430,6 +439,7 @@ const GestionarAsistenciaProfesor = () => {
                               type="checkbox"
                               checked={asistencia[profesorSeleccionado]?.retiroAntes === 1}
                               onChange={() => handleCheckboxChange(profesorSeleccionado, 'retiroAntes')}
+                              disabled={asistencia[profesorSeleccionado]?.asistio === 1}
                             />
                           </td>
                         </tr>
