@@ -117,7 +117,7 @@ class FormEditarSuperAdmin extends Component {
             usuarioModificado.activo = activo;
 
             const respuesta = await api.patch(
-                `http://localhost:8080/api/usuario/modificarUsuario/${idUsuario}`,
+                `/api/usuario/modificarUsuario/${idUsuario}`,
                 usuarioModificado,
                 { withCredentials: true }
             );
