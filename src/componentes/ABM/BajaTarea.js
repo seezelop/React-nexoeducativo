@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from "axios";
 
 // Crear una instancia de axios con la URL base
@@ -18,15 +18,6 @@ function BajaTarea() {
   useEffect(() => {
     cargarCursos();
   }, []);
-
-  // Cargar tareas cuando cambia la materia seleccionada
-  useEffect(() => {
-    if (materiaSeleccionada && cursoSeleccionado) {
-      cargarTareas(materiaSeleccionada);
-    } else {
-      setTareas([]);
-    }
-  }, [materiaSeleccionada, cursoSeleccionado]);
 
   const cargarCursos = async () => {
     try {
@@ -51,7 +42,8 @@ function BajaTarea() {
     }
   };
 
-  const cargarTareas = async (materiaId) => {
+  // Usar useCallback para memorizar la función cargarTareas
+  const cargarTareas = useCallback(async (materiaId) => {
     if (!materiaId) return;
 
     try {
@@ -65,7 +57,16 @@ function BajaTarea() {
       console.error("Error al cargar las tareas:", error);
       setTareas([]);
     }
-  };
+  }, [cursoSeleccionado]); // Incluir cursoSeleccionado como dependencia ya que se usa dentro
+
+  // Cargar tareas cuando cambia la materia seleccionada
+  useEffect(() => {
+    if (materiaSeleccionada && cursoSeleccionado) {
+      cargarTareas(materiaSeleccionada);
+    } else {
+      setTareas([]);
+    }
+  }, [materiaSeleccionada, cursoSeleccionado, cargarTareas]);
 
   const handleCursoChange = (e) => {
     const cursoId = e.target.value;
