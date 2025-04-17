@@ -1,8 +1,13 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Table, Alert, Spinner, Container, Button, Form, Card} from 'react-bootstrap';
 import axios from 'axios';
 
 const GestionarAsistenciaProfesor = () => {
+  // Create API instance using useRef to ensure it doesn't change between renders
+  const apiRef = useRef(axios.create({
+    baseURL: process.env.REACT_APP_API_URL,
+  }));
+
   const [profesores, setProfesores] = useState([]);
   const [loading, setLoading] = useState({
     general: false,
@@ -19,17 +24,12 @@ const GestionarAsistenciaProfesor = () => {
   const [profesorSeleccionado, setProfesorSeleccionado] = useState('');
   const [planValido, setPlanValido] = useState(null); // null: no verificado, true: válido, false: no válido
 
-  // Create API instance once, outside of any effect or callback
-  const api = axios.create({
-    baseURL: process.env.REACT_APP_API_URL,
-  });
-
   // Verificar el plan al cargar el componente
   useEffect(() => {
     const verificarPlan = async () => {
       setLoading(prev => ({ ...prev, general: true }));
       try {
-        const response = await api.get('/api/usuario/getPlanEscuela', { 
+        const response = await apiRef.current.get('/api/usuario/getPlanEscuela', { 
           withCredentials: true 
         });
         setPlanValido(response.data === 2);
@@ -42,11 +42,12 @@ const GestionarAsistenciaProfesor = () => {
     };
 
     verificarPlan();
-  }, [api]);
+  }, []); // No dependencies
+
   const obtenerProfesores = useCallback(async () => {
     setLoading(prev => ({ ...prev, profesores: true }));
     try {
-      const response = await api.get('/api/usuario/verProfesAdministrativo', { 
+      const response = await apiRef.current.get('/api/usuario/verProfesAdministrativo', { 
         withCredentials: true 
       });
       setProfesores(response.data);
@@ -62,12 +63,12 @@ const GestionarAsistenciaProfesor = () => {
     } finally {
       setLoading(prev => ({ ...prev, profesores: false }));
     }
-  }, [api]); 
+  }, []); // No dependencies
 
   const obtenerFechasAsistencias = useCallback(async () => {
     setLoading(prev => ({ ...prev, asistencias: true }));
     try {
-      const response = await api.get('/api/usuario/obtenerAsistenciaProfe', { 
+      const response = await apiRef.current.get('/api/usuario/obtenerAsistenciaProfe', { 
         withCredentials: true 
       });
       
@@ -81,7 +82,7 @@ const GestionarAsistenciaProfesor = () => {
     } finally {
       setLoading(prev => ({ ...prev, asistencias: false }));
     }
-  }, [api]); // Remove api from dependency array
+  }, []); // No dependencies
 
   // Cargar profesores si el plan es válido
   useEffect(() => {
@@ -132,7 +133,9 @@ const GestionarAsistenciaProfesor = () => {
 
   const handleCheckboxChange = (id_usuario, campo) => {
     setAsistencia((prev) => {
+      // Create a deep copy of the specific user's data
       const nuevoEstado = { ...prev[id_usuario] };
+      
       // Toggle the value for the current field
       nuevoEstado[campo] = nuevoEstado[campo] === 1 ? 0 : 1;
       
@@ -147,6 +150,7 @@ const GestionarAsistenciaProfesor = () => {
         nuevoEstado.asistio = 0;
       }
       
+      // Return a new object with the updated state for the specific user
       return { ...prev, [id_usuario]: nuevoEstado };
     });
   };
@@ -163,7 +167,7 @@ const GestionarAsistenciaProfesor = () => {
         })),
       };
       
-      await api.post('/api/usuario/tomarAsistenciaProfesor', data, { 
+      await apiRef.current.post('/api/usuario/tomarAsistenciaProfesor', data, { 
         withCredentials: true 
       });
 
@@ -174,7 +178,7 @@ const GestionarAsistenciaProfesor = () => {
         obtenerFechasAsistencias();
       }
     } catch (err) {
-      setMensaje('Error al registrar la asistencia: ' + (JSON.stringify(err.response?.data) || err.message));
+      setMensaje('Error al registrar la asistencia: ' + (err.response?.data?.message || err.message));
     } finally {
       setLoading(prev => ({ ...prev, guardando: false }));
     }
@@ -201,7 +205,7 @@ const GestionarAsistenciaProfesor = () => {
         retiroAntes: asistencia[profesorSeleccionado].retiroAntes,
       }];
       
-      await api.patch(
+      await apiRef.current.patch(
         `/api/usuario/editarAsistenciaProfe?fecha=${fechaSeleccionada}`, 
         dataToSend, 
         { withCredentials: true }
@@ -212,7 +216,7 @@ const GestionarAsistenciaProfesor = () => {
       // Refresh attendance data after successful edit
       obtenerFechasAsistencias();
     } catch (err) {
-      setMensaje('Error al editar la asistencia: ' + (JSON.stringify(err.response?.data) || err.message));
+      setMensaje('Error al editar la asistencia: ' + (err.response?.data?.message || err.message));
     } finally {
       setLoading(prev => ({ ...prev, guardando: false }));
     }
@@ -301,7 +305,12 @@ const GestionarAsistenciaProfesor = () => {
         <Card className="mb-4">
           <Card.Body>
             <h2 className="mb-3">Tomar Asistencia</h2>
-            {profesores.length > 0 ? (
+            {loading.profesores ? (
+              <div className="text-center">
+                <Spinner animation="border" />
+                <p>Cargando profesores...</p>
+              </div>
+            ) : profesores.length > 0 ? (
               <Table striped bordered hover>
                 <thead>
                   <tr>
@@ -352,7 +361,7 @@ const GestionarAsistenciaProfesor = () => {
             <Button 
               variant="success" 
               onClick={enviarAsistencia} 
-              disabled={loading.guardando}
+              disabled={loading.guardando || profesores.length === 0}
             >
               {loading.guardando ? 'Guardando...' : 'Registrar Asistencia'}
             </Button>
@@ -364,94 +373,105 @@ const GestionarAsistenciaProfesor = () => {
         <Card className="mb-4">
           <Card.Body>
             <h2 className="mb-3">Modificar Asistencia</h2>
-            <Form.Group controlId="formFecha">
-              <Form.Label>Fecha</Form.Label>
-              <Form.Control 
-                as="select" 
-                value={fechaSeleccionada}
-                onChange={handleFechaChange}
-                disabled={loading.asistencias}
-              >
-                <option value="">Seleccione una fecha</option>
-                {fechasAsistencias.map((fecha) => (
-                  <option key={fecha.fecha} value={fecha.fecha}>
-                    {fecha.fecha}
-                  </option>
-                ))}
-              </Form.Control>
-            </Form.Group>
-
-            {fechaSeleccionada && (
+            {loading.asistencias ? (
+              <div className="text-center">
+                <Spinner animation="border" />
+                <p>Cargando datos...</p>
+              </div>
+            ) : (
               <>
-                <Form.Group controlId="formProfesor" className="mt-3">
-                  <Form.Label>Profesor</Form.Label>
+                <Form.Group controlId="formFecha">
+                  <Form.Label>Fecha</Form.Label>
                   <Form.Control 
                     as="select" 
-                    value={profesorSeleccionado}
-                    onChange={handleProfesorChange}
+                    value={fechaSeleccionada}
+                    onChange={handleFechaChange}
                     disabled={loading.asistencias}
                   >
-                    <option value="">Seleccione un profesor</option>
-                    {profesores.map((profesor) => (
-                      <option key={profesor.id_usuario} value={profesor.id_usuario}>
-                        {profesor.nombreCompleto || `${profesor.nombre} ${profesor.apellido}`}
+                    <option value="">Seleccione una fecha</option>
+                    {fechasAsistencias.map((fecha) => (
+                      <option key={fecha.fecha} value={fecha.fecha}>
+                        {fecha.fecha}
                       </option>
                     ))}
                   </Form.Control>
                 </Form.Group>
 
-                {profesorSeleccionado && (
+                {fechaSeleccionada && (
                   <>
-                    <Table striped bordered hover className="mt-4">
-                      <thead>
-                        <tr>
-                          <th>Nombre</th>
-                          <th>Asistió</th>
-                          <th>Media Falta</th>
-                          <th>Retiro Antes</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>{getProfesorSeleccionadoData()?.profesor.nombreCompleto || 'N/A'}</td>
-                          <td>
-                            <Form.Check
-                              type="checkbox"
-                              checked={asistencia[profesorSeleccionado]?.asistio === 1}
-                              onChange={() => handleCheckboxChange(profesorSeleccionado, 'asistio')}
-                              disabled={
-                                asistencia[profesorSeleccionado]?.mediaFalta === 1 || 
-                                asistencia[profesorSeleccionado]?.retiroAntes === 1
-                              }
-                            />
-                          </td>
-                          <td>
-                            <Form.Check
-                              type="checkbox"
-                              checked={asistencia[profesorSeleccionado]?.mediaFalta === 1}
-                              onChange={() => handleCheckboxChange(profesorSeleccionado, 'mediaFalta')}
-                              disabled={asistencia[profesorSeleccionado]?.asistio === 1}
-                            />
-                          </td>
-                          <td>
-                            <Form.Check
-                              type="checkbox"
-                              checked={asistencia[profesorSeleccionado]?.retiroAntes === 1}
-                              onChange={() => handleCheckboxChange(profesorSeleccionado, 'retiroAntes')}
-                              disabled={asistencia[profesorSeleccionado]?.asistio === 1}
-                            />
-                          </td>
-                        </tr>
-                      </tbody>
-                    </Table>
+                    <Form.Group controlId="formProfesor" className="mt-3">
+                      <Form.Label>Profesor</Form.Label>
+                      <Form.Control 
+                        as="select" 
+                        value={profesorSeleccionado}
+                        onChange={handleProfesorChange}
+                        disabled={loading.asistencias}
+                      >
+                        <option value="">Seleccione un profesor</option>
+                        {profesores.map((profesor) => (
+                          <option key={profesor.id_usuario} value={profesor.id_usuario}>
+                            {profesor.nombreCompleto || `${profesor.nombre} ${profesor.apellido}`}
+                          </option>
+                        ))}
+                      </Form.Control>
+                    </Form.Group>
 
-                    <Button 
-                      variant="success" 
-                      onClick={editarAsistencia} 
-                      disabled={loading.guardando}
-                    >
-                      {loading.guardando ? 'Guardando...' : 'Guardar Cambios'}
-                    </Button>
+                    {profesorSeleccionado && (
+                      <>
+                        <Table striped bordered hover className="mt-4">
+                          <thead>
+                            <tr>
+                              <th>Nombre</th>
+                              <th>Asistió</th>
+                              <th>Media Falta</th>
+                              <th>Retiro Antes</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr>
+                              <td>{getProfesorSeleccionadoData()?.profesor.nombreCompleto || 
+                                  `${getProfesorSeleccionadoData()?.profesor.nombre} ${getProfesorSeleccionadoData()?.profesor.apellido}` || 
+                                  'N/A'}</td>
+                              <td>
+                                <Form.Check
+                                  type="checkbox"
+                                  checked={asistencia[profesorSeleccionado]?.asistio === 1}
+                                  onChange={() => handleCheckboxChange(profesorSeleccionado, 'asistio')}
+                                  disabled={
+                                    asistencia[profesorSeleccionado]?.mediaFalta === 1 || 
+                                    asistencia[profesorSeleccionado]?.retiroAntes === 1
+                                  }
+                                />
+                              </td>
+                              <td>
+                                <Form.Check
+                                  type="checkbox"
+                                  checked={asistencia[profesorSeleccionado]?.mediaFalta === 1}
+                                  onChange={() => handleCheckboxChange(profesorSeleccionado, 'mediaFalta')}
+                                  disabled={asistencia[profesorSeleccionado]?.asistio === 1}
+                                />
+                              </td>
+                              <td>
+                                <Form.Check
+                                  type="checkbox"
+                                  checked={asistencia[profesorSeleccionado]?.retiroAntes === 1}
+                                  onChange={() => handleCheckboxChange(profesorSeleccionado, 'retiroAntes')}
+                                  disabled={asistencia[profesorSeleccionado]?.asistio === 1}
+                                />
+                              </td>
+                            </tr>
+                          </tbody>
+                        </Table>
+
+                        <Button 
+                          variant="success" 
+                          onClick={editarAsistencia} 
+                          disabled={loading.guardando}
+                        >
+                          {loading.guardando ? 'Guardando...' : 'Guardar Cambios'}
+                        </Button>
+                      </>
+                    )}
                   </>
                 )}
               </>
