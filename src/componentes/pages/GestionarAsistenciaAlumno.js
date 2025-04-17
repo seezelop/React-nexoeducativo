@@ -118,7 +118,7 @@ const GestionarAsistenciaAlumnos = () => {
     setLoading(true);
     try {
       const response = await api.post(
-        `/usuario/tomarAsistencia/${cursoSeleccionado}`,
+        `api/usuario/tomarAsistencia/${cursoSeleccionado}`,
         { alumnosCurso: asistencia },
         { withCredentials: true }
       );
