@@ -83,15 +83,19 @@ const GestionarAsistenciaProfesor = () => {
     }
   }, [api]);
 
-  // Cargar datos si el plan es válido
+  // Cargar profesores si el plan es válido
   useEffect(() => {
     if (planValido === true) {
       obtenerProfesores();
-      if (activeTab === 'modificar') {
-        obtenerFechasAsistencias();
-      }
     }
-  }, [planValido, activeTab, obtenerProfesores, obtenerFechasAsistencias]);
+  }, [planValido, obtenerProfesores]);
+
+  // Cargar fechas de asistencias cuando se cambia a la pestaña "modificar"
+  useEffect(() => {
+    if (planValido === true && activeTab === 'modificar') {
+      obtenerFechasAsistencias();
+    }
+  }, [planValido, activeTab, obtenerFechasAsistencias]);
 
   const obtenerAsistenciasPorFecha = async (fecha) => {
     setLoading(prev => ({ ...prev, asistencias: true }));
@@ -128,8 +132,21 @@ const GestionarAsistenciaProfesor = () => {
 
   const handleCheckboxChange = (id_usuario, campo) => {
     setAsistencia((prev) => {
-      const nuevoEstado = { asistio: 0, mediaFalta: 0, retiroAntes: 0 };
-      nuevoEstado[campo] = prev[id_usuario][campo] === 1 ? 0 : 1;
+      const nuevoEstado = { ...prev[id_usuario] };
+      // Toggle the value for the current field
+      nuevoEstado[campo] = nuevoEstado[campo] === 1 ? 0 : 1;
+      
+      // If turning on 'asistio', turn off the others
+      if (campo === 'asistio' && nuevoEstado[campo] === 1) {
+        nuevoEstado.mediaFalta = 0;
+        nuevoEstado.retiroAntes = 0;
+      }
+      
+      // If turning on 'mediaFalta' or 'retiroAntes', turn off 'asistio'
+      if ((campo === 'mediaFalta' || campo === 'retiroAntes') && nuevoEstado[campo] === 1) {
+        nuevoEstado.asistio = 0;
+      }
+      
       return { ...prev, [id_usuario]: nuevoEstado };
     });
   };
@@ -152,7 +169,7 @@ const GestionarAsistenciaProfesor = () => {
 
       setMensaje('Asistencia registrada correctamente');
       
-      // Si se registra correctamente, actualizar la lista de fechas
+      // Si se registra correctamente y estamos en la pestaña modificar, actualizar la lista de fechas
       if (activeTab === 'modificar') {
         obtenerFechasAsistencias();
       }

@@ -158,6 +158,7 @@ class ModificarJefeColegio extends Component {
         if (datos[key] === '') delete datos[key];
       });
 
+      console.log('LO QUE SE ENVIA PARA MODIFICAR AL BACKEND: '+JSON.stringify(datos))
       const response = await api.patch(
         `/api/usuario/modificarUsuario/${idUsuario}`,
         datos,

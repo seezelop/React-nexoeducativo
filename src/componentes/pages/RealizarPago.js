@@ -10,17 +10,17 @@ function RealizarPago() {
   const [pagosAlDia, setPagosAlDia] = useState(false);
   const [verificando, setVerificando] = useState(true);
 
-  // Eliminamos la variable 'api' que no está en uso
-  // const api = axios.create({
-  //   baseURL: process.env.REACT_APP_API_URL,
-  // });
+  
+  const api = axios.create({
+     baseURL: process.env.REACT_APP_API_URL,
+   });
 
   useEffect(() => {
     const verificarEstadoPagos = async () => {
       setVerificando(true);
       try {
         // Verificar si el padre ya está al día con los pagos
-        const pagosResponse = await axios.get("/api/usuario/siPago", {
+        const pagosResponse = await api.get("/api/usuario/siPago", {
           withCredentials: true,
         });
         
@@ -55,7 +55,7 @@ function RealizarPago() {
 
     const fetchPrecio = async () => {
       try {
-        const response = await axios.get("/api/usuario/obtenerInfoCuota", {
+        const response = await api.get("/api/usuario/obtenerInfoCuota", {
           withCredentials: true,
         });
         setPrecio(response.data);
@@ -75,11 +75,12 @@ function RealizarPago() {
 
     setLoading(true);
     try {
-      const response = await axios.post("/crear-preferencia", {
+      const response = await api.post("/crear-preferencia", {
         items: [{ title: "Cuota Escolar", quantity: 1, unit_price: precio }],
         platform: "web" // Asegurar que use las URLs web
       });
 
+      console.log('INFO RESPONSE: '+response.data)
       window.location.href = response.data.init_point; // Redirigir al init_point correcto
       
     } catch (error) {

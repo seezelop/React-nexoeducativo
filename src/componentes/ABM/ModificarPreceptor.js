@@ -193,7 +193,7 @@ class ModificarPreceptor extends Component {
             return;
         }
     
-       // console.log('Datos a enviar:', datosModificados);
+        console.log('Datos a enviar:', datosModificados);
     
         try {
             const response = await api.patch(

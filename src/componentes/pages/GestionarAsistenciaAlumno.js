@@ -122,6 +122,8 @@ const GestionarAsistenciaAlumnos = () => {
         { alumnosCurso: asistencia },
         { withCredentials: true }
       );
+      console.log('LO QUE SE VA A ENVIAR PARAMETROS: '+cursoSeleccionado)
+      console.log('LO QUE SE VA A ENVIAR ASISTENCIA DE ALUMNOS: '+JSON.stringify(asistencia))
 
       if (response.status === 201) {
         setMensaje({ text: 'Asistencia registrada correctamente.', type: 'success' });
@@ -168,6 +170,8 @@ const GestionarAsistenciaAlumnos = () => {
         asistenciaAlumno,
         { withCredentials: true }
       );
+
+      console.log('ASISTENCIA A MODIFICAR: '+JSON.stringify(asistenciaAlumno)+" fecha: "+fechaSeleccionada)
 
       if (response.status === 200) {
         setMensaje({ text: 'Asistencia modificada correctamente.', type: 'success' });

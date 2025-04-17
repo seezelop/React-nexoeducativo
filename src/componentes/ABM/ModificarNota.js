@@ -135,7 +135,7 @@ function ModificarNota() {
       new Blob([JSON.stringify(tarea)], { type: "application/json" })
     );
 
-    console.log('lo que se envia al backend '+tarea.idAlumno)
+    console.log('lo que se envia al backend '+JSON.stringify(tarea))
 
     try {
       await api.patch(

@@ -66,7 +66,7 @@ function AltaEvento() {
     e.preventDefault();
 
     const fechaObj = formatDateForBackend(fecha);
-  
+    console.log('LO QUE SE ENVIA DE FECHA: '+JSON.stringify(fechaObj)+" curso: "+cursoSeleccionado+" descripcion: "+descripcion)
     try {
       await api.post(`/api/usuario/altaEvento/${cursoSeleccionado}`, {
         cursoSeleccionado,

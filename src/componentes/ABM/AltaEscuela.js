@@ -96,6 +96,7 @@ class AltaEscuela extends Component {
         event.preventDefault(); 
         const { nombre, direccion, activo, idPlan, id_usuario } = this.state;
 
+        console.log('LO QUE SE ENVIA AL BACKEND: '+JSON.stringify(this.state))
         try {
             // Enviar los datos al backend
             const response = await api.post('/api/usuario/saveEscuela', {

@@ -1,8 +1,6 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 
 function Alumno() {
-  const navigate = useNavigate();
   return (
     <section className="d-flex flex-column min-vh-100 text-white pt-5">
       <div className="container flex-grow-1">
