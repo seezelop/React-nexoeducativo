@@ -111,7 +111,7 @@ function ModificarNota() {
   const handleAlumnosChange = (e) => {
     const usuario = e.target.value;
     setAlumnoSeleccionado(usuario);
-    console.log('alumno handle: '+usuario)
+    //console.log('alumno handle: '+usuario)
   };
 
   const handleSubmit = async (e) => {
@@ -135,7 +135,7 @@ function ModificarNota() {
       new Blob([JSON.stringify(tarea)], { type: "application/json" })
     );
 
-    console.log('lo que se envia al backend '+JSON.stringify(tarea))
+   // console.log('lo que se envia al backend '+JSON.stringify(tarea))
 
     try {
       await api.patch(
@@ -157,7 +157,7 @@ function ModificarNota() {
   };
 
   //console.log('curso seleccionado: ' + cursoSeleccionado);
-  console.log('alumno seleccionado: '+alumnoSeleccionado)
+  //console.log('alumno seleccionado: '+alumnoSeleccionado)
   return (
     <form onSubmit={handleSubmit}>
       <div className="mb-3">

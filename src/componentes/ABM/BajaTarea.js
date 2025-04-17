@@ -11,22 +11,28 @@ function BajaTarea() {
   const [cursoSeleccionado, setCursoSeleccionado] = useState("");
   const [materias, setMaterias] = useState([]);
   const [materiaSeleccionada, setMateriaSeleccionada] = useState("");
-  //const [tareaSeleccionada, setTareaSeleccionada] = useState("");
-  //const [tareas, setTareas] = useState(null);
+  const [tareaSeleccionada, setTareaSeleccionada] = useState("");
+  const [tareas, setTareas] = useState([]);
 
   // Cargar los cursos del profesor al montar el componente
   useEffect(() => {
-    //console.log("Componente AltaTarea montado, cargando cursos...");
     cargarCursos();
   }, []);
 
+  // Cargar tareas cuando cambia la materia seleccionada
+  useEffect(() => {
+    if (materiaSeleccionada && cursoSeleccionado) {
+      cargarTareas(materiaSeleccionada);
+    } else {
+      setTareas([]);
+    }
+  }, [materiaSeleccionada, cursoSeleccionado]);
+
   const cargarCursos = async () => {
     try {
-      //console.log("Haciendo petición a la API para cargar cursos...");
       const response = await api.get("/api/usuario/verCursoProfesor", {
         withCredentials: true,
       });
-     // console.log("Respuesta de cursos recibida:", response.data);
       setCursos(response.data);
     } catch (error) {
       console.error("Error al cargar los cursos:", error);
@@ -35,11 +41,9 @@ function BajaTarea() {
 
   const cargarMaterias = async (cursoId) => {
     try {
-     // console.log(`Cargando materias para el curso ID: ${cursoId}...`);
       const response = await api.get(`/api/usuario/selecMateriaProfesor/${cursoId}`, {
         withCredentials: true,
       });
-     // console.log("Respuesta de materias recibida:", response.data);
       setMaterias(response.data);
     } catch (error) {
       console.error("Error al cargar las materias:", error);
@@ -47,11 +51,27 @@ function BajaTarea() {
     }
   };
 
+  const cargarTareas = async (materiaId) => {
+    if (!materiaId) return;
+
+    try {
+      const response = await api.get(
+        `/api/usuario/obtenerTareas?cursoIdCurso=${cursoSeleccionado}&idMateria=${materiaId}`,
+        { withCredentials: true }
+      );
+      setTareas(response.data);
+      setTareaSeleccionada(""); // Limpiar la tarea seleccionada al cargar nuevas tareas
+    } catch (error) {
+      console.error("Error al cargar las tareas:", error);
+      setTareas([]);
+    }
+  };
+
   const handleCursoChange = (e) => {
     const cursoId = e.target.value;
-   // console.log(`Curso seleccionado cambiado a: ${cursoId}`);
     setCursoSeleccionado(cursoId);
     setMateriaSeleccionada(""); // Limpiar la materia seleccionada al cambiar el curso
+    setTareaSeleccionada(""); // Limpiar la tarea seleccionada al cambiar el curso
     
     if (cursoId) {
       cargarMaterias(cursoId);
@@ -63,28 +83,32 @@ function BajaTarea() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!materiaSeleccionada) {
-      alert("Por favor selecciona una materia.");
+    if (!tareaSeleccionada) {
+      alert("Por favor selecciona una tarea para eliminar.");
       return;
     }
 
     try {
+      // Enviamos el ID de la tarea a eliminar
       await api.delete(
-        `/api/usuario/borrarTarea`,
-        //formData,
+        `/api/usuario/borrarTarea/${tareaSeleccionada}`, // Incluimos el ID en la URL
         {
           withCredentials: true
         }
       );
 
-      alert(`Tarea borrada correctamente.`);
+      alert(`Tarea eliminada correctamente.`);
+      
+      // Recargar la lista de tareas para reflejar el cambio
+      if (materiaSeleccionada) {
+        cargarTareas(materiaSeleccionada);
+      }
     } catch (error) {
-      console.error("Error al crear la tarea:", error);
-      alert(`Error al crear la tarea: ${error.response?.data?.message || error.message}`);
+      console.error("Error al eliminar la tarea:", error);
+      alert(`Error al eliminar la tarea: ${error.response?.data?.message || error.message}`);
     }
   };
 
-  // Estilos personalizados para asegurar que el texto sea visible
   const selectStyle = {
     color: "black", // Forzar color negro para el texto
     backgroundColor: "white" // Asegurar fondo blanco para contraste
@@ -144,12 +168,36 @@ function BajaTarea() {
         </select>
       </div>
 
+      {/* Selección de Tarea */}
+      <div className="mb-3">
+        <label htmlFor="tarea" className="form-label">Selecciona una Tarea</label>
+        <select
+          id="tarea"
+          className="form-control"
+          value={tareaSeleccionada}
+          onChange={(e) => setTareaSeleccionada(e.target.value)}
+          required
+          style={selectStyle}
+          disabled={!materiaSeleccionada}
+        >
+          <option value="" style={optionStyle}>Seleccione...</option>
+          {tareas.map((tarea) => (
+            <option 
+              key={tarea.idTarea} 
+              value={tarea.idTarea}
+              style={optionStyle} 
+            >
+              {tarea.descripcion}
+            </option>
+          ))}
+        </select>
+      </div>
+
       <button type="submit" className="btn btn-success">
-        Crear Tarea
+        Eliminar Tarea
       </button>
     </form>
   );
 }
-
 
 export default BajaTarea;
