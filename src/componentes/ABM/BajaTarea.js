@@ -83,32 +83,34 @@ function BajaTarea() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!tareaSeleccionada) {
-      alert("Por favor selecciona una tarea para eliminar.");
+  
+    if (!tareaSeleccionada || !materiaSeleccionada || !cursoSeleccionado) {
+      alert("Por favor selecciona un curso, materia y tarea para eliminar.");
       return;
     }
-
+  
     try {
-      // Enviamos el ID de la tarea a eliminar
-      await api.delete(
-        `/api/usuario/borrarTarea/${tareaSeleccionada}`, // Incluimos el ID en la URL
-        {
-          withCredentials: true
-        }
-      );
-
-      alert(`Tarea eliminada correctamente.`);
-      
-      // Recargar la lista de tareas para reflejar el cambio
-      if (materiaSeleccionada) {
-        cargarTareas(materiaSeleccionada);
-      }
+      await api.request({
+        url: `/api/usuario/borrarTarea`,
+        method: "delete",
+        data: {
+          idCurso: parseInt(cursoSeleccionado),
+          idMateria: parseInt(materiaSeleccionada),
+          idTarea: parseInt(tareaSeleccionada)
+        },
+        withCredentials: true
+      });
+  
+      alert("Tarea eliminada correctamente.");
+  
+      // Recargar las tareas
+      cargarTareas(materiaSeleccionada);
     } catch (error) {
       console.error("Error al eliminar la tarea:", error);
       alert(`Error al eliminar la tarea: ${error.response?.data?.message || error.message}`);
     }
   };
+  
 
   const selectStyle = {
     color: "black", // Forzar color negro para el texto
