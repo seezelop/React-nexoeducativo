@@ -1,0 +1,14 @@
+[phases.setup]
+cmds = [
+  "cd backend && npm install",
+  "npm install"  # Instala dependencias del frontend
+]
+
+[phases.build]
+cmds = [
+  "npm run build",           # Build del frontend (React)
+  "cd backend && npm prune --production"  # Optimiza backend
+]
+
+[start]
+cmd = "cd backend && npm start"  # Inicia el backend
