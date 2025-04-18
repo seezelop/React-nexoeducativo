@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 8080;
 
 // URLs configuradas en Railway
 const PROD_WEB_URL = process.env.PROD_WEB_URL; // URL de tu backend en producción
