@@ -8,8 +8,9 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // URLs base para producción y desarrollo
-const PROD_WEB_URL = process.env.PROD_WEB_URL || 'https://nexoeducativo.up.railway.app';
+const PROD_WEB_URL = process.env.PROD_WEB_URL;
 const PROD_MOBILE_URL = process.env.PROD_MOBILE_URL || 'exp://tu-expo-url';
+const FRONTEND_URL=process.env.FRONTEND_URL
 
 // URLs para entorno local
 const DEV_WEB_URL = 'http://localhost:3000';
@@ -23,6 +24,7 @@ const allowedOrigins = [
   // URLs de producción
   PROD_WEB_URL,
   PROD_MOBILE_URL,
+  process.env.FRONTEND_URL,
   // URLs de desarrollo
   'http://localhost:3000',
   'http://192.168.0.160:3000',
@@ -48,16 +50,15 @@ app.post('/crear-preferencia', async (req, res) => {
   const { items, platform } = req.body;
 
   // Determinar las URLs base según el entorno
-  const baseWebUrl = isProduction ? PROD_WEB_URL : DEV_WEB_URL;
   const baseMobileUrl = isProduction ? PROD_MOBILE_URL : DEV_MOBILE_URL;
-
+  const frontReact= isProduction ? FRONTEND_URL : DEV_WEB_URL
   // URLs con parámetro status
   const successUrl = platform === 'web'
-    ? `${baseWebUrl}/Padre?status=approved`
+    ? `${frontReact}/Padre?status=approved`
     : `${baseMobileUrl}/padre?status=approved`;
 
   const failureUrl = platform === 'web'
-    ? `${baseWebUrl}/Padre?status=rejected`
+    ? `${frontReact}/Padre?status=rejected`
     : `${baseMobileUrl}/padre?status=rejected`;
 
   const preference = {
