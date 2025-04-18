@@ -22,7 +22,6 @@ function RealizarPago() {
         // Verificar si el padre ya está al día con los pagos
         const pagosResponse = await api.get("/api/usuario/siPago", {
           withCredentials: true,
-          timeout: 10000 //viendo si se arregla
         });
         
         // Verificar si todos los elementos en la lista son iguales a 1
