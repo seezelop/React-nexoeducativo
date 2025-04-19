@@ -7,6 +7,10 @@ import { useSearchParams } from "react-router-dom";
   const api = axios.create({
     baseURL: process.env.REACT_APP_API_URL,
   });
+
+  const api2 = axios.create({
+    baseURL: process.env.PROD_WEB_URL,
+  });
 function RealizarPago() {
   const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
@@ -80,7 +84,7 @@ function RealizarPago() {
 
     setLoading(true);
     try {
-      const response = await api.post("/crear-preferencia", {
+      const response = await api2.post("/crear-preferencia", {
         items: [{ title: "Cuota Escolar", quantity: 1, unit_price: precio }],
         platform: "web" // Asegurar que use las URLs web
       });
