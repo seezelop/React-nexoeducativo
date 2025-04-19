@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { useSearchParams } from "react-router-dom";
 
@@ -10,51 +10,37 @@ function RealizarPago() {
   const [pagosAlDia, setPagosAlDia] = useState(false);
   const [verificando, setVerificando] = useState(true);
 
+  // Crear la instancia de API fuera del componente o mediante useRef/useMemo/useCallback
+  // para evitar recreaciones en cada render
   const api = axios.create({
     baseURL: process.env.REACT_APP_API_URL,
   });
 
-  useEffect(() => {
-    // Create a single asynchronous function that does everything we need
-    const inicializarComponent = async () => {
-      setVerificando(true);
-      try {
-        // Verificar si el padre ya está al día con los pagos
-        const pagosResponse = await api.get("/api/usuario/siPago", {
-          withCredentials: true,
-        });
-        
-        // Verificar si todos los elementos en la lista son iguales a 1
-        const todosAlDia = Array.isArray(pagosResponse.data) && 
-                        pagosResponse.data.length > 0 && 
-                        pagosResponse.data.every(valor => valor === 1);
-        
-        setPagosAlDia(todosAlDia);
-        
-        if (todosAlDia) {
-          // Si está al día, actualizar estado de pago a "approved"
-          setEstadoPago("approved");
-        } else {
-          // Si no está al día, verificar el estado del pago de la URL
-          const status = searchParams.get("status");
-          setEstadoPago(status || '');
-          
-          // Obtener el precio de la cuota si no está al día
-          try {
-            const response = await api.get("/api/usuario/obtenerInfoCuota", {
-              withCredentials: true,
-            });
-            setPrecio(response.data);
-          } catch (error) {
-            console.error("Error al obtener el precio:", error);
-          }
-        }
-      } catch (error) {
-        console.error("Error al verificar estado de pagos:", error);
-        // En caso de error, verificar el parámetro de la URL
+  // Usar useCallback para memoizar la función inicializarComponent
+  const inicializarComponent = useCallback(async () => {
+    setVerificando(true);
+    try {
+      // Verificar si el padre ya está al día con los pagos
+      const pagosResponse = await api.get("/api/usuario/siPago", {
+        withCredentials: true,
+      });
+      
+      // Verificar si todos los elementos en la lista son iguales a 1
+      const todosAlDia = Array.isArray(pagosResponse.data) && 
+                      pagosResponse.data.length > 0 && 
+                      pagosResponse.data.every(valor => valor === 1);
+      
+      setPagosAlDia(todosAlDia);
+      
+      if (todosAlDia) {
+        // Si está al día, actualizar estado de pago a "approved"
+        setEstadoPago("approved");
+      } else {
+        // Si no está al día, verificar el estado del pago de la URL
         const status = searchParams.get("status");
         setEstadoPago(status || '');
         
+        // Obtener el precio de la cuota si no está al día
         try {
           const response = await api.get("/api/usuario/obtenerInfoCuota", {
             withCredentials: true,
@@ -63,13 +49,29 @@ function RealizarPago() {
         } catch (error) {
           console.error("Error al obtener el precio:", error);
         }
-      } finally {
-        setVerificando(false);
       }
-    };
+    } catch (error) {
+      console.error("Error al verificar estado de pagos:", error);
+      // En caso de error, verificar el parámetro de la URL
+      const status = searchParams.get("status");
+      setEstadoPago(status || '');
+      
+      try {
+        const response = await api.get("/api/usuario/obtenerInfoCuota", {
+          withCredentials: true,
+        });
+        setPrecio(response.data);
+      } catch (error) {
+        console.error("Error al obtener el precio:", error);
+      }
+    } finally {
+      setVerificando(false);
+    }
+  }, [searchParams]); // Dependencias de useCallback
 
+  useEffect(() => {
     inicializarComponent();
-  }, [searchParams]); // Only depend on searchParams and exclude api to avoid re-renders
+  }, [inicializarComponent]); // Ahora la única dependencia es inicializarComponent
 
   const redirigirAMercadoPago = async () => {
     if (!precio || precio <= 0) {
