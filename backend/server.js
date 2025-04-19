@@ -25,6 +25,7 @@ const allowedOrigins = [
   PROD_WEB_URL,
   PROD_MOBILE_URL,
   process.env.FRONTEND_URL,
+  process.env.REACT_APP_BACKEND_URL,
   // URLs de desarrollo
   'http://localhost:3000',
   'http://192.168.0.160:3000',
