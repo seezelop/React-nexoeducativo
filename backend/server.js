@@ -36,21 +36,22 @@ const allowedOrigins = [
 // Añade estas líneas después de las URLs permitidas
 console.log('URLS permitidas:', allowedOrigins);
 
-app.use(cors({
-  origin: function (origin, callback) {
-    console.log('Origen de la solicitud:', origin); // Para debugging
+// Elimina la configuración CORS anterior y usa esta
+app.use((req, res, next) => {
+  // Configura los headers CORS de forma explícita
+  res.header('Access-Control-Allow-Origin', 'https://nexoeducativo.up.railway.app');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  res.header('Access-Control-Allow-Credentials', 'true');
+
+  // Manejar las solicitudes preflight OPTIONS
+  if (req.method === 'OPTIONS') {
+    return res.status(204).end();
+  }
   
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      console.log('Origen rechazado:', origin);
-      callback(null, false); 
-    }
-  },
-  methods: ['GET', 'POST', 'OPTIONS'], 
-  allowedHeaders:  ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin', 'Access-Control-Allow-Headers', 'Access-Control-Allow-Origin', 'Access-Control-Allow-Methods'], 
-  credentials: true,
-}));
+  next();
+});
+
 app.use(bodyParser.json());
 
 app.post('/crear-preferencia', async (req, res) => {
