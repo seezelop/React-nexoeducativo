@@ -2,14 +2,12 @@ import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { useSearchParams } from "react-router-dom";
 
-  // Crear la instancia de API fuera del componente o mediante useRef/useMemo/useCallback
-  // para evitar recreaciones en cada render
   const api = axios.create({
     baseURL: process.env.REACT_APP_API_URL,
   });
 
   const api2 = axios.create({
-    baseURL: process.env.PROD_WEB_URL,
+    baseURL: process.env.REACT_APP_BACKEND_URL,
   });
 function RealizarPago() {
   const [searchParams] = useSearchParams();
