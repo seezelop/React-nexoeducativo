@@ -33,18 +33,24 @@ const allowedOrigins = [
   'exp://192.168.0.160:8081',
 ];
 
+// Añade estas líneas después de las URLs permitidas
+console.log('URLS permitidas:', allowedOrigins);
+
 app.use(cors({
   origin: function (origin, callback) {
+    console.log('Origen de la solicitud:', origin); // Para debugging
+  
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('Origen no permitido'));
+      console.log('Origen rechazado:', origin);
+      callback(null, false); 
     }
   },
-  methods: ['GET', 'POST'],
+  methods: ['GET', 'POST', 'OPTIONS'], 
+  allowedHeaders:  ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin', 'Access-Control-Allow-Headers', 'Access-Control-Allow-Origin', 'Access-Control-Allow-Methods'], 
   credentials: true,
 }));
-
 app.use(bodyParser.json());
 
 app.post('/crear-preferencia', async (req, res) => {
