@@ -10,25 +10,24 @@ function RealizarPago() {
   const [pagosAlDia, setPagosAlDia] = useState(false);
   const [verificando, setVerificando] = useState(true);
 
-  
   const api = axios.create({
-     baseURL: process.env.REACT_APP_API_URL,
-   });
+    baseURL: process.env.REACT_APP_API_URL,
+  });
 
   useEffect(() => {
-    const verificarEstadoPagos = async () => {
+    // Create a single asynchronous function that does everything we need
+    const inicializarComponent = async () => {
       setVerificando(true);
       try {
         // Verificar si el padre ya está al día con los pagos
         const pagosResponse = await api.get("/api/usuario/siPago", {
           withCredentials: true,
-          //timeout: 10000 //viendo si se arregla
         });
         
         // Verificar si todos los elementos en la lista son iguales a 1
         const todosAlDia = Array.isArray(pagosResponse.data) && 
-                         pagosResponse.data.length > 0 && 
-                         pagosResponse.data.every(valor => valor === 1);
+                        pagosResponse.data.length > 0 && 
+                        pagosResponse.data.every(valor => valor === 1);
         
         setPagosAlDia(todosAlDia);
         
@@ -41,32 +40,36 @@ function RealizarPago() {
           setEstadoPago(status || '');
           
           // Obtener el precio de la cuota si no está al día
-          await fetchPrecio();
+          try {
+            const response = await api.get("/api/usuario/obtenerInfoCuota", {
+              withCredentials: true,
+            });
+            setPrecio(response.data);
+          } catch (error) {
+            console.error("Error al obtener el precio:", error);
+          }
         }
       } catch (error) {
         console.error("Error al verificar estado de pagos:", error);
         // En caso de error, verificar el parámetro de la URL
         const status = searchParams.get("status");
         setEstadoPago(status || '');
-        await fetchPrecio();
+        
+        try {
+          const response = await api.get("/api/usuario/obtenerInfoCuota", {
+            withCredentials: true,
+          });
+          setPrecio(response.data);
+        } catch (error) {
+          console.error("Error al obtener el precio:", error);
+        }
       } finally {
         setVerificando(false);
       }
     };
 
-    const fetchPrecio = async () => {
-      try {
-        const response = await api.get("/api/usuario/obtenerInfoCuota", {
-          withCredentials: true,
-        });
-        setPrecio(response.data);
-      } catch (error) {
-        console.error("Error al obtener el precio:", error);
-      }
-    };
-
-    verificarEstadoPagos();
-  }, [searchParams, api]);
+    inicializarComponent();
+  }, [searchParams]); // Only depend on searchParams and exclude api to avoid re-renders
 
   const redirigirAMercadoPago = async () => {
     if (!precio || precio <= 0) {
@@ -81,7 +84,7 @@ function RealizarPago() {
         platform: "web" // Asegurar que use las URLs web
       });
 
-      console.log('INFO RESPONSE: '+response.data)
+      console.log('INFO RESPONSE: '+response.data);
       window.location.href = response.data.init_point; // Redirigir al init_point correcto
       
     } catch (error) {
