@@ -35,7 +35,7 @@ const allowedOrigins = [
 
 // Añade estas líneas después de las URLs permitidas
 console.log('URLS permitidas:', allowedOrigins);
-
+const web='https://nexoeducativo.up.railway.app'
 // Elimina la configuración CORS anterior y usa esta
 app.use((req, res, next) => {
   // Configura los headers CORS de forma explícita
@@ -59,14 +59,14 @@ app.post('/crear-preferencia', async (req, res) => {
 
   // Determinar las URLs base según el entorno
   const baseMobileUrl = isProduction ? PROD_MOBILE_URL : DEV_MOBILE_URL;
-  const frontReact= isProduction ? FRONTEND_URL : DEV_WEB_URL
+ // const frontReact= isProduction ? FRONTEND_URL : DEV_WEB_URL
   // URLs con parámetro status
   const successUrl = platform === 'web'
-    ? `${frontReact}/Padre?status=approved`
+    ? `${web}/Padre?status=approved`
     : `${baseMobileUrl}/padre?status=approved`;
 
   const failureUrl = platform === 'web'
-    ? `${frontReact}/Padre?status=rejected`
+    ? `${web}/Padre?status=rejected`
     : `${baseMobileUrl}/padre?status=rejected`;
 
   const preference = {
