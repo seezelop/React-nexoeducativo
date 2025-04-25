@@ -50,6 +50,26 @@ function CantInasistencias() {
     obtenerInasistencias();
   }, [hijoSeleccionado]); // ✅ sin advertencia
 
+  // Función para determinar el mensaje a mostrar
+  const getMensajeInasistencias = () => {
+    // Si es una cadena de texto (mensaje del backend)
+    if (typeof inasistencias === "string") {
+      return inasistencias;
+    }
+    
+    // Si es un número
+    if (typeof inasistencias === "number") {
+      return inasistencias === 0
+        ? "No tiene inasistencias registradas."
+        : `Tiene ${inasistencias} inasistencia${
+            inasistencias > 1 ? "s" : ""
+          } registrada${inasistencias > 1 ? "s" : ""}.`;
+    }
+    
+    // Caso por defecto
+    return "No hay información disponible sobre inasistencias.";
+  };
+
   return (
     <div className="container mt-4 pt-5 pb-5">
       <h3 className="text-center mb-4 text-white">Inasistencias</h3>
@@ -63,7 +83,7 @@ function CantInasistencias() {
             setHijoSeleccionado(e.target.value);
             setCargando(true); // 🟡 muestra "Cargando..." al cambiar de hijo
           }}
-          value={hijoSeleccionado}
+          value={hijoSeleccionado || ""}
           style={{ color: "black" }}
         >
           <option value="">Seleccione un hijo</option>
@@ -75,17 +95,17 @@ function CantInasistencias() {
         </select>
       </div>
 
-      {cargando ? (
+      {cargando && hijoSeleccionado ? (
         <div className="alert alert-info mt-3">Cargando...</div>
       ) : error ? (
         <div className="alert alert-danger mt-3">{error}</div>
-      ) : (
+      ) : hijoSeleccionado ? (
         <div className="alert alert-success mt-3">
-          {inasistencias === 0
-            ? "No tiene inasistencias registradas."
-            : `Tiene ${inasistencias} inasistencia${
-                inasistencias > 1 ? "s" : ""
-              } registrada${inasistencias > 1 ? "s" : ""}.`}
+          {getMensajeInasistencias()}
+        </div>
+      ) : (
+        <div className="alert alert-info mt-3">
+          Seleccione un hijo para ver sus inasistencias.
         </div>
       )}
     </div>
