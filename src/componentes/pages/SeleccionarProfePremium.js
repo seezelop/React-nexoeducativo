@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Alert, Spinner, Container, Form, Card, Row, Col } from 'react-bootstrap';
 import axios from 'axios';
 
@@ -12,7 +12,11 @@ const SeleccionarProfePremium = () => {
   const [error, setError] = useState(null);
   const [profesorSeleccionado, setProfesorSeleccionado] = useState('');
   const [infoProfesor, setInfoProfesor] = useState(null);
-  const [planValido, setPlanValido] = useState(null); // null: no verificado, true: válido, false: no válido
+  const [planValido, setPlanValido] = useState(null);
+  
+  // Referencias para controlar si ya se ejecutaron las llamadas
+  const planVerificado = useRef(false);
+  const profesoresCargados = useRef(false);
 
   const api = axios.create({
     baseURL: process.env.REACT_APP_API_URL,
@@ -20,6 +24,9 @@ const SeleccionarProfePremium = () => {
 
   // Verificar el plan al cargar el componente
   useEffect(() => {
+    // Evitar llamadas repetidas si ya se verificó el plan
+    if (planVerificado.current) return;
+    
     const verificarPlan = async () => {
       setLoading(prev => ({ ...prev, general: true }));
       try {
@@ -27,6 +34,7 @@ const SeleccionarProfePremium = () => {
           withCredentials: true
         });
         setPlanValido(response.data === 2);
+        planVerificado.current = true; // Marcar como verificado
       } catch (err) {
         setError('Error al verificar el plan de la escuela: ' + (err.response?.data || err.message));
         setPlanValido(false);
@@ -36,11 +44,11 @@ const SeleccionarProfePremium = () => {
     };
 
     verificarPlan();
-  }, [api]);
+  }, []);  // Eliminar api de las dependencias para evitar llamadas adicionales
 
   // Cargar profesores solo si el plan es válido
   useEffect(() => {
-    if (planValido) {
+    if (planValido && !profesoresCargados.current) {
       const cargarProfesores = async () => {
         setLoading(prev => ({ ...prev, profesores: true }));
         try {
@@ -54,6 +62,7 @@ const SeleccionarProfePremium = () => {
           }));
 
           setProfesores(profesores);
+          profesoresCargados.current = true; // Marcar como cargados
         } catch (error) {
           setError('Error al cargar los profesores: ' + (error.response?.data || error.message));
         } finally {
@@ -63,7 +72,7 @@ const SeleccionarProfePremium = () => {
 
       cargarProfesores();
     }
-  }, [api, planValido]); 
+  }, [planValido]);  // Eliminar api de las dependencias
 
   const handleProfesorChange = async (e) => {
     const idUsuario = e.target.value;
@@ -153,7 +162,7 @@ const SeleccionarProfePremium = () => {
               <p><strong>Horas Totales:</strong> {infoProfesor.cantHoras}</p>
               <p><strong>Asistencias:</strong></p>
               <ul>
-                {infoProfesor.asistencias.map((asistencia, index) => (
+                {infoProfesor.asistencias && infoProfesor.asistencias.map((asistencia, index) => (
                   <li key={index}>{asistencia}</li>
                 ))}
               </ul>
