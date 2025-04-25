@@ -59,6 +59,7 @@ function CantInasistencias() {
     
     // Si es un número
     if (typeof inasistencias === "number") {
+      console.log('LO QUE SE VE DE INASISTENCIAS: '+inasistencias)
       return inasistencias === 0
         ? "No tiene inasistencias registradas."
         : `Tiene ${inasistencias} inasistencia${
