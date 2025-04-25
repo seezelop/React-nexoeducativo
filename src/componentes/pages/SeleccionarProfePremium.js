@@ -12,25 +12,31 @@ const SeleccionarProfePremium = () => {
   const [error, setError] = useState(null);
   const [profesorSeleccionado, setProfesorSeleccionado] = useState('');
   const [infoProfesor, setInfoProfesor] = useState(null);
-  const [planValido, setPlanValido] = useState(null);
+  const [planValido, setPlanValido] = useState(null); // null: no verificado, true: válido, false: no válido
   
-  // Referencias para controlar si ya se ejecutaron las llamadas
+  // Referencias para controlar si ya se ejecutaron las llamadas y para mantener la instancia de API
   const planVerificado = useRef(false);
   const profesoresCargados = useRef(false);
+  const apiRef = useRef(null);
 
-  const api = axios.create({
-    baseURL: process.env.REACT_APP_API_URL,
-  });
+  // Inicializar la API una vez
+  useEffect(() => {
+    if (!apiRef.current) {
+      apiRef.current = axios.create({
+        baseURL: process.env.REACT_APP_API_URL,
+      });
+    }
+  }, []);
 
   // Verificar el plan al cargar el componente
   useEffect(() => {
     // Evitar llamadas repetidas si ya se verificó el plan
-    if (planVerificado.current) return;
+    if (planVerificado.current || !apiRef.current) return;
     
     const verificarPlan = async () => {
       setLoading(prev => ({ ...prev, general: true }));
       try {
-        const response = await api.get('/api/usuario/getPlanEscuela', {
+        const response = await apiRef.current.get('/api/usuario/getPlanEscuela', {
           withCredentials: true
         });
         setPlanValido(response.data === 2);
@@ -44,15 +50,15 @@ const SeleccionarProfePremium = () => {
     };
 
     verificarPlan();
-  }, []);  // Eliminar api de las dependencias para evitar llamadas adicionales
+  }, []);
 
   // Cargar profesores solo si el plan es válido
   useEffect(() => {
-    if (planValido && !profesoresCargados.current) {
+    if (planValido && !profesoresCargados.current && apiRef.current) {
       const cargarProfesores = async () => {
         setLoading(prev => ({ ...prev, profesores: true }));
         try {
-          const response = await api.get(`/api/usuario/getUsuarios/profesor`, {
+          const response = await apiRef.current.get(`/api/usuario/getUsuarios/profesor`, {
             withCredentials: true,
           });
 
@@ -72,16 +78,16 @@ const SeleccionarProfePremium = () => {
 
       cargarProfesores();
     }
-  }, [planValido]);  // Eliminar api de las dependencias
+  }, [planValido]);
 
   const handleProfesorChange = async (e) => {
     const idUsuario = e.target.value;
     setProfesorSeleccionado(idUsuario);
 
-    if (idUsuario) {
+    if (idUsuario && apiRef.current) {
       setLoading(prev => ({ ...prev, info: true }));
       try {
-        const response = await api.get(`/api/usuario/verInfoProfe/${idUsuario}`, {
+        const response = await apiRef.current.get(`/api/usuario/verInfoProfe/${idUsuario}`, {
           withCredentials: true,
         });
 
@@ -162,9 +168,13 @@ const SeleccionarProfePremium = () => {
               <p><strong>Horas Totales:</strong> {infoProfesor.cantHoras}</p>
               <p><strong>Asistencias:</strong></p>
               <ul>
-                {infoProfesor.asistencias && infoProfesor.asistencias.map((asistencia, index) => (
-                  <li key={index}>{asistencia}</li>
-                ))}
+                {infoProfesor.asistencias && infoProfesor.asistencias.length > 0 ? (
+                  infoProfesor.asistencias.map((asistencia, index) => (
+                    <li key={index}>{asistencia}</li>
+                  ))
+                ) : (
+                  <li>No hay asistencias registradas</li>
+                )}
               </ul>
             </Card.Body>
           </Card>
