@@ -76,10 +76,6 @@ function BajaEvento() {
       return;
     }
 
-    // Obtener información del evento seleccionado para la confirmación
-    //const eventoAEliminar = eventos.find(evento => evento.idEvento.toString() === eventoSeleccionado.toString());
-    //const nombreEvento = eventoAEliminar ? eventoAEliminar.nombre || `ID: ${eventoSeleccionado}` : `ID: ${eventoSeleccionado}`;
-
     // Confirmación antes de eliminar
     const confirmar = window.confirm(`¿Está seguro que desea eliminar el evento? Esta acción no se puede deshacer.`);
 
@@ -151,8 +147,8 @@ function BajaEvento() {
           <Form.Group className="mb-3">
             <Form.Label>Seleccionar Evento</Form.Label>
             {eventos.length > 0 ? (
-              <Card className="border-light bg-transparent">
-                <ListGroup variant="flush" className="bg-transparent">
+              <Card className="border-light">
+                <ListGroup variant="flush">
                   {eventos.map((evento) => (
                     <ListGroup.Item
                       key={evento.idEvento}
@@ -161,11 +157,10 @@ function BajaEvento() {
                       onClick={() => setEventoSeleccionado(evento.idEvento.toString())}
                       disabled={cargando}
                       style={{
-                        backgroundColor: eventoSeleccionado === evento.idEvento.toString() ? 'rgba(255, 255, 255, 0.1)' : 'transparent',
-                        color: 'white',
-                        border: 'none' // Elimina posibles bordes blancos
+                        backgroundColor: eventoSeleccionado === evento.idEvento.toString() ? '#0d6efd' : '#f8f9fa',
+                        color: eventoSeleccionado === evento.idEvento.toString() ? 'white' : 'black',
+                        cursor: 'pointer'
                       }}
-                      className="border-0 text-white bg-transparent"
                     >
                       <div className="d-flex justify-content-between align-items-center">
                         <div>
@@ -186,7 +181,6 @@ function BajaEvento() {
             )}
           </Form.Group>
         )}
-
 
         {/* Botón de eliminar */}
         <Button
